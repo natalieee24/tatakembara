@@ -591,15 +591,16 @@
             border-color: #E74C3C;
         }
 
-        /* ===== iframe 游戏容器 ===== */
+        /* ===== iframe 游戏容器 — 全屏覆盖 ===== */
         #game-slot {
             display: none;
-            position: absolute;
-            inset: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             background: #000;
-            z-index: 350;
-            border-radius: 16px;
-            overflow: hidden;
+            z-index: 9999;
         }
         #game-slot.show { display: block; }
         #game-iframe {
@@ -611,15 +612,17 @@
         /* 加载中遮罩 */
         #game-loading {
             display: none;
-            position: absolute;
-            inset: 0;
-            background: rgba(10, 10, 20, 0.92);
-            z-index: 360;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 10, 20, 0.96);
+            z-index: 10000;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             gap: 14px;
-            border-radius: 16px;
         }
         #game-loading.show { display: flex; }
         #game-loading p {
