@@ -925,6 +925,7 @@
         locked: true,
         selectedChar: 'male',
         currentEvents: [],
+        proximityCooldown: false,
     };
 
     // ============================================================
@@ -1188,6 +1189,7 @@
     const BOARD_OPEN_RADIUS = 52;   // radius to auto-open board
 
     function checkProximity() {
+        if (S.proximityCooldown) return;
         const n = N;
 
         // Board 1
@@ -1542,7 +1544,7 @@
     //  GAME FILE MAP
     // ============================================================
     const GAME_FILES = {
-        1: { file: 'katanama.html', method: 'iframe' },
+        1: { file: 'katanama.html', method: 'redirect' },
         2: { file: 'game2.html',    method: 'redirect' },
         3: { file: null,            method: 'placeholder' },
     };
@@ -2007,6 +2009,10 @@
                     gc.setAttribute('tabindex', '-1');
                     gc.focus({ preventScroll: true });
                 }, 200);
+
+                // [fix proximity] Beri masa pemain bergerak sebelum proximity check aktif semula
+                S.proximityCooldown = true;
+                setTimeout(() => { S.proximityCooldown = false; }, 1500);
 
                 // [fix game lock] Proses keputusan game
                 if (curBoard > 0) {

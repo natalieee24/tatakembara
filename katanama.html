@@ -1621,7 +1621,24 @@ window.kembaliKeMenu = function() {
     });
 };
 
-window.kembaliKeLobi = function() { /* dikendalikan oleh induk */ };
+window.kembaliKeLobi = function(isWin) {
+    // Simpan state dan redirect kembali ke TataKembara
+    let st = {};
+    try { st = JSON.parse(sessionStorage.getItem('tk_state') || '{}'); } catch(e) {}
+    if (isWin) st.game1Done = true;
+    st.returnBoard = 1;
+    st.gamePassed = isWin ? true : false;
+    sessionStorage.setItem('tk_state', JSON.stringify(st));
+
+    // Cuba postMessage kalau dalam iframe, kalau tidak redirect
+    try {
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'GAME_DONE', game: 1, passed: isWin }, '*');
+            return;
+        }
+    } catch(e) {}
+    window.location.href = 'index.html';
+};
 window.getGameScore = function() { return state.score; };
 window.resetGame = function() { initGame(); };
 </script>
