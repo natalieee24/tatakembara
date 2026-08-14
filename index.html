@@ -1547,50 +1547,60 @@
         3: null,   // belum siap — akan guna fallback
     };
 
+    // ============================================================
+    //  GAME FILE MAP
+    // ============================================================
+    const GAME_FILES = {
+        1: { file: 'katanama.html', method: 'iframe' },
+        2: { file: 'game2.html',    method: 'redirect' },
+        3: { file: null,            method: 'placeholder' },
+    };
+
     function startGame() {
         closeModal();
         S.locked = true;
 
-        const file = GAME_FILES[curBoard];
+        const game = GAME_FILES[curBoard];
 
-        if (!file) {
+        if (!game || !game.file) {
             _showPlaceholder(curBoard);
             return;
         }
 
+        if (game.method === 'redirect') {
+            // Simpan state dalam sessionStorage, redirect ke game
+            sessionStorage.setItem('tk_state', JSON.stringify({
+                lives: S.lives,
+                game1Done: S.game1Done,
+                game2Done: S.game2Done,
+                game3Done: S.game3Done,
+                eventsUnlocked: S.eventsUnlocked,
+                selectedChar: S.selectedChar,
+                returnBoard: curBoard,
+            }));
+            window.location.href = game.file;
+            return;
+        }
+
+        // method === 'iframe'
         const loading = document.getElementById('game-loading');
         const slot = document.getElementById('game-slot');
         const iframe = document.getElementById('game-iframe');
 
         iframe.onload = null;
         iframe.removeAttribute('src');
-
         loading.classList.add('show');
         slot.classList.add('show');
 
-        // Tutup loading sebaik iframe selesai load
-        // Cuba inject kembaliKeLobi (untuk katanama.html yang menyokongnya)
-        // game2.html akan guna postMessage sebagai alternatif
         iframe.onload = function () {
             loading.classList.remove('show');
             try {
-                iframe.contentWindow.kembaliKeLobi = function () {
-                    finishGame();
-                };
-            } catch (e) {
-                // game2 akan guna postMessage — tidak perlu buat apa-apa di sini
-            }
+                iframe.contentWindow.kembaliKeLobi = function () { finishGame(); };
+            } catch (e) {}
         };
 
-        setTimeout(function () { iframe.src = file; }, 50);
+        setTimeout(function () { iframe.src = game.file; }, 50);
     }
-
-    // Dengar postMessage dari game2 (atau mana-mana game lain)
-    window.addEventListener('message', function (e) {
-        if (e.data && e.data.type === 'GAME_DONE') {
-            finishGame();
-        }
-    });
 
     function _showPlaceholder(num) {
         // Fallback untuk game yang belum siap
@@ -1904,12 +1914,68 @@
         }, 300);
     }
 
+    // Dengar postMessage dari iframe games
+    window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'GAME_DONE') {
+            finishGame();
+        }
+    });
+
     // ============================================================
     //  INIT
     // ============================================================
     window.addEventListener('load', () => {
         buildWorld();
         updateHUD();
+
+        // Semak sama ada kembali dari redirect game (game2, game3)
+        const saved = sessionStorage.getItem('tk_state');
+        if (saved) {
+            sessionStorage.removeItem('tk_state');
+            try {
+                const st = JSON.parse(saved);
+                S.lives        = st.lives        ?? S.lives;
+                S.game1Done    = st.game1Done    ?? false;
+                S.game2Done    = st.game2Done    ?? false;
+                S.game3Done    = st.game3Done    ?? false;
+                S.eventsUnlocked = st.eventsUnlocked ?? false;
+                S.selectedChar = st.selectedChar ?? 'male';
+                curBoard       = st.returnBoard  ?? 0;
+
+                // Tetapkan watak
+                const imgSrc = S.selectedChar === 'male' ? IMAGES.playerMale : IMAGES.playerFemale;
+                document.getElementById('playerImg').src = imgSrc;
+
+                // Langkau skrin pilih watak, terus ke lobi
+                document.getElementById('character-select').classList.add('hidden');
+                S.locked = false;
+                updateHUD();
+                S.currentEvents = getRandomEvents();
+                updateEventObjects();
+
+                // Tanda board yang sudah selesai
+                if (S.game1Done) {
+                    const b1 = document.getElementById('board1');
+                    if (b1) b1.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 1</div><div class="board-label">Kata Nama</div>';
+                }
+                if (S.game2Done) {
+                    const b2 = document.getElementById('board2');
+                    if (b2) b2.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 2</div><div class="board-label">Ayat Aktif→Pasif</div>';
+                }
+
+                // Jalankan finishGame untuk board yang baru selesai
+                if (curBoard > 0) finishGame();
+                else {
+                    S.locked = false;
+                    playBGM();
+                    entryAnimation();
+                }
+                return;
+            } catch(e) {
+                console.warn('State restore failed:', e);
+            }
+        }
+
         document.getElementById('character-select').classList.remove('hidden');
         S.locked = true;
         setTimeout(() => resizeCanvas(), 100);

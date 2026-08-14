@@ -3440,28 +3440,34 @@
     });
 
     // ============================================================
-    //  ANTARA MUKA LOBI — postMessage kepada TataKembara
+    //  ANTARA MUKA LOBI — redirect kembali ke TataKembara
     // ============================================================
-    function balikKeLobi() {
+    function balikKeLobi(gameDone) {
       sound.stopBGM();
-      // Cuba inject dulu, kalau gagal guna postMessage
+      // Baca state yang disimpan dari TataKembara
+      let st = {};
+      try { st = JSON.parse(sessionStorage.getItem('tk_state') || '{}'); } catch(e) {}
+
+      if (gameDone) st.game2Done = true;
+      st.returnBoard = gameDone ? 2 : 0;
+      sessionStorage.setItem('tk_state', JSON.stringify(st));
+
+      // Cuba postMessage dulu (kalau dalam iframe), kalau gagal redirect
       try {
-        if (window.kembaliKeLobi && typeof window.kembaliKeLobi === 'function') {
-          window.kembaliKeLobi();
+        if (window.parent !== window) {
+          window.parent.postMessage({ type: 'GAME_DONE', game: 2 }, '*');
           return;
         }
       } catch(e) {}
-      // Fallback: hantar mesej kepada parent (TataKembara)
-      try {
-        window.parent.postMessage({ type: 'GAME_DONE', game: 2 }, '*');
-      } catch(e) {}
+
+      window.location.href = 'index.html';
     }
 
-    document.getElementById('btn-lobi-vic').addEventListener('click', balikKeLobi);
-    document.getElementById('btn-lobi-go').addEventListener('click', balikKeLobi);
+    document.getElementById('btn-lobi-vic').addEventListener('click', () => balikKeLobi(true));
+    document.getElementById('btn-lobi-go').addEventListener('click', () => balikKeLobi(false));
 
     window.kembaliKeLobi = function () {
-      // Diisi oleh induk (TataKembara) — jangan buang baris ini
+      balikKeLobi(true);
     };
 
     window.getGameScore = function () {
