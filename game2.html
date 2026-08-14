@@ -3450,12 +3450,13 @@
 
       if (gameDone) st.game2Done = true;
       st.returnBoard = gameDone ? 2 : 0;
+      st.game2Passed = gameDone;
       sessionStorage.setItem('tk_state', JSON.stringify(st));
 
       // Cuba postMessage dulu (kalau dalam iframe), kalau gagal redirect
       try {
         if (window.parent !== window) {
-          window.parent.postMessage({ type: 'GAME_DONE', game: 2 }, '*');
+          window.parent.postMessage({ type: 'GAME_DONE', game: 2, passed: gameDone }, '*');
           return;
         }
       } catch(e) {}

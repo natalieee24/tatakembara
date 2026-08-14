@@ -1558,8 +1558,10 @@
             return;
         }
 
+        // [fix 2] Pause lobi BGM sebelum masuk game
+        if (bgm) bgm.pause();
+
         if (game.method === 'redirect') {
-            // Simpan state dalam sessionStorage, redirect ke game
             sessionStorage.setItem('tk_state', JSON.stringify({
                 lives: S.lives,
                 game1Done: S.game1Done,
@@ -1586,7 +1588,7 @@
         iframe.onload = function () {
             loading.classList.remove('show');
             try {
-                iframe.contentWindow.kembaliKeLobi = function () { finishGame(); };
+                iframe.contentWindow.kembaliKeLobi = function (passed) { finishGame(passed); };
             } catch (e) {}
         };
 
@@ -1612,8 +1614,7 @@
         document.getElementById('game-loading').classList.remove('show');
     }
 
-    function finishGame() {
-        // Kosongkan iframe dan sembunyi
+    function finishGame(gamePassed) {
         const iframe = document.getElementById('game-iframe');
         iframe.onload = null;
         iframe.src = '';
@@ -1621,31 +1622,54 @@
 
         document.getElementById('game-slot').classList.remove('show');
         document.getElementById('game-loading').classList.remove('show');
+
+        // [fix 2] Resume lobi BGM
+        if (bgm && isMusicOn) bgm.play().catch(() => {});
+
+        // [fix 3] Kembalikan focus supaya keyboard berfungsi serta-merta
+        setTimeout(() => {
+            window.focus();
+            const gc = document.getElementById('gameContainer');
+            gc.setAttribute('tabindex', '-1');
+            gc.focus({ preventScroll: true });
+        }, 100);
+
+        // [fix 1] 'failed' = player kalah, jangan mark done
+        const passed = gamePassed !== 'failed';
         S.locked = false;
 
         if (curBoard === 1) {
-            S.game1Done = true;
-            S.eventsUnlocked = true;
-            // Tandakan board sebagai selesai
-            const b1 = document.getElementById('board1');
-            if (b1) { b1.classList.remove('near'); b1.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 1</div><div class="board-label">Kata Nama</div>'; }
-            document.getElementById('progress-label').textContent = '✅ Game 1';
-            showPopup('🎉', 'Game 1 Selesai!', 'Objek rawak muncul!');
-            evObjects.forEach(ev => {
-                if (ev.type) ev.el.classList.add('visible');
-            });
+            if (passed) {
+                S.game1Done = true;
+                S.eventsUnlocked = true;
+                const b1 = document.getElementById('board1');
+                if (b1) { b1.classList.remove('near'); b1.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 1</div><div class="board-label">Kata Nama</div>'; }
+                document.getElementById('progress-label').textContent = '✅ Game 1';
+                showPopup('🎉', 'Game 1 Selesai!', 'Objek rawak muncul!');
+                evObjects.forEach(ev => { if (ev.type) ev.el.classList.add('visible'); });
+            } else {
+                showPopup('💪', 'Cuba Lagi!', 'Jalan ke GAME 1 semula!');
+            }
         } else if (curBoard === 2) {
-            S.game2Done = true;
-            const b2 = document.getElementById('board2');
-            if (b2) { b2.classList.remove('near'); b2.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 2</div><div class="board-label">Ayat Aktif→Pasif</div>'; }
-            document.getElementById('progress-label').textContent = '✅ Game 2';
-            showPopup('🎉', 'Game 2 Selesai!', 'Teruskan ke Game 3!');
+            if (passed) {
+                S.game2Done = true;
+                const b2 = document.getElementById('board2');
+                if (b2) { b2.classList.remove('near'); b2.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 2</div><div class="board-label">Ayat Aktif→Pasif</div>'; }
+                document.getElementById('progress-label').textContent = '✅ Game 2';
+                showPopup('🎉', 'Game 2 Selesai!', 'Teruskan ke Game 3!');
+            } else {
+                showPopup('💪', 'Cuba Lagi!', 'Jalan ke GAME 2 semula!');
+            }
         } else if (curBoard === 3) {
-            S.game3Done = true;
-            const b3 = document.getElementById('board3');
-            if (b3) { b3.classList.remove('near'); b3.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 3</div><div class="board-label">Ayat Pasif→Aktif</div>'; }
-            document.getElementById('progress-label').textContent = '✅ Semua Selesai!';
-            showPopup('🏆', 'Semua Selesai!', 'Pergi ke SELESAI!');
+            if (passed) {
+                S.game3Done = true;
+                const b3 = document.getElementById('board3');
+                if (b3) { b3.classList.remove('near'); b3.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 3</div><div class="board-label">Ayat Pasif→Aktif</div>'; }
+                document.getElementById('progress-label').textContent = '✅ Semua Selesai!';
+                showPopup('🏆', 'Semua Selesai!', 'Pergi ke SELESAI!');
+            } else {
+                showPopup('💪', 'Cuba Lagi!', 'Jalan ke GAME 3 semula!');
+            }
         }
     }
 
@@ -1908,7 +1932,7 @@
     // Dengar postMessage dari iframe games
     window.addEventListener('message', function (e) {
         if (e.data && e.data.type === 'GAME_DONE') {
-            finishGame();
+            finishGame(e.data.passed === false ? 'failed' : true);
         }
     });
 
@@ -1955,8 +1979,12 @@
                 }
 
                 // Jalankan finishGame untuk board yang baru selesai
-                if (curBoard > 0) finishGame();
-                else {
+                if (curBoard > 0) {
+                    // Resume BGM dan fix focus selepas redirect
+                    initBGM();
+                    setTimeout(() => playBGM(), 300);
+                    finishGame(st.game2Passed === false ? 'failed' : true);
+                } else {
                     S.locked = false;
                     playBGM();
                     entryAnimation();
