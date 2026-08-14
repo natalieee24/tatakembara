@@ -1,0 +1,3486 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kembara Gurun - Ayat Aktif → Ayat Pasif</title>
+  
+  <!-- Import Outfit font from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: #1c0d02; /* Deep desert dusk */
+      --panel-bg: rgba(43, 29, 20, 0.85); /* Warm sand-brown card background */
+      --panel-border: rgba(251, 191, 36, 0.2); /* Golden border */
+      --primary: #f59e0b; /* Golden amber */
+      --primary-glow: rgba(245, 158, 11, 0.4);
+      --secondary: #ef4444; /* Retro red */
+      --secondary-glow: rgba(239, 68, 68, 0.4);
+      --success: #10b981; /* Subway green */
+      --success-glow: rgba(16, 185, 129, 0.4);
+      --text-color: #fef3c7; /* Sand-white text */
+      --text-muted: #d97706; /* Golden brown text */
+      --diri-pertama: #3b82f6;
+      --diri-kedua: #10b981;
+      --diri-ketiga: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden !important;
+      position: fixed;
+      top: 0;
+      left: 0;
+      touch-action: none;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      background-image: linear-gradient(135deg, #1c0d02 0%, #451a03 100%);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Background image with overlay to make it look spectacular */
+    .bg-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('desert_background.png');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.35;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Main Container - Full screen landscape width */
+    #app-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      z-index: 1;
+      overflow: hidden !important;
+      background: rgba(28, 13, 2, 0.88);
+    }
+
+    /* Utility Screens style */
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 15px 20px;
+      z-index: 10;
+      transition: all 0.4s ease-in-out;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.95);
+      overflow: hidden !important;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+
+    /* Glassmorphic Panel Card */
+    .glass-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      padding: 18px 24px;
+      margin-bottom: 10px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 620px; /* Centered layout block */
+      max-height: 85vh;
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      text-align: center;
+      background: linear-gradient(to right, #fbbf24, #f97316);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      filter: drop-shadow(0 2px 10px rgba(245, 158, 11, 0.2));
+    }
+
+    .title-sub {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-color);
+      opacity: 0.8;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--primary);
+      border-left: 4px solid var(--primary);
+      padding-left: 10px;
+    }
+
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-color);
+      margin: 10px 0 6px 0;
+    }
+
+    p {
+      font-size: 0.9rem;
+      line-height: 1.4;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      color: #fff;
+      background: linear-gradient(135deg, #451a03 0%, #1c0d02 100%);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+      transition: 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(251, 191, 36, 0.4);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      border: none;
+      color: #1e140f;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 25px var(--primary);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      border: none;
+      box-shadow: 0 0 15px var(--secondary-glow);
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 0 25px var(--secondary);
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      border: none;
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-accent:hover {
+      box-shadow: 0 0 25px rgba(34, 197, 94, 0.6);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Speed Selector Buttons */
+    .speed-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--panel-border);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-radius: 10px;
+    }
+
+    .speed-btn:hover {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: var(--primary);
+    }
+
+    .speed-btn.active {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+      color: #1e140f !important;
+      font-weight: 800 !important;
+      border: 1px solid #fef08a !important;
+      box-shadow: 0 0 15px var(--primary-glow) !important;
+      transform: scale(1.03);
+    }
+
+    /* Controls Buttons */
+    .icon-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.05);
+    }
+
+    /* Level Selector Screen */
+    .level-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 650px;
+    }
+
+    .level-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .level-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--primary);
+      transform: translateY(-3px);
+    }
+
+    .level-card.senang { border-left: 5px solid var(--diri-kedua); }
+    .level-card.sederhana { border-left: 5px solid var(--diri-pertama); }
+    .level-card.susah { border-left: 5px solid var(--diri-ketiga); }
+    .level-card.semua { border-left: 5px solid var(--primary); }
+
+    .level-info h3 {
+      margin: 0 0 5px 0;
+      color: #fff;
+    }
+    
+    .level-info p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #d97706;
+    }
+
+    .level-arrow {
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    /* Panduan Modal */
+    .modal-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-container.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      width: 90%;
+      max-width: 600px;
+      max-height: 85vh;
+      background: #2d1b10;
+      border: 1px solid var(--primary);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+      box-shadow: 0 0 40px rgba(245, 158, 11, 0.25);
+    }
+
+    .modal-container.active .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 20px;
+      background: #451a03;
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      border: none;
+      padding: 0;
+      font-size: 1.3rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 1.8rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .close-btn:hover {
+      color: #fff;
+    }
+
+    .modal-tabs {
+      display: flex;
+      background: #451a03;
+      border-bottom: 1px solid var(--panel-border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 5px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: none;
+      border: none;
+      color: #d97706;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+      font-size: 0.9rem;
+    }
+
+    /* Style Guide Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      border: 1px solid rgba(251, 191, 36, 0.15);
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: rgba(251, 191, 36, 0.05);
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .tag-m { background-color: var(--diri-pertama); color: #fff; }
+    .tag-t { background-color: var(--diri-kedua); color: #fff; }
+    .tag-d { background-color: var(--diri-ketiga); color: #fff; }
+
+    /* Floating Game HUD on top of canvas wrapper */
+    #game-hud {
+      position: absolute;
+      top: 12px;
+      left: 70px; /* Leave space for Pause button */
+      width: calc(100% - 140px); /* Leave space for Pause and Mute buttons */
+      z-index: 15;
+      background: rgba(43, 29, 20, 0.9);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+
+    .hud-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .hud-label {
+      font-size: 0.65rem;
+      color: #d97706;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+    }
+
+    .hud-value {
+      font-size: 1.1rem;
+      color: var(--primary);
+      text-shadow: 0 0 5px rgba(245, 158, 11, 0.2);
+    }
+
+    /* Floating Question Panel on top of canvas wrapper */
+    #question-panel {
+      position: absolute;
+      top: 72px;
+      left: 15px;
+      width: calc(100% - 30px);
+      z-index: 15;
+      background: rgba(28, 13, 2, 0.92);
+      border: 1.5px solid var(--primary);
+      border-radius: 14px;
+      padding: 10px 15px;
+      text-align: center;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.7);
+    }
+
+    .question-prompt {
+      font-size: 0.75rem;
+      color: var(--secondary);
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.4;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    /* Game Area Canvas Wrapper - occupies full screen height */
+    #game-canvas-wrapper {
+      flex: 1;
+      position: relative;
+      background: #7c2d12;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+      object-fit: contain; /* Keeps widescreen aspect ratio without stretch */
+    }
+
+    /* Feedback Overlay */
+    #feedback-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(28, 13, 2, 0.97);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #feedback-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .feedback-icon {
+      font-size: 4rem;
+      margin-bottom: 15px;
+      animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+
+    .feedback-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .feedback-title.correct { color: var(--success); text-shadow: 0 0 15px var(--success-glow); }
+    .feedback-title.wrong { color: var(--secondary); text-shadow: 0 0 15px var(--secondary-glow); }
+
+    .feedback-card {
+      width: 100%;
+      max-width: 450px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+
+    .feedback-card h4 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #d97706;
+      margin-bottom: 8px;
+    }
+
+    .feedback-card p {
+      font-size: 1rem;
+      margin-bottom: 15px;
+      line-height: 1.4;
+    }
+
+    .feedback-card p.highlight {
+      font-weight: 600;
+      color: #fff;
+      background: rgba(255,255,255,0.05);
+      padding: 10px;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .feedback-explanation {
+      font-size: 0.9rem;
+      color: #d97706;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 15px;
+      margin-bottom: 0;
+    }
+
+    /* Swipe Overlay (Visual aid for mobile) */
+    .swipe-tutorial {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.6);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text-color);
+      opacity: 0.7;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      animation: pulse-glow 2s infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.9; }
+    }
+
+    .review-list {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      padding-right: 5px;
+    }
+
+    .review-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+    }
+
+    .review-item .wrong-text {
+      color: var(--secondary);
+      text-decoration: line-through;
+      margin-bottom: 4px;
+    }
+
+    .review-item .correct-text {
+      color: var(--success);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-image"></div>
+
+  <!-- Audio Toggle -->
+  <button id="mute-btn" class="icon-btn" title="Pasang/Senyap Muzik">
+    <svg id="volume-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+    </svg>
+  </button>
+
+  <!-- Pause Toggle -->
+  <button id="pause-btn" class="icon-btn" style="right: auto; left: 20px; display: none;" title="Jeda/Teruskan Permainan (Spacebar)">
+    <svg id="pause-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="6" y="4" width="4" height="16" fill="currentColor"></rect>
+      <rect x="14" y="4" width="4" height="16" fill="currentColor"></rect>
+    </svg>
+  </button>
+
+  <div id="app-container">
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="screen active" style="justify-content: flex-start; padding-top: 20px;">
+      <div class="menu-logo-container" style="text-align: center; margin-bottom: 4px;">
+        <div class="runner-art" style="font-size: 1.8rem; margin: 0; margin-bottom: 6px;">🌵 🍄🏃💨🐺</div>
+        <h1 style="font-size: 2.4rem; margin: 0; line-height: 1.1; margin-bottom: 4px;">Kembara Gurun</h1>
+        <h1 style="font-size: 1.5rem; color: var(--secondary); margin-top: 0; margin-bottom: 12px; line-height: 1.1;">Ayat Aktif → Pasif</h1>
+      </div>
+
+      <div class="glass-card" style="padding: 20px 28px; margin-bottom: 6px; max-width: 680px;">
+        <!-- Game Speed Selector -->
+        <div style="margin-bottom: 8px; text-align: center;">
+          <span style="font-size: 0.9rem; color: var(--text-color); opacity: 0.75; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Kelajuan Larian</span>
+          <div class="speed-selector" style="display: flex; gap: 6px; justify-content: center;">
+            <button class="btn speed-btn active" data-speed="slow" style="flex: 1; padding: 10px 12px; margin: 0; font-size: 1.0rem;">🐢 Perlahan</button>
+            <button class="btn speed-btn" data-speed="normal" style="flex: 1; padding: 10px 12px; margin: 0; font-size: 1.0rem;">🚶 Biasa</button>
+            <button class="btn speed-btn" data-speed="fast" style="flex: 1; padding: 10px 12px; margin: 0; font-size: 1.0rem;">⚡ Laju</button>
+          </div>
+        </div>
+
+        <div style="text-align: left; background: rgba(0, 0, 0, 0.25); padding: 14px 20px; border-radius: 10px; border: 1px solid var(--panel-border); margin-bottom: 14px;">
+          <h3 style="font-size: 1.1rem; color: var(--primary); margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1px; text-align: center; border-bottom: 1px solid rgba(251, 191, 36, 0.2); padding-bottom: 4px;">📜 Syarat & Peraturan Permainan</h3>
+          <ol style="font-size: 1.0rem; line-height: 1.45; padding-left: 20px; color: var(--text-color);">
+            <li style="margin-bottom: 6px;"><strong>Larian & Jawapan Betul:</strong> Bantu <strong>Wira Kembara</strong> berlari di landasan padang pasir dan pilih papan tanda pasif betul.</li>
+            <li style="margin-bottom: 6px;"><strong>Syiling & Skor:</strong> Kumpul syiling 🪙 & kekalkan streak jawapan betul untuk bonus.</li>
+            <li style="margin-bottom: 0;"><strong>Nyawa & Halangan:</strong> Elakkan barikade kayu/batu 🪵🪨. Anda dibekalkan <strong>3 Nyawa (❤️)</strong>; melanggar halangan menolak 1 Nyawa.</li>
+          </ol>
+        </div>
+        <button id="btn-play-menu" class="btn btn-primary" style="padding: 12px 20px; font-size: 1.2rem; margin-bottom: 8px;">Mula Bermain</button>
+        <button id="btn-panduan" class="btn" style="padding: 12px 20px; font-size: 1.2rem;">Panduan Tatabahasa</button>
+      </div>
+      
+      <p style="text-align: center; font-size: 0.9rem; color: var(--text-color); opacity: 0.5; margin: 0; margin-top: 8px;">
+        Ketik bahagian kiri, tengah, atau kanan skrin untuk menukar landasan wira.
+      </p>
+    </div>
+
+    <!-- LEVEL SELECTION SCREEN -->
+    <div id="level-screen" class="screen">
+      <h2>Pilih Tahap Cabaran</h2>
+      <p class="title-sub" style="text-align: left; margin-bottom: 20px;">Pilih tahap kesukaran untuk memulakan larian.</p>
+
+      <div class="level-grid">
+        <div class="level-card senang" data-difficulty="senang">
+          <div class="level-info">
+            <h3>Tahap Senang</h3>
+            <p>Subjek Diri Pertama/Kedua/Ketiga ringkas. (6 Soalan)</p>
+          </div>
+          <div class="level-arrow">⚡</div>
+        </div>
+
+        <div class="level-card sederhana" data-difficulty="sederhana">
+          <div class="level-info">
+            <h3>Tahap Sederhana</h3>
+            <p>Ayat lebih panjang berserta keterangan. (8 Soalan)</p>
+          </div>
+          <div class="level-arrow">⚡⚡</div>
+        </div>
+
+        <div class="level-card susah" data-difficulty="susah">
+          <div class="level-info">
+            <h3>Tahap Susah</h3>
+            <p>Subjek ganti diri klasik (patik, tuanku, hamba). (6 Soalan)</p>
+          </div>
+          <div class="level-arrow">⚡⚡⚡</div>
+        </div>
+
+        <div class="level-card semua" data-difficulty="semua">
+          <div class="level-info">
+            <h3>Cabaran Infiniti</h3>
+            <p>Semua 20 soalan secara rawak tanpa henti!</p>
+          </div>
+          <div class="level-arrow">🏆</div>
+        </div>
+      </div>
+
+      <button id="btn-back-levels" class="btn" style="margin-top: 30px; max-width: 250px;">Kembali ke Menu</button>
+    </div>
+
+    <!-- PLAYING CANVAS SCREEN (Full screen height wrapper) -->
+    <div id="game-screen" class="screen" style="padding: 0; display: flex; flex-direction: column;">
+      <div id="game-canvas-wrapper" style="flex: 1; position: relative;">
+        
+        <!-- Floating HUD (Z-Index 15) placed inside canvas wrapper so it floats correctly on top of canvas -->
+        <div id="game-hud" style="display: none; z-index: 15;">
+          <div class="hud-item">
+            <span class="hud-label">Skor</span>
+            <span id="hud-score" class="hud-value">0</span>
+          </div>
+          
+          <div class="hud-item" style="align-items: center; flex: 1;">
+            <span class="hud-label">Nyawa</span>
+            <span id="hud-lives" style="font-size: 1.15rem; letter-spacing: 1px;">❤️ ❤️ ❤️</span>
+          </div>
+
+          <div class="hud-item" style="text-align: right; align-items: flex-end;">
+            <span class="hud-label">Streak</span>
+            <span id="hud-streak" class="hud-value" style="color: var(--primary);">0x</span>
+          </div>
+        </div>
+
+        <!-- Floating Question Panel (Z-Index 15) placed inside canvas wrapper -->
+        <div id="question-panel" style="display: none; z-index: 15;">
+          <div id="question-lvl-badge" class="question-prompt">TAHAP SENANG - SOALAN 1/20</div>
+          <div id="question-text" class="question-text">Saya membaca buku.</div>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+        <div class="swipe-tutorial">
+          <span>⌨️ Arrow Kiri/Kanan: Bergerak | Spacebar/⬆️/W: Melompat | Tombol P: Jeda</span>
+        </div>
+
+        <!-- Pause Overlay Panel (Z-Index 20) -->
+        <div id="pause-overlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 20; color: #fff; flex-direction: column;">
+          <!-- Glassmorphic Modal Box -->
+          <div class="glass-card" style="max-width: 600px; width: 90%; padding: 35px 30px; text-align: center; border: 2px solid var(--secondary); box-shadow: 0 0 25px rgba(245, 158, 11, 0.4); border-radius: 16px; background: rgba(30, 41, 59, 0.95); position: relative;">
+            
+            <!-- Circle Pause icon -->
+            <div style="width: 70px; height: 70px; background: #7c2d12; border: 3px solid #fbbf24; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: -70px auto 20px auto; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fef08a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="4" width="4" height="16" fill="#fef08a"></rect>
+                <rect x="14" y="4" width="4" height="16" fill="#fef08a"></rect>
+              </svg>
+            </div>
+
+            <h2 style="color: #fbbf24; font-size: 1.8rem; margin: 0 0 15px 0; text-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);">PERMAINAN DIJEDA</h2>
+            
+            <div style="background: rgba(15, 23, 42, 0.5); padding: 15px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px;">
+              <span style="font-size: 0.8rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px;">Soalan Tatabahasa Aktif</span>
+              <p id="pause-question-text" style="font-size: 1.25rem; font-style: italic; font-weight: bold; margin: 0 0 5px 0; color: #fff;">Saya membaca buku.</p>
+              <p id="pause-question-type" style="font-size: 0.85rem; color: #a7f3d0; margin: 0;">Tukar kepada: Ayat Pasif (Jenis Pertama)</p>
+            </div>
+
+            <div style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 25px; line-height: 1.5; text-align: left; background: rgba(15, 23, 42, 0.3); padding: 12px 18px; border-radius: 8px;">
+              <strong style="color: #fbbf24; display: block; margin-bottom: 6px; font-size: 0.85rem; text-transform: uppercase;">🎮 Panduan Kawalan Larian:</strong>
+              <span>• <strong>⬅️ Kiri / ➡️ Kanan (A / D)</strong>: Tukar landasan Mario</span><br/>
+              <span>• <strong>Spacebar / ⬆️ Atas / W</strong>: Melompat melepasi halangan</span><br/>
+              <span>• <strong>Tombol P / Escape</strong>: Jeda / Teruskan permainan</span>
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: center;">
+              <button id="btn-pause-resume" class="btn btn-primary" style="margin: 0; min-width: 160px;">Teruskan Larian</button>
+              <button id="btn-pause-quit" class="btn" style="margin: 0; min-width: 140px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444;">Utama</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Transition Popup -->
+      <div id="feedback-overlay">
+        <div id="feedback-icon" class="feedback-icon">✅</div>
+        <div id="feedback-title" class="feedback-title correct">Betul!</div>
+        
+        <div class="feedback-card">
+          <h4>Ayat Aktif</h4>
+          <p id="feedback-active-text">Saya membaca buku.</p>
+          <h4>Ayat Pasif Betul</h4>
+          <p id="feedback-correct-text" class="highlight">Buku saya baca.</p>
+          <p id="feedback-explanation" class="feedback-explanation">Tip formula...</p>
+        </div>
+
+        <button id="btn-feedback-continue" class="btn btn-primary" style="max-width: 250px;">Teruskan Larian</button>
+      </div>
+    </div>
+
+    <!-- GAME OVER SCREEN -->
+    <div id="gameover-screen" class="screen">
+      <div class="menu-logo-container" style="margin-bottom: 20px;">
+        <div class="runner-art" style="animation: none;">🐺💥🍄</div>
+        <h1 style="color: var(--secondary);">Larian Terhenti!</h1>
+        <div class="title-sub">Ulangkaji membuat kita lebih bijak!</div>
+      </div>
+
+      <div class="glass-card">
+        <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 20px;">
+          <div>
+            <div class="hud-label">Skor Akhir</div>
+            <div id="go-score" class="hud-value" style="font-size: 2rem;">0</div>
+          </div>
+          <div>
+            <div class="hud-label">Soalan Dijawab</div>
+            <div id="go-answered" class="hud-value" style="font-size: 2rem; color: var(--secondary);">0</div>
+          </div>
+        </div>
+
+        <div id="go-review-container">
+          <h3 style="margin-top: 0; color: var(--secondary);">Latihan Pembetulan:</h3>
+          <div id="go-review-list" class="review-list">
+            <!-- Dynamic reviews -->
+          </div>
+        </div>
+
+        <button id="btn-restart-go" class="btn btn-primary">Main Semula</button>
+        <button id="btn-menu-go" class="btn">Menu Utama</button>
+        <button id="btn-lobi-go" class="btn" style="background: linear-gradient(135deg, #8B6914, #D4A017); border-color: #4a2c0a; margin-top: 8px;">🏠 Kembali ke Lobi</button>
+      </div>
+    </div>
+
+    <!-- VICTORY SCREEN -->
+    <div id="victory-screen" class="screen">
+      <div class="menu-logo-container" style="margin-bottom: 20px;">
+        <div class="runner-art">🏆🎉🥳</div>
+        <h1 style="color: var(--success);">Larian Selesai!</h1>
+        <div class="title-sub">Anda Master Ayat Pasif!</div>
+      </div>
+
+      <div class="glass-card">
+        <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 20px;">
+          <div>
+            <div class="hud-label">Skor</div>
+            <div id="vic-score" class="hud-value" style="font-size: 2rem;">0</div>
+          </div>
+          <div>
+            <div class="hud-label">Ketepatan</div>
+            <div id="vic-accuracy" class="hud-value" style="font-size: 2rem; color: var(--success);">100%</div>
+          </div>
+        </div>
+
+        <div id="vic-review-container">
+          <h3 style="margin-top: 0; color: var(--success);">Jawapan Anda:</h3>
+          <div id="vic-review-list" class="review-list">
+            <!-- Dynamic success list -->
+          </div>
+        </div>
+
+        <button id="btn-restart-vic" class="btn btn-accent">Main Semula</button>
+        <button id="btn-menu-vic" class="btn">Menu Utama</button>
+        <button id="btn-lobi-vic" class="btn" style="background: linear-gradient(135deg, #8B6914, #D4A017); border-color: #4a2c0a; margin-top: 8px;">🏠 Kembali ke Lobi</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INTERACTIVE PANDUAN MODAL -->
+  <div id="panduan-modal" class="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Panduan Tukar Ayat Aktif → Pasif</h2>
+        <button id="btn-close-panduan" class="close-btn">&times;</button>
+      </div>
+      
+      <div class="modal-tabs">
+        <button class="tab-btn active" data-tab="tab-ganti">1. Kata Ganti</button>
+        <button class="tab-btn" data-tab="tab-formula">2. Formula</button>
+        <button class="tab-btn" data-tab="tab-imbuhan">3. Kata Kerja</button>
+        <button class="tab-btn" data-tab="tab-contoh">4. Contoh Soalan</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- TAB 1: KATA GANTI NAMA DIRI -->
+        <div id="tab-ganti" class="tab-content">
+          <h3>1. Kenal Pasti Kata Ganti Nama Diri Subjek</h3>
+          <p>Sebelum menukar ayat aktif kepada ayat pasif, kenal pasti dahulu golongan kata ganti nama diri bagi subjek:</p>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Golongan</th>
+                <th>Kata Ganti Nama Diri</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tag tag-m">Diri Pertama</span></td>
+                <td>saya, aku, kami, kita, hamba, patik, beta</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-t">Diri Kedua</span></td>
+                <td>awak, kamu, anda, kalian, engkau, tuanku, tuan hamba</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-d">Diri Ketiga</span></td>
+                <td>ia, dia, beliau, mereka, baginda, -nya, serta nama khas / kata nama (e.g. emak, Suraya, ayah, guru)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TAB 2: FORMULA AYAT PASIF -->
+        <div id="tab-formula" class="tab-content" style="display: none;">
+          <h3>2. Formula Susunan Ayat Pasif</h3>
+          <p>Gunakan jenis formula yang betul berdasarkan subjek ayat aktif:</p>
+          
+          <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid var(--diri-pertama); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <strong style="color: var(--diri-pertama);">Jika Subjek = Diri Pertama / Kedua:</strong>
+            <p style="margin: 5px 0 0 0; font-size: 0.85rem; font-weight: 600;">Gunakan Ayat Pasif Jenis Pertama</p>
+            <p style="margin: 2px 0 0 0; font-size: 0.95rem; color: #fff;">Formula: Objek + Subjek + Kata Kerja</p>
+            <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: var(--text-color); opacity: 0.8;">*Nota: Buang imbuhan meN- pada kata kerja.</p>
+          </div>
+
+          <div style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--diri-ketiga); padding: 12px; border-radius: 8px;">
+            <strong style="color: var(--diri-ketiga);">Jika Subjek = Diri Ketiga / Nama Khas:</strong>
+            <p style="margin: 5px 0 0 0; font-size: 0.85rem; font-weight: 600;">Gunakan Ayat Pasif Jenis Kedua</p>
+            <p style="margin: 2px 0 0 0; font-size: 0.95rem; color: #fff;">Formula: Objek + Kata Kerja + oleh + Subjek</p>
+            <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: var(--text-color); opacity: 0.8;">*Nota: Tukar imbuhan meN- kepada di-.</p>
+          </div>
+        </div>
+
+        <!-- TAB 3: IMBUHAN KATA KERJA -->
+        <div id="tab-imbuhan" class="tab-content" style="display: none;">
+          <h3>3. Ringkasan Perubahan Kata Kerja</h3>
+          <p>Bagaimana kata kerja diubahsuai semasa penukaran:</p>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Ayat Aktif (Kata Kerja)</th>
+                <th>Pasif Jenis Pertama (Diri 1 & 2)</th>
+                <th>Pasif Jenis Kedua (Diri 3)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>menanak</strong> (awalan meN-)</td>
+                <td><strong>tanak</strong> (meN- digugurkan)</td>
+                <td><strong>ditanak</strong> (awalan di-)</td>
+              </tr>
+              <tr>
+                <td><strong>membaca</strong></td>
+                <td><strong>baca</strong></td>
+                <td><strong>dibaca</strong></td>
+              </tr>
+              <tr>
+                <td><strong>menyapu</strong></td>
+                <td><strong>sapu</strong></td>
+                <td><strong>disapu</strong></td>
+              </tr>
+              <tr>
+                <td><strong>melukis</strong></td>
+                <td><strong>lukis</strong></td>
+                <td><strong>dilukis</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TAB 4: CONTOH SOALAN -->
+        <div id="tab-contoh" class="tab-content" style="display: none;">
+          <h3>Contoh Soalan & Jawapan</h3>
+          <div style="max-height: 250px; overflow-y: auto;">
+            <p><strong>Senang:</strong></p>
+            <ul style="margin-left: 20px; margin-bottom: 15px; font-size: 0.85rem;">
+              <li>Saya membaca buku. → <strong>Buku saya baca.</strong></li>
+              <li>Dia menulis surat. → <strong>Surat ditulis olehnya.</strong></li>
+            </ul>
+            <p><strong>Sederhana:</strong></p>
+            <ul style="margin-left: 20px; margin-bottom: 15px; font-size: 0.85rem;">
+              <li>Kalian mencuci kereta itu di garaj. → <strong>Kereta itu kalian cuci di garaj.</strong></li>
+              <li>Ayah membaiki basikal adik semalam. → <strong>Basikal adik dibaiki oleh ayah semalam.</strong></li>
+            </ul>
+            <p><strong>Susah (Ganti Diri Klasik):</strong></p>
+            <ul style="margin-left: 20px; font-size: 0.85rem;">
+              <li>Patik menyembah baginda di istana. → <strong>Baginda patik sembah di istana.</strong></li>
+              <li>Tuanku mentadbir negeri itu dengan adil. → <strong>Negeri itu tuanku tadbir dengan adil.</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Audio Synthesis Manager (Web Audio API)
+    class SoundManager {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.bgmInterval = null;
+        this.tempo = 120; 
+        this.bgmSequence = [
+          // Upbeat Mario-style retro loop
+          [329.63, 0.15], [329.63, 0.15], [0, 0.15], [329.63, 0.15], 
+          [0, 0.15], [261.63, 0.15], [329.63, 0.15], [0, 0.15], 
+          [392.00, 0.15], [0, 0.30], [196.00, 0.15], [0, 0.30],
+          [261.63, 0.20], [0, 0.10], [196.00, 0.20], [0, 0.10], 
+          [164.81, 0.20], [0, 0.10], [220.00, 0.15], [246.94, 0.15], 
+          [233.08, 0.15], [220.00, 0.20]
+        ];
+        this.bgmStep = 0;
+        this.isPlayingBgm = false;
+      }
+
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        const icon = document.getElementById('volume-icon');
+        if (this.muted) {
+          icon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>`;
+          this.stopBGM();
+        } else {
+          icon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
+          this.init();
+          this.startBGM();
+        }
+      }
+
+      playTone(freq, type, duration, gainStart) {
+        if (this.muted || !this.ctx || freq === 0) return;
+        
+        try {
+          const osc = this.ctx.createOscillator();
+          const gainNode = this.ctx.createGain();
+          
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          
+          gainNode.gain.setValueAtTime(gainStart, this.ctx.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          
+          osc.connect(gainNode);
+          gainNode.connect(this.ctx.destination);
+          
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {
+          console.warn("Audio error: ", e);
+        }
+      }
+
+      playLaneSwitch() {
+        this.init();
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gainNode = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(700, this.ctx.currentTime + 0.12);
+          gainNode.gain.setValueAtTime(0.12, this.ctx.currentTime);
+          gainNode.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+          osc.connect(gainNode);
+          gainNode.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.12);
+        } catch (e) {}
+      }
+
+      playCorrect() {
+        this.init();
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        notes.forEach((freq, idx) => {
+          setTimeout(() => {
+            this.playTone(freq, 'sine', 0.25, 0.15);
+          }, idx * 50);
+        });
+      }
+
+      playWrong() {
+        this.init();
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gainNode = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(60, this.ctx.currentTime + 0.45);
+          
+          gainNode.gain.setValueAtTime(0.25, this.ctx.currentTime);
+          gainNode.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.45);
+          
+          osc.connect(gainNode);
+          gainNode.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.45);
+          
+          setTimeout(() => this.playBark(), 150);
+        } catch (e) {}
+      }
+
+      playBark() {
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc1 = this.ctx.createOscillator();
+          const osc2 = this.ctx.createOscillator();
+          const gainNode = this.ctx.createGain();
+          
+          osc1.type = 'sawtooth';
+          osc1.frequency.setValueAtTime(200, this.ctx.currentTime);
+          osc1.frequency.exponentialRampToValueAtTime(90, this.ctx.currentTime + 0.1);
+
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(150, this.ctx.currentTime);
+          osc2.frequency.exponentialRampToValueAtTime(70, this.ctx.currentTime + 0.1);
+          
+          gainNode.gain.setValueAtTime(0.3, this.ctx.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+          
+          osc1.connect(gainNode);
+          osc2.connect(gainNode);
+          gainNode.connect(this.ctx.destination);
+          
+          osc1.start();
+          osc2.start();
+          osc1.stop(this.ctx.currentTime + 0.1);
+          osc2.stop(this.ctx.currentTime + 0.1);
+        } catch(e){}
+      }
+
+      playGameOver() {
+        this.init();
+        this.stopBGM();
+        const notes = [329.63, 293.66, 261.63, 220.00, 196.00];
+        notes.forEach((freq, idx) => {
+          setTimeout(() => {
+            this.playTone(freq, 'triangle', 0.5, 0.2);
+          }, idx * 180);
+        });
+      }
+
+      playVictory() {
+        this.init();
+        this.stopBGM();
+        const melody = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+        melody.forEach((freq, idx) => {
+          setTimeout(() => {
+            this.playTone(freq, 'sine', 0.3, 0.15);
+          }, idx * 80);
+        });
+      }
+
+      startBGM() {
+        if (this.muted || this.isPlayingBgm) return;
+        this.init();
+        this.isPlayingBgm = true;
+        
+        const tick = () => {
+          if (!this.isPlayingBgm || this.muted) return;
+          const [freq, dur] = this.bgmSequence[this.bgmStep];
+          this.playTone(freq, 'square', dur * 0.95, 0.025); 
+          this.bgmStep = (this.bgmStep + 1) % this.bgmSequence.length;
+          
+          this.bgmInterval = setTimeout(tick, dur * 1000);
+        };
+        
+        tick();
+      }
+
+      stopBGM() {
+        this.isPlayingBgm = false;
+        if (this.bgmInterval) {
+          clearTimeout(this.bgmInterval);
+          this.bgmInterval = null;
+        }
+      }
+    }
+
+    const sound = new SoundManager();
+
+    // 20 Questions Data
+    const QUESTIONS_BANK = [
+      // SENANG (6 Soalan)
+      {
+        id: 1,
+        difficulty: 'senang',
+        active: 'Saya membaca buku.',
+        passive: 'Buku saya baca.',
+        type: 'Jenis Pertama',
+        subject: 'Saya (Diri Pertama)',
+        explanation: "Subjek ialah Kata Ganti Diri Pertama (<strong>saya</strong>). Gunakan formula Jenis Pertama: <strong>Objek + Subjek + Kata Kerja</strong> (buang imbuhan meN-). Jadi, 'buku' + 'saya' + 'baca' = <strong>Buku saya baca</strong>.",
+        distractors: ['Buku dibaca oleh saya.', 'Buku saya membaca.']
+      },
+      {
+        id: 2,
+        difficulty: 'senang',
+        active: 'Kamu menyapu lantai.',
+        passive: 'Lantai kamu sapu.',
+        type: 'Jenis Pertama',
+        subject: 'Kamu (Diri Kedua)',
+        explanation: "Subjek ialah Kata Ganti Diri Kedua (<strong>kamu</strong>). Gunakan formula Jenis Pertama: <strong>Objek + Subjek + Kata Kerja</strong> (buang imbuhan meN-). Jadi, 'lantai' + 'kamu' + 'sapu' = <strong>Lantai kamu sapu</strong>.",
+        distractors: ['Lantai disapu oleh kamu.', 'Lantai kamu menyapu.']
+      },
+      {
+        id: 3,
+        difficulty: 'senang',
+        active: 'Dia menulis surat.',
+        passive: 'Surat ditulis olehnya.',
+        type: 'Jenis Kedua',
+        subject: 'Dia (Diri Ketiga)',
+        explanation: "Subjek ialah Kata Ganti Diri Ketiga (<strong>dia</strong>). Gunakan formula Jenis Kedua: <strong>Objek + Kata Kerja (imbuhan di-) + oleh + Subjek (-nya)</strong>. Jadi, 'surat' + 'ditulis' + 'oleh' + 'nya' = <strong>Surat ditulis olehnya</strong>.",
+        distractors: ['Surat dia tulis.', 'Surat ditulis oleh dia.']
+      },
+      {
+        id: 4,
+        difficulty: 'senang',
+        active: 'Emak memasak nasi.',
+        passive: 'Nasi dimasak oleh emak.',
+        type: 'Jenis Kedua',
+        subject: 'Emak (Diri Ketiga/Nama Khas)',
+        explanation: "Subjek ialah Diri Ketiga/Kata Nama Khas (<strong>emak</strong>). Gunakan formula Jenis Kedua: <strong>Objek + Kata Kerja (di-) + oleh + Subjek</strong>. Jadi, <strong>Nasi dimasak oleh emak</strong>.",
+        distractors: ['Nasi emak masak.', 'Nasi dimasak emak.']
+      },
+      {
+        id: 5,
+        difficulty: 'senang',
+        active: 'Aku menutup pintu.',
+        passive: 'Pintu aku tutup.',
+        type: 'Jenis Pertama',
+        subject: 'Aku (Diri Pertama)',
+        explanation: "Subjek ialah Diri Pertama (<strong>aku</strong>). Gunakan formula Jenis Pertama: <strong>Objek + Subjek + Kata Kerja</strong> (buang meN-). Jadi, <strong>Pintu aku tutup</strong>.",
+        distractors: ['Pintu ditutup oleh aku.', 'Pintu aku menutup.']
+      },
+      {
+        id: 6,
+        difficulty: 'senang',
+        active: 'Mereka menonton filem.',
+        passive: 'Filem ditonton oleh mereka.',
+        type: 'Jenis Kedua',
+        subject: 'Mereka (Diri Ketiga)',
+        explanation: "Subjek ialah Diri Ketiga (<strong>mereka</strong>). Gunakan formula Jenis Kedua: <strong>Objek + Kata Kerja (di-) + oleh + Subjek</strong>. Jadi, <strong>Filem ditonton oleh mereka</strong>.",
+        distractors: ['Filem mereka tonton.', 'Filem ditonton mereka.']
+      },
+
+      // SEDERHANA (8 Soalan)
+      {
+        id: 7,
+        difficulty: 'sederhana',
+        active: 'Kalian mencuci kereta itu di garaj.',
+        passive: 'Kereta itu kalian cuci di garaj.',
+        type: 'Jenis Pertama',
+        subject: 'Kalian (Diri Kedua)',
+        explanation: "Subjek ialah Diri Kedua (<strong>kalian</strong>). Gunakan Jenis Pertama: <strong>Objek + Subjek + Kata Kerja + Penerangan</strong>. Jadi, <strong>Kereta itu kalian cuci di garaj</strong>.",
+        distractors: ['Kereta itu dicuci oleh kalian di garaj.', 'Kereta itu kalian mencuci di garaj.']
+      },
+      {
+        id: 8,
+        difficulty: 'sederhana',
+        active: 'Suraya melukis gambar bunga di taman.',
+        passive: 'Gambar bunga dilukis oleh Suraya di taman.',
+        type: 'Jenis Kedua',
+        subject: 'Suraya (Nama Khas / Diri Ketiga)',
+        explanation: "Subjek ialah Nama Khas (<strong>Suraya</strong>). Gunakan Jenis Kedua: <strong>Objek + Kata Kerja (di-) + oleh + Subjek + Penerangan</strong>. Jadi, <strong>Gambar bunga dilukis oleh Suraya di taman</strong>.",
+        distractors: ['Gambar bunga Suraya lukis di taman.', 'Gambar bunga dilukis Suraya di taman.']
+      },
+      {
+        id: 9,
+        difficulty: 'sederhana',
+        active: 'Beliau menandatangani dokumen itu pagi tadi.',
+        passive: 'Dokumen itu ditandatangani oleh beliau pagi tadi.',
+        type: 'Jenis Kedua',
+        subject: 'Beliau (Diri Ketiga)',
+        explanation: "Subjek ialah Diri Ketiga (<strong>beliau</strong>). Gunakan Jenis Kedua: <strong>Objek + Kata Kerja (di-) + oleh + Subjek + Keterangan</strong>. Jadi, <strong>Dokumen itu ditandatangani oleh beliau pagi tadi</strong>.",
+        distractors: ['Dokumen itu beliau tandatangan pagi tadi.', 'Dokumen itu ditandatangani beliau pagi tadi.']
+      },
+      {
+        id: 10,
+        difficulty: 'sederhana',
+        active: 'Kami membeli buah-buahan di pasar malam.',
+        passive: 'Buah-buahan kami beli di pasar malam.',
+        type: 'Jenis Pertama',
+        subject: 'Kami (Diri Pertama)',
+        explanation: "Subjek ialah Diri Pertama (<strong>kami</strong>). Gunakan Jenis Pertama: <strong>Objek + Subjek + Kata Kerja + Keterangan</strong>. Jadi, <strong>Buah-buahan kami beli di pasar malam</strong>.",
+        distractors: ['Buah-buahan dibeli oleh kami di pasar malam.', 'Buah-buahan kami membeli di pasar malam.']
+      },
+      {
+        id: 11,
+        difficulty: 'sederhana',
+        active: 'Guru itu mengajar murid-murid tingkatan lima.',
+        passive: 'Murid-murid tingkatan lima diajar oleh guru itu.',
+        type: 'Jenis Kedua',
+        subject: 'Guru itu (Diri Ketiga / Nama Khas)',
+        explanation: "Subjek ialah Diri Ketiga (<strong>guru itu</strong>). Gunakan Jenis Kedua: <strong>Objek + Kata Kerja (di-) + oleh + Subjek</strong>. Jadi, <strong>Murid-murid tingkatan lima diajar oleh guru itu</strong>.",
+        distractors: ['Murid-murid tingkatan lima guru itu ajar.', 'Murid-murid tingkatan lima diajar guru itu.']
+      },
+      {
+        id: 12,
+        difficulty: 'sederhana',
+        active: 'Ayah membaiki basikal adik semalam.',
+        passive: 'Basikal adik dibaiki oleh ayah semalam.',
+        type: 'Jenis Kedua',
+        subject: 'Ayah (Nama Khas / Diri Ketiga)',
+        explanation: "Subjek ialah Diri Ketiga (<strong>ayah</strong>). Gunakan Jenis Kedua: <strong>Objek + Kata Kerja (di-) + oleh + Subjek + Keterangan</strong>. Jadi, <strong>Basikal adik dibaiki oleh ayah semalam</strong>.",
+        distractors: ['Basikal adik ayah baiki semalam.', 'Basikal adik dibaiki ayah semalam.']
+      },
+      {
+        id: 13,
+        difficulty: 'sederhana',
+        active: 'Nina mengemas bilik tidurnya sebelum ke sekolah.',
+        passive: 'Bilik tidurnya dikemas oleh Nina sebelum ke sekolah.',
+        type: 'Jenis Kedua',
+        subject: 'Nina (Nama Khas)',
+        explanation: "Subjek ialah Nama Khas (<strong>Nina</strong>). Gunakan Jenis Kedua: <strong>Objek + Kata Kerja (di-) + oleh + Subjek + Keterangan</strong>. Jadi, <strong>Bilik tidurnya dikemas oleh Nina sebelum ke sekolah</strong>.",
+        distractors: ['Bilik tidurnya Nina kemas sebelum ke sekolah.', 'Bilik tidurnya dikemas Nina sebelum ke sekolah.']
+      },
+      {
+        id: 14,
+        difficulty: 'sederhana',
+        active: 'Anda mengisi borang permohonan itu dengan teliti.',
+        passive: 'Borang permohonan itu anda isi dengan teliti.',
+        type: 'Jenis Pertama',
+        subject: 'Anda (Diri Kedua)',
+        explanation: "Subjek ialah Diri Kedua (<strong>anda</strong>). Gunakan Jenis Pertama: <strong>Objek + Subjek + Kata Kerja + Keterangan</strong>. Jadi, <strong>Borang permohonan itu anda isi dengan teliti</strong>.",
+        distractors: ['Borang permohonan itu diisi oleh anda dengan teliti.', 'Borang permohonan itu anda diisi dengan teliti.']
+      },
+
+      // SUSAH (6 Soalan)
+      {
+        id: 15,
+        difficulty: 'susah',
+        active: 'Patik menyembah baginda dengan penuh hormat di istana.',
+        passive: 'Baginda patik sembah dengan penuh hormat di istana.',
+        type: 'Jenis Pertama',
+        subject: 'Patik (Diri Pertama Klasik)',
+        explanation: "Subjek ialah Diri Pertama (<strong>patik</strong>). Gunakan Jenis Pertama: <strong>Objek + Subjek + Kata Kerja + Keterangan</strong>. Jadi, <strong>Baginda patik sembah dengan penuh hormat di istana</strong>.",
+        distractors: ['Baginda disembah oleh patik dengan penuh hormat di istana.', 'Baginda patik disembah dengan penuh hormat di istana.']
+      },
+      {
+        id: 16,
+        difficulty: 'susah',
+        active: 'Tuanku mentadbir negeri itu dengan adil selama bertahun-tahun.',
+        passive: 'Negeri itu tuanku tadbir dengan adil selama bertahun-tahun.',
+        type: 'Jenis Pertama',
+        subject: 'Tuanku (Diri Kedua Klasik)',
+        explanation: "Subjek ialah Diri Kedua (<strong>tuanku</strong>). Gunakan Jenis Pertama: <strong>Objek + Subjek + Kata Kerja + Keterangan</strong>. Jadi, <strong>Negeri itu tuanku tadbir dengan adil selama bertahun-tahun</strong>.",
+        distractors: ['Negeri itu ditadbir oleh tuanku dengan adil selama bertahun-tahun.', 'Negeri itu tuanku ditadbir dengan adil selama bertahun-tahun.']
+      },
+      {
+        id: 17,
+        difficulty: 'susah',
+        active: 'Engkau membawa beg berat itu daripada stesen ke rumah.',
+        passive: 'Beg berat itu engkau bawa daripada stesen ke rumah.',
+        type: 'Jenis Pertama',
+        subject: 'Engkau (Diri Kedua)',
+        explanation: "Subjek ialah Diri Kedua (<strong>engkau</strong>). Gunakan Jenis Pertama: <strong>Objek + Subjek + Kata Kerja + Keterangan</strong>. Jadi, <strong>Beg berat itu engkau bawa daripada stesen ke rumah</strong>.",
+        distractors: ['Beg berat itu dibawa oleh engkau daripada stesen ke rumah.', 'Beg berat itu engkau dibawa daripada stesen ke rumah.']
+      },
+      {
+        id: 18,
+        difficulty: 'susah',
+        active: 'Tuan hamba menyimpan kitab lama itu di dalam almari kayu.',
+        passive: 'Kitab lama itu tuan hamba simpan di dalam almari kayu.',
+        type: 'Jenis Pertama',
+        subject: 'Tuan hamba (Diri Kedua Klasik)',
+        explanation: "Subjek ialah Diri Kedua (<strong>tuan hamba</strong>). Gunakan Jenis Pertama: <strong>Objek + Subjek + Kata Kerja + Keterangan</strong>. Jadi, <strong>Kitab lama itu tuan hamba simpan di dalam almari kayu</strong>.",
+        distractors: ['Kitab lama itu disimpan oleh tuan hamba di dalam almari kayu.', 'Kitab lama itu tuan hamba disimpan di dalam almari kayu.']
+      },
+      {
+        id: 19,
+        difficulty: 'susah',
+        active: 'Hamba menyampaikan pesanan itu kepada raja pada waktu malam.',
+        passive: 'Pesanan itu hamba sampaikan kepada raja pada waktu malam.',
+        type: 'Jenis Pertama',
+        subject: 'Hamba (Diri Pertama Klasik)',
+        explanation: "Subjek ialah Diri Pertama (<strong>hamba</strong>). Gunakan Jenis Pertama: <strong>Objek + Subjek + Kata Kerja + Keterangan</strong>. Jadi, <strong>Pesanan itu hamba sampaikan kepada raja pada waktu malam</strong>.",
+        distractors: ['Pesanan itu disampaikan oleh hamba kepada raja pada waktu malam.', 'Pesanan itu hamba disampaikan kepada raja pada waktu malam.']
+      },
+      {
+        id: 20,
+        difficulty: 'susah',
+        active: 'Kalian dan saya menyiapkan projek sekolah itu sebelum tarikh akhir.',
+        passive: 'Projek sekolah itu kalian dan saya siapkan sebelum tarikh akhir.',
+        type: 'Jenis Pertama',
+        subject: 'Kalian dan saya (Diri Pertama & Kedua)',
+        explanation: "Subjek gabungan diri pertama/kedua (<strong>kalian dan saya</strong>) bertindak sebagai subjek majmuk. Gunakan Jenis Pertama: <strong>Objek + Subjek + Kata Kerja + Keterangan</strong>. Jadi, <strong>Projek sekolah itu kalian dan saya siapkan sebelum tarikh akhir</strong>.",
+        distractors: ['Projek sekolah itu disiapkan oleh kalian dan saya sebelum tarikh akhir.', 'Projek sekolah itu kalian dan saya disiapkan sebelum tarikh akhir.']
+      }
+    ];
+
+    // Game Core State
+    let state = {
+      score: 0,
+      streak: 0,
+      maxStreak: 0,
+      lives: 3, 
+      currentLevelQuestions: [],
+      currentQuestionIndex: 0,
+      selectedDifficulty: 'senang',
+      wrongAnswers: [], 
+      answeredCorrectly: [],
+      gameState: 'menu', 
+      gameSpeedSetting: 'slow', 
+      isPaused: false,
+      deathReason: 'lives', 
+      obstacleHit: false,
+      isJumping: false,
+      jumpProgress: 0,
+      jumpY: 0
+    };
+
+    // Canvas Engine Variables
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Load Character Sprite Image
+    const heroImage = new Image();
+    heroImage.src = 'Character-removebg-preview.png';
+    
+    // Fit canvas resolution to landscape (aspect ratio 5:3)
+    const CANVAS_WIDTH = 1000;
+    const CANVAS_HEIGHT = 600;
+    canvas.width = CANVAS_WIDTH;
+    canvas.height = CANVAS_HEIGHT;
+
+    // Road Dimensions & Perspective
+    const vanishingPoint = { x: CANVAS_WIDTH / 2, y: 220 }; // Centered at 500
+    const roadYBottom = CANVAS_HEIGHT - 60; 
+
+    // Lane positions (0: Left, 1: Center, 2: Right)
+    let playerLane = 1;
+    let targetPlayerX = getLaneCenterX(1);
+    let playerX = targetPlayerX;
+    const playerY = CANVAS_HEIGHT - 140;
+    const playerLerpSpeed = 0.25;
+
+    // Timeline Progress of the active question (0.0 to 2.0)
+    // 0.0 to 1.0 = Track Obstacle Phase
+    // 1.0 to 2.0 = Grammar Prop Checkpoint Phase
+    let questionProgress = 0; 
+    let gateSpeed = 0.0022; 
+    
+    let obstacles = []; // Array of active obstacles: [{ lane: 0, type: 'fence' }, { lane: 2, type: 'stone' }]
+    let screenFlashAlpha = 0.0; // Damage flash opacity
+
+    // Golden coins path along the correct lane
+    let coins = [];
+    let floatingTexts = [];
+
+    // Desert Scrolling Decor Elements
+    let decorElements = [
+      { side: -1.3, z: 0.0, type: 'cactus' },
+      { side: 1.3, z: 0.1, type: 'flower-yellow' },
+      { side: -1.5, z: 0.2, type: 'tumbleweed' },
+      { side: 1.4, z: 0.3, type: 'flower-orange' },
+      { side: -1.2, z: 0.4, type: 'skull' },
+      { side: 1.2, z: 0.5, type: 'palm' },
+      { side: -1.3, z: 0.6, type: 'flower-orange' },
+      { side: 1.3, z: 0.7, type: 'grass' },
+      { side: -1.5, z: 0.8, type: 'tumbleweed' },
+      { side: 1.4, z: 0.9, type: 'rock' },
+      { side: -1.2, z: 1.0, type: 'cactus' }
+    ];
+
+    const DECOR_TYPES = ['cactus', 'flower-yellow', 'flower-orange', 'grass', 'rock', 'tumbleweed', 'skull', 'palm'];
+    function getRandomDecorType() {
+      return DECOR_TYPES[Math.floor(Math.random() * DECOR_TYPES.length)];
+    }
+
+    // Blowing sand particles
+    let sandParticles = [];
+    for (let i = 0; i < 15; i++) { 
+      sandParticles.push({
+        x: Math.random() * CANVAS_WIDTH,
+        y: Math.random() * CANVAS_HEIGHT,
+        speed: 1.5 + Math.random() * 2,
+        size: 1.5 + Math.random() * 1.5
+      });
+    }
+
+    // Animation frames
+    let animFrameId = null;
+    let gameTime = 0;
+    let lastTime = 0; 
+
+    // Real 3D Perspective Projection Function mapping world coordinates to 2D canvas screen
+    function getPerspective(worldX, z_progress) {
+      // worldZ decreases from 12.0 (horizon depth) down to 1.0 (screen bottom depth)
+      const worldZ = 12.0 - (z_progress * 11.0);
+      const scale = 1.0 / worldZ; // perspective scale factor
+      
+      const screenX = vanishingPoint.x + worldX * scale;
+      const screenY = vanishingPoint.y + 320 * scale; // 320 is the ground Y height relative to vanishing point
+      
+      return { x: screenX, y: screenY, scale: scale };
+    }
+
+    // Helper functions
+    function getLaneCenterX(lane) {
+      if (lane === 0) return 200;
+      if (lane === 1) return 500;
+      return 800;
+    }
+
+    // Spawn floating score indicator (+15)
+    function spawnFloatingText(text, x, y) {
+      floatingTexts.push({ text, x, y, alpha: 1.0 });
+    }
+
+    // Shuffle helper
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    // Set up active screen
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+      
+      const hud = document.getElementById('game-hud');
+      const qPanel = document.getElementById('question-panel');
+      const pauseBtn = document.getElementById('pause-btn');
+      
+      if (screenId === 'game-screen') {
+        hud.style.display = 'flex';
+        qPanel.style.display = 'block';
+        pauseBtn.style.display = 'flex';
+      } else {
+        hud.style.display = 'none';
+        qPanel.style.display = 'none';
+        pauseBtn.style.display = 'none';
+      }
+    }
+
+    // Initialize Question & Spawn Phase 1 Obstacle
+    function loadQuestion() {
+      if (state.currentQuestionIndex >= state.currentLevelQuestions.length) {
+        if (state.selectedDifficulty === 'semua') {
+          // Seamlessly append reshuffled questions for continuous infinite gameplay
+          state.currentLevelQuestions = state.currentLevelQuestions.concat(shuffleArray([...QUESTIONS_BANK]));
+        } else {
+          endGame(true);
+          return;
+        }
+      }
+
+      const question = state.currentLevelQuestions[state.currentQuestionIndex];
+      
+      // Update HUD & Panel
+      const isInfiniti = state.selectedDifficulty === 'semua';
+      const badgeTitle = isInfiniti ? 'CABARAN INFINITI' : `TAHAP ${question.difficulty.toUpperCase()}`;
+      const totalText = isInfiniti ? '∞' : state.currentLevelQuestions.length;
+      document.getElementById('question-lvl-badge').innerHTML = `${badgeTitle} — SOALAN ${state.currentQuestionIndex + 1}/${totalText}`;
+      document.getElementById('question-text').innerText = question.active;
+
+      // Prepare options and shuffle them into the 3 lanes
+      const options = shuffleArray([
+        { text: question.passive, isCorrect: true },
+        { text: question.distractors[0], isCorrect: false },
+        { text: question.distractors[1], isCorrect: false }
+      ]);
+
+      currentGateData = options;
+
+      // Spawn coins along the correct lane (active during phase 2)
+      const correctLaneIndex = options.findIndex(opt => opt.isCorrect);
+      coins = [
+        { z: 0.15, lane: correctLaneIndex, collected: false },
+        { z: 0.35, lane: correctLaneIndex, collected: false },
+        { z: 0.55, lane: correctLaneIndex, collected: false },
+        { z: 0.75, lane: correctLaneIndex, collected: false }
+      ];
+
+      // Spawn 2 track obstacles blocking 2 lanes (leaving exactly 1 safe lane to pass through!)
+      const allLanes = [0, 1, 2];
+      const safeLane = Math.floor(Math.random() * 3);
+      const blockedLanes = allLanes.filter(l => l !== safeLane);
+      const types = ['stone', 'grass', 'fence', 'cactus'];
+
+      obstacles = blockedLanes.map(lane => ({
+        lane: lane,
+        type: types[Math.floor(Math.random() * types.length)]
+      }));
+
+      state.obstacleHit = false; // Reset collision detection
+      state.collisionGraceFrames = 5; // Grace period: ignore collision for first 5 frames
+      state.isJumping = false;
+      state.jumpProgress = 0;
+      state.jumpY = 0;
+
+      // Reset timeline progress
+      questionProgress = 0;
+      screenFlashAlpha = 0.0;
+      // CRITICAL FIX: reset lastTime so the first frame after feedback
+      // doesn't produce a massive dt spike that skips the collision zone
+      lastTime = 0;
+      
+      // Determine speeds
+      let baseSpeed = 0.0022; // Perlahan (default) -> ~15 seconds total cycle
+      if (state.gameSpeedSetting === 'normal') {
+        baseSpeed = 0.0035; // Biasa -> ~9.5 seconds total
+      } else if (state.gameSpeedSetting === 'fast') {
+        baseSpeed = 0.0055; // Laju -> ~6 seconds total
+      }
+
+      gateSpeed = baseSpeed + (state.currentQuestionIndex * 0.00008);
+    }
+
+    // Select Lane
+    function setLane(lane) {
+      if (state.gameState !== 'playing' || state.isPaused) return;
+      playerLane = lane;
+      targetPlayerX = getLaneCenterX(lane);
+      sound.playLaneSwitch();
+    }
+
+    function triggerJump() {
+      if (state.gameState !== 'playing' || state.isPaused || state.isJumping) return;
+      state.isJumping = true;
+      state.jumpProgress = 0;
+      state.jumpY = 0;
+      // Play a retro jumping sound tone
+      sound.playTone(330, 'square', 0.1, 0.08);
+      setTimeout(() => {
+        sound.playTone(660, 'square', 0.15, 0.08);
+      }, 60);
+    }
+
+    // Toggle Pause
+    function togglePause() {
+      if (state.gameState !== 'playing') return;
+      state.isPaused = !state.isPaused;
+      updatePauseButtonUI();
+      
+      const overlay = document.getElementById('pause-overlay');
+      if (state.isPaused) {
+        // Populate current question details in Pause HTML popup overlay
+        const question = state.currentLevelQuestions[state.currentQuestionIndex];
+        if (question) {
+          document.getElementById('pause-question-text').innerText = question.active;
+          document.getElementById('pause-question-type').innerText = `Tukar kepada: Ayat Pasif (${question.type})`;
+        }
+        overlay.style.display = 'flex';
+      } else {
+        overlay.style.display = 'none';
+      }
+    }
+
+    function updatePauseButtonUI() {
+      const btn = document.getElementById('pause-btn');
+      if (state.isPaused) {
+        btn.innerHTML = `<svg id="pause-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon></svg>`;
+        btn.title = "Teruskan Larian (Tombol P)";
+      } else {
+        btn.innerHTML = `<svg id="pause-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16" fill="currentColor"></rect><rect x="14" y="4" width="4" height="16" fill="currentColor"></rect></svg>`;
+        btn.title = "Jeda Larian (Tombol P)";
+      }
+    }
+
+    // Click Pause Button
+    document.getElementById('pause-btn').addEventListener('click', (e) => {
+      togglePause();
+      e.stopPropagation();
+    });
+
+    // Keyboard controls
+    window.addEventListener('keydown', (e) => {
+      // Toggle Pause with 'p', 'P', or Escape key
+      if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+        if (state.gameState === 'playing') {
+          togglePause();
+          e.preventDefault(); 
+        }
+      }
+      
+      // Close feedback explanation overlay with Spacebar or Enter
+      if (state.gameState === 'feedback') {
+        if (e.key === ' ' || e.code === 'Space' || e.key === 'Enter') {
+          document.getElementById('btn-feedback-continue').click();
+          e.preventDefault();
+          return;
+        }
+      }
+      
+      if (state.gameState !== 'playing') return;
+
+      // Handle jumping keys (Spacebar, ArrowUp, or W)
+      if (!state.isPaused) {
+        if (e.key === ' ' || e.code === 'Space' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
+          triggerJump();
+          e.preventDefault();
+          return;
+        }
+      }
+      
+      if (state.isPaused) return;
+      
+      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') {
+        if (playerLane > 0) setLane(playerLane - 1);
+      } else if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') {
+        if (playerLane < 2) setLane(playerLane + 1);
+      }
+    });
+
+    // Tap/Click on Canvas left/middle/right to steer (Supports full-screen touch control)
+    canvas.addEventListener('touchstart', handleCanvasTouch, false);
+    canvas.addEventListener('mousedown', handleCanvasClick, false);
+
+    function handleCanvasTouch(e) {
+      if (state.gameState !== 'playing' || state.isPaused) return;
+      const rect = canvas.getBoundingClientRect();
+      const touchX = e.touches[0].clientX - rect.left;
+      const width = rect.width;
+      const pct = touchX / width;
+      if (pct < 0.33) setLane(0);
+      else if (pct < 0.66) setLane(1);
+      else setLane(2);
+    }
+
+    function handleCanvasClick(e) {
+      if (state.gameState !== 'playing' || state.isPaused) return;
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const width = rect.width;
+      const pct = clickX / width;
+      if (pct < 0.33) setLane(0);
+      else if (pct < 0.66) setLane(1);
+      else setLane(2);
+    }
+
+    // Start Game Function
+    function startGame(difficulty) {
+      sound.init();
+      sound.startBGM();
+      
+      state.gameState = 'playing';
+      state.isPaused = false;
+      state.score = 0;
+      state.streak = 0;
+      state.maxStreak = 0;
+      state.lives = 3; 
+      state.wrongAnswers = [];
+      state.answeredCorrectly = [];
+      state.currentQuestionIndex = 0;
+      state.selectedDifficulty = difficulty;
+      if (difficulty === 'semua') {
+        state.currentLevelQuestions = shuffleArray([...QUESTIONS_BANK]);
+      } else {
+        state.currentLevelQuestions = QUESTIONS_BANK.filter(q => q.difficulty === difficulty);
+      }
+      state.deathReason = 'lives';
+      state.obstacleHit = false;
+      state.collisionGraceFrames = 0;
+      state.isJumping = false;
+      state.jumpProgress = 0;
+      state.jumpY = 0;
+      playerLane = 1;
+      playerX = getLaneCenterX(1);
+      targetPlayerX = playerX;
+      floatingTexts = [];
+      screenFlashAlpha = 0.0;
+      updatePauseButtonUI();
+
+      // Reset scrolling elements
+      decorElements.forEach((d, idx) => {
+        d.z = 0.05 + (idx * 0.09);
+        d.type = getRandomDecorType();
+      });
+
+      // Update HUD
+      updateHUD();
+      loadQuestion();
+      showScreen('game-screen');
+
+      // Start loop
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      gameTime = 0;
+      lastTime = 0;
+      animFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function updateHUD() {
+      document.getElementById('hud-score').innerText = state.score;
+      document.getElementById('hud-streak').innerText = `${state.streak}x`;
+      
+      // Update Lives HUD (❤️ icons)
+      const livesElement = document.getElementById('hud-lives');
+      let heartsHtml = '';
+      for (let i = 1; i <= 3; i++) {
+        if (i <= state.lives) {
+          heartsHtml += '❤️ ';
+        } else {
+          heartsHtml += '🖤 ';
+        }
+      }
+      livesElement.innerHTML = heartsHtml.trim();
+    }
+
+    // Evaluate answer selection
+    function checkAnswer() {
+      state.gameState = 'feedback';
+      
+      const question = state.currentLevelQuestions[state.currentQuestionIndex];
+      const selectedOption = currentGateData[playerLane];
+      const isCorrect = selectedOption.isCorrect;
+
+      // Pop overlay
+      const overlay = document.getElementById('feedback-overlay');
+      const fIcon = document.getElementById('feedback-icon');
+      const fTitle = document.getElementById('feedback-title');
+      const fActive = document.getElementById('feedback-active-text');
+      const fCorrect = document.getElementById('feedback-correct-text');
+      const fExplain = document.getElementById('feedback-explanation');
+
+      fActive.innerText = question.active;
+      fCorrect.innerHTML = question.passive;
+      fExplain.innerHTML = question.explanation;
+
+      if (isCorrect) {
+        sound.playCorrect();
+        fIcon.innerText = '✅';
+        fTitle.innerText = 'Tepat Sekali!';
+        fTitle.className = 'feedback-title correct';
+        
+        state.streak++;
+        if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+        
+        const scoreGain = 100 + (state.streak * 10);
+        state.score += scoreGain;
+        state.answeredCorrectly.push(question);
+      } else {
+        sound.playWrong();
+        fIcon.innerText = '❌';
+        fTitle.innerText = 'Awas, Salah!';
+        fTitle.className = 'feedback-title wrong';
+        
+        state.streak = 0;
+        state.lives--; 
+        
+        state.wrongAnswers.push({
+          question: question,
+          selected: selectedOption.text
+        });
+      }
+
+      updateHUD();
+      overlay.classList.add('active');
+    }
+
+    // Game loop renderer utilizing high precision delta-time
+    function gameLoop(timestamp) {
+      if (state.gameState !== 'playing') return;
+
+      if (!lastTime) lastTime = timestamp;
+      let dt = (timestamp - lastTime) / 16.666; 
+      lastTime = timestamp;
+
+      // Cap delta time to prevent physics breaking on huge frame skips
+      if (dt > 4) dt = 4;
+
+      if (!state.isPaused) {
+        gameTime += dt;
+        
+        // Update physics utilizing normalized delta time
+        playerX += (targetPlayerX - playerX) * playerLerpSpeed * dt;
+        
+        // Update Mario Jump Physics
+        if (state.isJumping) {
+          state.jumpProgress += 0.042 * dt;
+          if (state.jumpProgress >= 1.0) {
+            state.isJumping = false;
+            state.jumpProgress = 0;
+            state.jumpY = 0;
+          } else {
+            state.jumpY = -Math.sin(state.jumpProgress * Math.PI) * 135;
+          }
+        }
+        
+        // Slow down larian when getting very close to gates to allow reading
+        let effectiveSpeed = gateSpeed;
+        if (questionProgress > 1.60 && questionProgress < 1.85) {
+          effectiveSpeed = gateSpeed * 0.45; // Slow down to 45% speed (bullet-time effect!)
+        }
+        
+        questionProgress += effectiveSpeed * dt;
+
+        // Fade damage screen flash overlay
+        if (screenFlashAlpha > 0) {
+          screenFlashAlpha -= 0.03 * dt;
+          if (screenFlashAlpha < 0) screenFlashAlpha = 0.0;
+        }
+
+        // Advance cacti, flowers, grass, rocks, tumbleweeds
+        decorElements.forEach(d => {
+          d.z += effectiveSpeed * dt;
+          if (d.z > 1.0) {
+            d.z = 0; 
+            d.side = (Math.random() > 0.5 ? 1 : -1) * (1.1 + Math.random()*0.4); 
+            d.type = getRandomDecorType(); 
+          }
+        });
+
+        // Advance sandstorm particles
+        sandParticles.forEach(p => {
+          p.x -= p.speed * dt;
+          p.y += p.speed * 0.15 * dt;
+          if (p.x < 0) {
+            p.x = CANVAS_WIDTH;
+            p.y = Math.random() * CANVAS_HEIGHT;
+          }
+        });
+
+        // Update floating score texts
+        floatingTexts.forEach((ft, idx) => {
+          ft.y -= 1.8 * dt;
+          ft.alpha -= 0.025 * dt;
+          if (ft.alpha <= 0) {
+            floatingTexts.splice(idx, 1);
+          }
+        });
+
+        // Tick down grace period guard (ignore collisions on first few frames of new question)
+        if (state.collisionGraceFrames > 0) state.collisionGraceFrames--;
+
+        // 1. Obstacle Phase Update
+        if (questionProgress < 1.0) {
+          const zObs = Math.pow(questionProgress, 1.75);
+          // Collision check: triggers ONLY when obstacle Y overlaps Mario's feet (proj.y >= 470)
+          for (let i = 0; i < obstacles.length; i++) {
+            const obs = obstacles[i];
+            const laneCenterXWorld = (obs.lane === 0) ? -300 : (obs.lane === 1 ? 0 : 300);
+            const proj = getPerspective(laneCenterXWorld, zObs);
+            
+            if (proj.y >= 470 && !state.obstacleHit && state.collisionGraceFrames <= 0) {
+              if (playerLane === obs.lane) {
+                // If Mario is jumping high enough (jumpY < -55), he passes over safely!
+                if (state.isJumping && state.jumpY < -55) {
+                  state.obstacleHit = true; // Mark obstacle as resolved/passed
+                  spawnFloatingText('LOMPAT!', playerX, playerY - 75);
+                } else {
+                  // Otherwise, Mario hits the obstacle!
+                  state.obstacleHit = true;
+                  state.lives--; // Hitting obstacle deducts 1 life!
+                  sound.playWrong(); // Play crash sound
+                  spawnFloatingText('NYAWA -1', playerX, playerY - 45);
+                  screenFlashAlpha = 0.5; // Flash screen in red
+                  
+                  updateHUD();
+                  if (state.lives <= 0) {
+                    state.deathReason = 'obstacle';
+                    endGame(false); // Game Over on 0 lives
+                    return;
+                  }
+                }
+              }
+            }
+          }
+        } 
+        // 2. Prop Answer Phase Update
+        else {
+          const zGate = Math.pow(questionProgress - 1.0, 1.75);
+          
+          // Update coins depth
+          coins.forEach(c => {
+            // coinProgress runs in synchronization with the question timeline
+            const coinProgress = (questionProgress - 1.0) + (0.8 - c.z);
+            // Check coin collection
+            if (coinProgress > 0.72 && coinProgress < 0.85 && !c.collected) {
+              if (playerLane === c.lane) {
+                c.collected = true;
+                state.score += 15;
+                sound.playTone(987.77, 'sine', 0.08, 0.15);
+                spawnFloatingText('+15', playerX, playerY - 45);
+                updateHUD();
+              }
+            }
+          });
+
+          if (questionProgress >= 1.88) { // Confirm answer when player hits the answer prop on track
+            state.deathReason = 'lives';
+            checkAnswer();
+          }
+        }
+      }
+
+      // Draw everything
+      renderCanvas();
+
+      animFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    // Pseudo-3D Drawing Logic (Desert Railway Tracks Theme)
+    function renderCanvas() {
+      // Clear screen
+      ctx.fillStyle = '#7c2d12'; 
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Draw Desert Sky (Sunset orange-yellow gradient)
+      const gradient = ctx.createLinearGradient(0, 0, 0, vanishingPoint.y);
+      gradient.addColorStop(0, '#ea580c'); 
+      gradient.addColorStop(1, '#fef08a'); 
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, vanishingPoint.y);
+
+      // Draw Big Hot Glowing Sun with multi-layered high-performance vector glows
+      ctx.fillStyle = 'rgba(251, 191, 36, 0.22)';
+      ctx.beginPath();
+      ctx.arc(vanishingPoint.x, vanishingPoint.y - 25, 62, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = 'rgba(254, 240, 138, 0.45)';
+      ctx.beginPath();
+      ctx.arc(vanishingPoint.x, vanishingPoint.y - 25, 46, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(vanishingPoint.x, vanishingPoint.y - 25, 32, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw Egyptian Pyramids in the far distance on the dunes
+      // Pyramid 1 (Left)
+      ctx.fillStyle = '#b45309'; // Shadow side
+      ctx.beginPath();
+      ctx.moveTo(vanishingPoint.x - 180, vanishingPoint.y);
+      ctx.lineTo(vanishingPoint.x - 110, vanishingPoint.y - 55);
+      ctx.lineTo(vanishingPoint.x - 40, vanishingPoint.y);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#d97706'; // Lit side
+      ctx.beginPath();
+      ctx.moveTo(vanishingPoint.x - 110, vanishingPoint.y - 55);
+      ctx.lineTo(vanishingPoint.x - 40, vanishingPoint.y);
+      ctx.lineTo(vanishingPoint.x - 75, vanishingPoint.y);
+      ctx.closePath();
+      ctx.fill();
+
+      // Pyramid 2 (Right - taller)
+      ctx.fillStyle = '#92400e'; // Shadow side
+      ctx.beginPath();
+      ctx.moveTo(vanishingPoint.x + 40, vanishingPoint.y);
+      ctx.lineTo(vanishingPoint.x + 115, vanishingPoint.y - 75);
+      ctx.lineTo(vanishingPoint.x + 190, vanishingPoint.y);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#b45309'; // Lit side
+      ctx.beginPath();
+      ctx.moveTo(vanishingPoint.x + 95, vanishingPoint.y - 65);
+      ctx.lineTo(vanishingPoint.x + 190, vanishingPoint.y);
+      ctx.lineTo(vanishingPoint.x + 150, vanishingPoint.y);
+      ctx.closePath();
+      ctx.fill();
+
+      // Draw Far Sand Dunes (Parallax rolling hills)
+      ctx.fillStyle = '#b45309'; 
+      ctx.beginPath();
+      ctx.moveTo(0, vanishingPoint.y);
+      ctx.quadraticCurveTo(CANVAS_WIDTH * 0.3, vanishingPoint.y - 20, CANVAS_WIDTH * 0.6, vanishingPoint.y);
+      ctx.quadraticCurveTo(CANVAS_WIDTH * 0.8, vanishingPoint.y - 12, CANVAS_WIDTH, vanishingPoint.y);
+      ctx.lineTo(CANVAS_WIDTH, vanishingPoint.y + 40);
+      ctx.lineTo(0, vanishingPoint.y + 40);
+      ctx.closePath();
+      ctx.fill();
+
+      // Draw Near Sand Dunes (Layer 2)
+      ctx.fillStyle = '#d97706'; 
+      ctx.beginPath();
+      ctx.moveTo(0, vanishingPoint.y);
+      ctx.quadraticCurveTo(CANVAS_WIDTH * 0.2, vanishingPoint.y - 10, CANVAS_WIDTH * 0.45, vanishingPoint.y + 5);
+      ctx.quadraticCurveTo(CANVAS_WIDTH * 0.75, vanishingPoint.y - 18, CANVAS_WIDTH, vanishingPoint.y - 5);
+      ctx.lineTo(CANVAS_WIDTH, vanishingPoint.y + 50);
+      ctx.lineTo(0, vanishingPoint.y + 50);
+      ctx.closePath();
+      ctx.fill();
+
+      // Draw Camel Silhouettes walking on dunes
+      const camel1X = (vanishingPoint.x - 220 + (gameTime * 0.06)) % (CANVAS_WIDTH * 0.45);
+      const camelY = vanishingPoint.y - 5;
+      ctx.fillStyle = '#78350f';
+      ctx.beginPath();
+      // humps
+      ctx.arc(camel1X, camelY, 3, 0, Math.PI * 2);
+      ctx.arc(camel1X - 4, camelY - 1, 3, 0, Math.PI * 2);
+      // neck/head
+      ctx.moveTo(camel1X + 2, camelY + 1);
+      ctx.quadraticCurveTo(camel1X + 6, camelY - 5, camel1X + 7, camelY - 8);
+      ctx.arc(camel1X + 7, camelY - 8, 1.5, 0, Math.PI * 2);
+      // legs
+      ctx.moveTo(camel1X - 3, camelY + 2); ctx.lineTo(camel1X - 3, camelY + 6);
+      ctx.moveTo(camel1X - 1, camelY + 2); ctx.lineTo(camel1X - 1, camelY + 6);
+      ctx.moveTo(camel1X + 1, camelY + 2); ctx.lineTo(camel1X + 2, camelY + 6);
+      ctx.fill();
+
+      // Draw Sandy Road Ground (Vibrant golden yellow sand shoulder)
+      ctx.fillStyle = '#d97706';
+      ctx.fillRect(0, vanishingPoint.y, CANVAS_WIDTH, roadYBottom - vanishingPoint.y);
+
+      // Draw wind-blown sand ripples on the ground
+      ctx.strokeStyle = '#b45309';
+      ctx.lineWidth = 1.5;
+      for (let i = 1; i <= 6; i++) {
+        const rippleY = vanishingPoint.y + i * 50;
+        const ripplePhase = Math.sin(gameTime * 0.02 + i) * 15;
+        ctx.beginPath();
+        ctx.moveTo(30 + ripplePhase, rippleY);
+        ctx.quadraticCurveTo(200 + ripplePhase, rippleY - 10, 370 + ripplePhase, rippleY + 5);
+        ctx.moveTo(630 + ripplePhase, rippleY);
+        ctx.quadraticCurveTo(800 + ripplePhase, rippleY + 8, 970 + ripplePhase, rippleY - 4);
+        ctx.stroke();
+      }
+
+      // Draw 3D Railway Tracks (sleepers and steel rails using perspective projection)
+      drawRailwayTracks();
+
+      // Draw scrolling cacti, wildflowers, grass, and rocks on both sides with real perspective projection
+      drawDecor();
+
+      // 1. Draw Active Obstacles (2 obstacles blocking 2 lanes) or 2. Draw active Gate & Coins
+      if (questionProgress < 1.0) {
+        const zObs = Math.pow(questionProgress, 1.75);
+        obstacles.forEach(obs => {
+          const laneCenterXWorld = (obs.lane === 0) ? -300 : (obs.lane === 1 ? 0 : 300);
+          const proj = getPerspective(laneCenterXWorld, zObs);
+          const scale = proj.scale * 1.6;
+          drawObstacle(proj.x, proj.y, scale, obs.type);
+        });
+      } else {
+        // Draw Gold Coins floating along correct lane
+        drawCoins();
+        // Draw Answer signpost props sitting on tracks (Cyan border, transparent slate background)
+        drawAnswerProps();
+      }
+
+      // Draw Cute Mario Character
+      drawPlayer();
+
+      // Draw Chasing Coyote
+      drawDog();
+
+      // Draw Floating indicator texts (Scores & Warnings)
+      ctx.save();
+      floatingTexts.forEach(ft => {
+        ctx.fillStyle = ft.text.startsWith('NYAWA') ? '#f87171' : `rgba(254, 240, 138, ${ft.alpha})`;
+        ctx.shadowColor = '#d97706';
+        ctx.shadowBlur = 4;
+        ctx.font = 'bold 18px Outfit';
+        ctx.textAlign = 'center';
+        ctx.fillText(ft.text, ft.x, ft.y);
+      });
+      ctx.restore();
+
+      // Draw red screen damage flash
+      if (screenFlashAlpha > 0) {
+        ctx.fillStyle = `rgba(239, 68, 68, ${screenFlashAlpha})`;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      }
+
+      // Draw Blowing Sand Particles
+      ctx.fillStyle = 'rgba(254, 240, 138, 0.4)'; 
+      sandParticles.forEach(p => {
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+      });
+    }
+
+    // Draw 3 distinct 3D Subway style railway tracks on ground utilizing getPerspective math
+    function drawRailwayTracks() {
+      const laneBorders = [
+        { left: -500, right: -150, center: -300 }, // Lane 0 (Left)
+        { left: -150, right: 150, center: 0 },    // Lane 1 (Center)
+        { left: 150, right: 500, center: 300 }    // Lane 2 (Right)
+      ];
+
+      laneBorders.forEach((lane) => {
+        // Draw track ballast (grey ballast gravel bed)
+        const pTL = getPerspective(lane.left, 0);
+        const pTR = getPerspective(lane.right, 0);
+        const pBR = getPerspective(lane.right, 1.0);
+        const pBL = getPerspective(lane.left, 1.0);
+
+        ctx.fillStyle = '#4b5563'; 
+        ctx.beginPath();
+        ctx.moveTo(pTL.x, pTL.y);
+        ctx.lineTo(pTR.x, pTR.y);
+        ctx.lineTo(pBR.x, pBR.y);
+        ctx.lineTo(pBL.x, pBL.y);
+        ctx.closePath();
+        ctx.fill();
+
+        // Draw railway sleepers (wooden horizontal ties scrolling down)
+        ctx.fillStyle = '#78350f'; 
+        const sleeperCount = 12;
+        const phase = (!state.isPaused ? (gameTime * 0.035) : 0) % 1;
+
+        for (let i = 0; i < sleeperCount; i++) {
+          const z = (i + phase) / sleeperCount;
+          const pLeft = getPerspective(lane.left + 25, z);
+          const pRight = getPerspective(lane.right - 25, z);
+          const scale = pLeft.scale;
+
+          // Draw wooden plank tie
+          ctx.fillRect(pLeft.x, pLeft.y - 2 * scale, pRight.x - pLeft.x, 4 * scale + 1);
+        }
+
+        // Draw steel rails (Left and Right rails in silver/grey)
+        ctx.strokeStyle = '#9ca3af';
+        ctx.lineWidth = 1.5;
+        
+        // Left rail
+        ctx.beginPath();
+        for (let i = 0; i <= 10; i++) {
+          const z = i / 10;
+          const p = getPerspective(lane.center - 60, z);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+
+        // Right rail
+        ctx.beginPath();
+        for (let i = 0; i <= 10; i++) {
+          const z = i / 10;
+          const p = getPerspective(lane.center + 60, z);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+
+        // Draw glowing rail tracks highlights
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        for (let i = 0; i <= 10; i++) {
+          const z = i / 10;
+          const p = getPerspective(lane.center - 60, z);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+      });
+    }
+
+    // Draw Cacti, Wildflowers, Grass, Rocks, Tumbleweeds, Palm trees, Cow skulls with realistic projection
+    function drawDecor() {
+      decorElements.forEach((d, idx) => {
+        // Project decor world coordinates to 2D canvas space
+        const proj = getPerspective(d.side * 580, d.z);
+        const scale = proj.scale * 1.55;
+        
+        if (d.z <= 0.02 || d.z > 1) return;
+
+        ctx.save();
+        
+        if (d.type === 'cactus') {
+          // Draw detailed 3D Cactus with Spikes
+          ctx.fillStyle = '#166534'; // Dark shade
+          ctx.strokeStyle = '#14532d';
+          ctx.lineWidth = 2.2 * scale;
+
+          // Main trunk
+          ctx.beginPath();
+          ctx.roundRect(proj.x - 5.5 * scale, proj.y - 45 * scale, 11 * scale, 45 * scale, 5 * scale);
+          ctx.fill();
+          ctx.stroke();
+
+          // Green highlight core
+          ctx.fillStyle = '#22c55e';
+          ctx.beginPath();
+          ctx.roundRect(proj.x - 2 * scale, proj.y - 42 * scale, 4 * scale, 40 * scale, 2 * scale);
+          ctx.fill();
+
+          // Arms
+          ctx.fillStyle = '#166534';
+          ctx.beginPath();
+          // Left arm
+          ctx.roundRect(proj.x - 16 * scale, proj.y - 28 * scale, 11 * scale, 7 * scale, 2 * scale);
+          ctx.roundRect(proj.x - 16 * scale, proj.y - 41 * scale, 7 * scale, 18 * scale, 2 * scale);
+          // Right arm
+          ctx.roundRect(proj.x + 5 * scale, proj.y - 22 * scale, 11 * scale, 7 * scale, 2 * scale);
+          ctx.roundRect(proj.x + 9 * scale, proj.y - 35 * scale, 7 * scale, 18 * scale, 2 * scale);
+          ctx.fill();
+          ctx.stroke();
+
+          // Draw tiny spikes (needles) on the cactus trunk & arms
+          ctx.strokeStyle = '#fef08a'; // yellow spikes
+          ctx.lineWidth = 1 * scale;
+          const spikePositions = [
+            { x: -5, y: -10, len: 3, ang: 0 },
+            { x: 5, y: -25, len: 3, ang: Math.PI },
+            { x: -5, y: -30, len: 3, ang: 0 },
+            { x: -16, y: -38, len: 2.5, ang: -Math.PI/2 },
+            { x: 12, y: -30, len: 2.5, ang: Math.PI/2 }
+          ];
+          spikePositions.forEach(sp => {
+            const sx = proj.x + sp.x * scale;
+            const sy = proj.y + sp.y * scale;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(sx + Math.cos(sp.ang) * sp.len * scale, sy + Math.sin(sp.ang) * sp.len * scale);
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(sx + Math.cos(sp.ang - 0.5) * sp.len * scale, sy + Math.sin(sp.ang - 0.5) * sp.len * scale);
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(sx + Math.cos(sp.ang + 0.5) * sp.len * scale, sy + Math.sin(sp.ang + 0.5) * sp.len * scale);
+            ctx.stroke();
+          });
+
+        } else if (d.type === 'flower-yellow' || d.type === 'flower-orange') {
+          const petalColor = d.type === 'flower-yellow' ? '#f59e0b' : '#ea580c';
+          
+          // Realistic stem with leaf nodes
+          ctx.strokeStyle = '#15803d';
+          ctx.lineWidth = 2.5 * scale;
+          ctx.beginPath();
+          ctx.moveTo(proj.x, proj.y);
+          ctx.lineTo(proj.x - 2 * scale, proj.y - 25 * scale);
+          ctx.stroke();
+          
+          // Leaves
+          ctx.fillStyle = '#166534';
+          ctx.beginPath();
+          ctx.ellipse(proj.x - 5 * scale, proj.y - 10 * scale, 5 * scale, 2.5 * scale, -0.4, 0, Math.PI * 2);
+          ctx.ellipse(proj.x + 5 * scale, proj.y - 16 * scale, 5 * scale, 2.5 * scale, 0.4, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Petals
+          ctx.fillStyle = petalColor;
+          ctx.strokeStyle = '#451a03';
+          ctx.lineWidth = 0.8 * scale;
+          
+          const flowerY = proj.y - 25 * scale;
+          const flowerX = proj.x - 2 * scale;
+          const rPetal = 5.5 * scale;
+          const numPetals = 6;
+          
+          for (let i = 0; i < numPetals; i++) {
+            const angle = (i * 2 * Math.PI) / numPetals;
+            const pX = flowerX + Math.cos(angle) * 5.5 * scale;
+            const pY = flowerY + Math.sin(angle) * 5.5 * scale;
+            ctx.beginPath();
+            ctx.arc(pX, pY, rPetal, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+          }
+          
+          // Center core
+          ctx.fillStyle = '#fef08a';
+          ctx.beginPath();
+          ctx.arc(flowerX, flowerY, 4.5 * scale, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+        } else if (d.type === 'grass') {
+          // Lush realistic desert grass clump swaying in wind
+          ctx.fillStyle = '#166534'; 
+          ctx.strokeStyle = '#15803d';
+          ctx.lineWidth = 1 * scale;
+          
+          const windSway = Math.sin(gameTime * 0.08 + idx * 3) * 3 * scale;
+
+          ctx.beginPath();
+          ctx.moveTo(proj.x - 10 * scale, proj.y);
+          ctx.quadraticCurveTo(proj.x - 14 * scale + windSway, proj.y - 18 * scale, proj.x - 20 * scale + windSway * 1.5, proj.y - 14 * scale);
+          ctx.quadraticCurveTo(proj.x - 10 * scale, proj.y - 8 * scale, proj.x - 5 * scale, proj.y);
+          
+          ctx.moveTo(proj.x - 4 * scale, proj.y);
+          ctx.quadraticCurveTo(proj.x + windSway, proj.y - 26 * scale, proj.x + 2 * scale + windSway * 1.2, proj.y - 28 * scale);
+          ctx.quadraticCurveTo(proj.x + 5 * scale, proj.y - 12 * scale, proj.x + 4 * scale, proj.y);
+          
+          ctx.moveTo(proj.x + 3 * scale, proj.y);
+          ctx.quadraticCurveTo(proj.x + 14 * scale + windSway, proj.y - 17 * scale, proj.x + 18 * scale + windSway * 1.4, proj.y - 12 * scale);
+          ctx.quadraticCurveTo(proj.x + 9 * scale, proj.y - 8 * scale, proj.x + 7 * scale, proj.y);
+          
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+        } else if (d.type === 'rock') {
+          // Detailed desert sandstone with cracks
+          ctx.fillStyle = '#7c2d12'; // Warm brown sandstone
+          ctx.strokeStyle = '#451a03';
+          ctx.lineWidth = 1.8 * scale;
+          
+          ctx.beginPath();
+          ctx.moveTo(proj.x - 10 * scale, proj.y);
+          ctx.lineTo(proj.x - 12 * scale, proj.y - 4 * scale);
+          ctx.lineTo(proj.x - 6 * scale, proj.y - 11 * scale);
+          ctx.lineTo(proj.x + 4 * scale, proj.y - 12 * scale);
+          ctx.lineTo(proj.x + 12 * scale, proj.y - 6 * scale);
+          ctx.lineTo(proj.x + 10 * scale, proj.y);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          
+          // Highlights
+          ctx.strokeStyle = '#f97316'; // Lit orange highlight
+          ctx.lineWidth = 1.2 * scale;
+          ctx.beginPath();
+          ctx.moveTo(proj.x - 6 * scale, proj.y - 11 * scale);
+          ctx.lineTo(proj.x + 4 * scale, proj.y - 12 * scale);
+          ctx.stroke();
+
+          // Dark cracks
+          ctx.strokeStyle = '#451a03';
+          ctx.lineWidth = 0.8 * scale;
+          ctx.beginPath();
+          ctx.moveTo(proj.x - 3 * scale, proj.y - 11 * scale);
+          ctx.lineTo(proj.x - 5 * scale, proj.y - 4 * scale);
+          ctx.moveTo(proj.x + 5 * scale, proj.y - 10 * scale);
+          ctx.lineTo(proj.x + 3 * scale, proj.y - 2 * scale);
+          ctx.stroke();
+
+        } else if (d.type === 'tumbleweed') {
+          // Curly branch bundle
+          ctx.strokeStyle = '#78350f'; 
+          ctx.lineWidth = 1.2 * scale;
+          const rotation = gameTime * 0.08 * (1 / (d.z + 0.1));
+          
+          ctx.translate(proj.x, proj.y - 12 * scale);
+          ctx.rotate(rotation);
+          
+          ctx.beginPath();
+          ctx.arc(0, 0, 11 * scale, 0, Math.PI * 2);
+          ctx.arc(3 * scale, 2 * scale, 8 * scale, 0, Math.PI * 2);
+          ctx.arc(-2 * scale, -1 * scale, 9 * scale, 0, Math.PI * 2);
+          ctx.stroke();
+          
+          // Draw curly inner lines
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 6 * scale, 3 * scale, 0.5, 0, Math.PI);
+          ctx.ellipse(-2 * scale, 2 * scale, 5 * scale, 2 * scale, -0.5, 0, Math.PI);
+          ctx.stroke();
+
+        } else if (d.type === 'skull') {
+          // Shaded Cow Skull
+          ctx.fillStyle = '#f3f4f6'; 
+          ctx.strokeStyle = '#9ca3af';
+          ctx.lineWidth = 1 * scale;
+          
+          ctx.beginPath();
+          ctx.roundRect(proj.x - 6 * scale, proj.y - 12 * scale, 12 * scale, 8 * scale, 2 * scale);
+          ctx.fill();
+          ctx.stroke();
+          
+          // Horns
+          ctx.beginPath();
+          ctx.moveTo(proj.x - 5 * scale, proj.y - 11 * scale);
+          ctx.quadraticCurveTo(proj.x - 14 * scale, proj.y - 16 * scale, proj.x - 16 * scale, proj.y - 6 * scale);
+          ctx.moveTo(proj.x + 5 * scale, proj.y - 11 * scale);
+          ctx.quadraticCurveTo(proj.x + 14 * scale, proj.y - 16 * scale, proj.x + 16 * scale, proj.y - 6 * scale);
+          ctx.stroke();
+          
+          // Shaded sockets & nose
+          ctx.fillStyle = '#374151';
+          ctx.beginPath();
+          ctx.arc(proj.x - 2.5 * scale, proj.y - 8 * scale, 1.8 * scale, 0, Math.PI * 2);
+          ctx.arc(proj.x + 2.5 * scale, proj.y - 8 * scale, 1.8 * scale, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Nostrils
+          ctx.fillStyle = '#1f2937';
+          ctx.fillRect(proj.x - 1 * scale, proj.y - 5 * scale, 0.8 * scale, 1.5 * scale);
+          ctx.fillRect(proj.x + 0.2 * scale, proj.y - 5 * scale, 0.8 * scale, 1.5 * scale);
+
+        } else if (d.type === 'palm') {
+          // Lush premium palm tree with realistic leaflets
+          // Trunk with ribbed plates
+          ctx.fillStyle = '#78350f';
+          ctx.strokeStyle = '#451a03';
+          ctx.lineWidth = 1.2 * scale;
+          
+          const steps = 7;
+          ctx.beginPath();
+          ctx.moveTo(proj.x, proj.y);
+          
+          let prevX = proj.x;
+          let prevY = proj.y;
+          
+          for (let i = 1; i <= steps; i++) {
+            const pct = i / steps;
+            const tx = proj.x - 8 * Math.sin(pct * Math.PI) * scale;
+            const ty = proj.y - 58 * pct * scale;
+            
+            ctx.lineWidth = (5 - pct * 2.5) * scale;
+            ctx.beginPath();
+            ctx.moveTo(prevX, prevY);
+            ctx.lineTo(tx, ty);
+            ctx.stroke();
+            
+            // Draw rib node
+            ctx.fillStyle = '#451a03';
+            ctx.beginPath();
+            ctx.arc(tx, ty, (5.5 - pct * 2.5) * scale, 0, Math.PI * 2);
+            ctx.fill();
+            
+            prevX = tx;
+            prevY = ty;
+          }
+          
+          const leafX = prevX;
+          const leafY = prevY;
+          
+          // Draw brown coconuts at leaf node
+          ctx.fillStyle = '#451a03';
+          ctx.beginPath();
+          ctx.arc(leafX - 3 * scale, leafY + 2 * scale, 4.2 * scale, 0, Math.PI*2);
+          ctx.arc(leafX + 3 * scale, leafY + 3 * scale, 3.8 * scale, 0, Math.PI*2);
+          ctx.fill();
+
+          // Green palm fronds - drawn as detailed comb-like feather leaves
+          ctx.strokeStyle = '#166534';
+          ctx.fillStyle = '#14532d'; 
+          
+          const numLeaves = 6;
+          for (let i = 0; i < numLeaves; i++) {
+            const angle = (i * 2 * Math.PI) / numLeaves;
+            ctx.save();
+            ctx.translate(leafX, leafY);
+            // Add subtle breeze sway to leaves
+            ctx.rotate(angle + Math.sin(gameTime * 0.05 + idx) * 0.06);
+            
+            // Main frond center spine
+            ctx.strokeStyle = '#22c55e';
+            ctx.lineWidth = 1.5 * scale;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.quadraticCurveTo(10 * scale, -5 * scale, 22 * scale, 0);
+            ctx.stroke();
+            
+            // Draw multiple leaflets branching off spine
+            ctx.fillStyle = '#15803d';
+            ctx.beginPath();
+            for (let j = 1; j <= 8; j++) {
+              const lx = (j * 2.2) * scale;
+              const ly = -1.5 * Math.sin((j/8)*Math.PI) * scale;
+              ctx.moveTo(lx, ly);
+              ctx.lineTo(lx - 2 * scale, ly - 6 * scale); // curved leaflet pinna
+              ctx.lineTo(lx + 1 * scale, ly);
+            }
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.restore();
+          }
+        }
+
+        ctx.restore();
+      });
+    }
+
+    // Draw gold coins floating down correct lane
+    function drawCoins() {
+      ctx.save();
+      
+      coins.forEach(c => {
+        if (c.collected) return;
+
+        // coinProgress is advanced in synchronization with the question timeline
+        const coinProgress = (questionProgress - 1.0) + (0.8 - c.z);
+        if (coinProgress < 0 || coinProgress > 1.0) return;
+
+        const proj = getPerspective((c.lane === 0 ? -300 : (c.lane === 1 ? 0 : 300)), coinProgress);
+        const scale = proj.scale * 1.2;
+        
+        const coinHover = Math.sin(gameTime * 0.25 + c.z * 10) * 4 * scale;
+
+        ctx.fillStyle = '#fbbf24'; 
+        ctx.strokeStyle = '#d97706'; 
+        ctx.lineWidth = 1.5 * scale + 0.5;
+
+        ctx.beginPath();
+        ctx.ellipse(proj.x, proj.y - 30 * scale + coinHover, 12 * scale, 12 * scale * 0.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#fef08a'; 
+        ctx.beginPath();
+        ctx.ellipse(proj.x, proj.y - 30 * scale + coinHover, 7 * scale, 7 * scale * 0.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#d97706';
+        ctx.beginPath();
+        ctx.rect(proj.x - 2.5 * scale, proj.y - 30 * scale + coinHover - 2 * scale, 5 * scale, 4 * scale);
+        ctx.fill();
+      });
+
+      ctx.restore();
+    }
+
+    // Draw active track obstacle (variety: fence, stone, grass, cactus) that deducts 1 life on collision
+    function drawObstacle(cX, cY, scale, type) {
+      ctx.save();
+      const currentType = type || 'fence';
+      
+      if (currentType === 'fence') {
+        // Red striped barrier fence
+        const w = 120 * scale; 
+        const h = 60 * scale;
+        
+        ctx.strokeStyle = '#ef4444'; 
+        ctx.lineWidth = 4 * scale + 1.5;
+        ctx.beginPath();
+        ctx.moveTo(cX - w/2.5, cY); ctx.lineTo(cX - w/2.5, cY - h);
+        ctx.moveTo(cX + w/2.5, cY); ctx.lineTo(cX + w/2.5, cY - h);
+        ctx.stroke();
+        
+        ctx.fillStyle = '#fef08a'; 
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1.5 * scale;
+        ctx.beginPath();
+        ctx.roundRect(cX - w/2, cY - h * 0.9, w, h * 0.35, 4 * scale);
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(cX - w/2, cY - h * 0.9, w, h * 0.35, 4 * scale);
+        ctx.clip();
+        ctx.fillStyle = '#000000';
+        const stripeWidth = 14 * scale;
+        for (let i = 0; i < 10; i++) {
+          ctx.beginPath();
+          ctx.moveTo(cX - w/2 + i * 2 * stripeWidth - stripeWidth, cY - h * 0.9);
+          ctx.lineTo(cX - w/2 + i * 2 * stripeWidth, cY - h * 0.9);
+          ctx.lineTo(cX - w/2 + i * 2 * stripeWidth - stripeWidth/2, cY - h * 0.55);
+          ctx.lineTo(cX - w/2 + i * 2 * stripeWidth - 1.5 * stripeWidth, cY - h * 0.55);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+        
+        const flashColor = (Math.sin(gameTime * 0.4) > 0) ? '#ef4444' : '#7f1d1d';
+        ctx.fillStyle = flashColor;
+        ctx.beginPath();
+        ctx.arc(cX - w/3, cY - h * 0.9, 6 * scale, 0, Math.PI * 2);
+        ctx.arc(cX + w/3, cY - h * 0.9, 6 * scale, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#000';
+        ctx.stroke();
+        
+        ctx.fillStyle = '#fef08a';
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2.5 * scale;
+        ctx.font = `bold ${Math.max(8, 12 * scale)}px Outfit`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.strokeText('AWAS', cX, cY - h * 0.38);
+        ctx.fillText('AWAS', cX, cY - h * 0.38);
+
+      } else if (currentType === 'stone') {
+        // Obvious Stone obstacle pile
+        const r = 32 * scale; 
+        ctx.fillStyle = '#4b5563'; 
+        ctx.strokeStyle = '#1f2937';
+        ctx.lineWidth = 2 * scale;
+        
+        ctx.beginPath();
+        ctx.arc(cX - 14 * scale, cY - 12 * scale, r * 0.8, 0, Math.PI * 2);
+        ctx.arc(cX + 14 * scale, cY - 12 * scale, r * 0.8, 0, Math.PI * 2);
+        ctx.arc(cX, cY - 25 * scale, r * 0.95, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Exclamation Flag sticking out
+        ctx.strokeStyle = '#ea580c'; 
+        ctx.lineWidth = 2.5 * scale;
+        ctx.beginPath();
+        ctx.moveTo(cX, cY - 25 * scale);
+        ctx.lineTo(cX + 20 * scale, cY - 55 * scale);
+        ctx.stroke();
+        
+        ctx.fillStyle = '#ef4444'; 
+        ctx.beginPath();
+        ctx.moveTo(cX + 20 * scale, cY - 55 * scale);
+        ctx.lineTo(cX + 38 * scale, cY - 47 * scale);
+        ctx.lineTo(cX + 20 * scale, cY - 39 * scale);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Exclamation Mark inside flag
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${Math.max(6, 11 * scale)}px Outfit`;
+        ctx.textAlign = 'center';
+        ctx.fillText('!', cX + 25 * scale, cY - 46 * scale);
+
+      } else if (currentType === 'grass') {
+        // Tumbleweed/Grass obstruction blocking track
+        ctx.strokeStyle = '#b45309'; // brown branches
+        ctx.lineWidth = 2.2 * scale;
+        ctx.fillStyle = '#d97706';
+        
+        ctx.beginPath();
+        ctx.arc(cX, cY - 16 * scale, 24 * scale, 0, Math.PI*2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Spiky dry branch arcs
+        ctx.strokeStyle = '#78350f';
+        ctx.lineWidth = 1.5 * scale;
+        for (let i = 0; i < 8; i++) {
+          const angle = (i * Math.PI) / 4;
+          ctx.beginPath();
+          ctx.arc(cX + Math.cos(angle) * 12 * scale, cY - 16 * scale + Math.sin(angle) * 12 * scale, 15 * scale, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        
+        // Red danger warning beacon
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.arc(cX, cY - 35 * scale, 6 * scale, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else if (currentType === 'cactus') {
+        // Desert cactus block on tracks
+        ctx.fillStyle = '#166534';
+        ctx.strokeStyle = '#14532d';
+        ctx.lineWidth = 2 * scale;
+        
+        ctx.beginPath();
+        ctx.roundRect(cX - 12 * scale, cY - 50 * scale, 24 * scale, 50 * scale, 6 * scale);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Yellow caution stripes on cactus trunk to show it is a hazardous obstacle
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(cX - 12 * scale, cY - 38 * scale, 24 * scale, 6 * scale);
+        ctx.fillRect(cX - 12 * scale, cY - 20 * scale, 24 * scale, 6 * scale);
+      }
+
+      ctx.restore();
+    }
+
+    // Draw the 3 collectible Answer Prop Signposts (Cyan border, transparent slate background)
+    // Redesigned with massive fonts and cards scaling up at horizon so they are legible from far away!
+    function drawAnswerProps() {
+      if (!currentGateData) return;
+
+      const z = Math.pow(questionProgress - 1.0, 1.75); 
+      const gateY = vanishingPoint.y + (roadYBottom - vanishingPoint.y) * z;
+      
+      // Real perspective projection scaling factor
+      // Starts at minimum 0.38 at horizon, so it is large and readable from far away!
+      const archScale = 0.38 + (z * 0.62);
+
+      const laneCenters = [
+        vanishingPoint.x - (vanishingPoint.x - 200) * z, 
+        vanishingPoint.x,                                 
+        vanishingPoint.x + (800 - vanishingPoint.x) * z   
+      ];
+
+      for (let lane = 0; lane < 3; lane++) {
+        const cX = laneCenters[lane];
+        const option = currentGateData[lane];
+        const isSelectedLane = (lane === playerLane);
+
+        ctx.save();
+        
+        // Widescreen large cards (280px base width, 80px base height)
+        const w = 280 * archScale;
+        const h = 82 * archScale;
+        
+        // Pod base standing on the track
+        ctx.fillStyle = '#374151'; // Dark metal base
+        ctx.strokeStyle = '#00f3ff'; // Cyan neon light
+        ctx.lineWidth = 2.5 * archScale;
+        ctx.beginPath();
+        ctx.ellipse(cX, gateY, 22 * archScale, 7 * archScale, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Signpost supporting stem
+        ctx.strokeStyle = '#9ca3af';
+        ctx.lineWidth = 4 * archScale;
+        ctx.beginPath();
+        ctx.moveTo(cX, gateY);
+        ctx.lineTo(cX, gateY - 22 * archScale);
+        ctx.stroke();
+
+        // Transparent card on top of the stem with glowing cyan border
+        // (Uses 180px minimum width so it is completely readable even far away)
+        const finalW = Math.max(180, w);
+        const finalH = Math.max(50, h);
+        const cardY = gateY - 50 * archScale;
+        
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.65)'; // 65% transparent dark slate
+        ctx.strokeStyle = '#00f3ff'; // cyan border
+        ctx.lineWidth = 2.2 * archScale + 0.5;
+        
+        ctx.beginPath();
+        ctx.roundRect(cX - finalW/2, cardY - finalH/2, finalW, finalH, 8 * archScale);
+        ctx.fill();
+        ctx.stroke();
+
+        // Draw Lane Badge inside the card (A, B, C)
+        ctx.fillStyle = '#00f3ff';
+        ctx.font = `bold ${Math.max(12, 24 * archScale)}px Outfit`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const badgeChar = String.fromCharCode(65 + lane); 
+        ctx.fillText(badgeChar, cX - finalW/2.4, cardY);
+
+        // Draw option text banner letters
+        // (Guarantees minimum readable 11.5px font size from the horizon!)
+        ctx.fillStyle = '#fef3c7';
+        ctx.font = `600 ${Math.max(11.5, 15 * archScale)}px Outfit`;
+        ctx.textAlign = 'center';
+        
+        let txt = option.text;
+        if (txt.length > 25) txt = txt.substring(0, 23) + '...';
+        
+        ctx.fillText(txt, cX + 12 * archScale, cardY);
+
+        ctx.restore();
+      }
+    }
+
+    // Animated Character Sprite (Character-removebg-preview.png)
+    function drawPlayer() {
+      ctx.save();
+
+      const bobbing = !state.isPaused ? (Math.sin(gameTime * 0.2) * 5) : 0;
+      
+      const px = playerX;
+      const py = playerY + bobbing;
+
+      ctx.translate(px, py);
+
+      // Shadow on ground (shrinks and fades as character jumps)
+      const shadowScale = Math.max(0.4, 1.0 + (state.jumpY / 150));
+      ctx.fillStyle = `rgba(0, 0, 0, ${0.35 * shadowScale})`;
+      ctx.beginPath();
+      ctx.ellipse(0, 34, 24 * shadowScale, 7 * shadowScale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Displace character vertically in mid-air
+      ctx.translate(0, state.jumpY);
+
+      if (heroImage.complete && heroImage.naturalWidth > 0) {
+        const targetHeight = 95;
+        const aspectRatio = heroImage.naturalWidth / heroImage.naturalHeight;
+        const targetWidth = targetHeight * aspectRatio;
+        
+        ctx.drawImage(heroImage, -targetWidth / 2, -targetHeight + 25, targetWidth, targetHeight);
+      } else {
+        // Fallback placeholder while image is loading
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.arc(0, -15, 18, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    // Vector-Animated Fierce Desert Wolf / Jackal (Snarling fangs, glowing eyes, sharp mane)
+    function drawDog() {
+      let safetyFactor = 3;
+      if (state.lives === 3) safetyFactor = 15;
+      else if (state.lives === 2) safetyFactor = 9;
+      else if (state.lives === 1) safetyFactor = 4;
+      else safetyFactor = 0;
+
+      const safePct = safetyFactor / 15; 
+      const dogY = playerY + 30 + (safePct * 80);
+      const dogX = playerX - (playerX - getLaneCenterX(playerLane)) * 0.1;
+
+      if (dogY > CANVAS_HEIGHT + 50) return;
+
+      ctx.save();
+
+      const dogBounce = !state.isPaused ? (Math.cos(gameTime * 0.35) * 5) : 0;
+      const dy = dogY + dogBounce;
+      const dx = dogX;
+
+      ctx.translate(dx, dy);
+      ctx.scale(0.9, 0.9);
+
+      // Threat aura when close (lives <= 2)
+      if (state.lives <= 2) {
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = state.lives === 1 ? 18 : 10;
+      }
+
+      // Shadow
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.beginPath();
+      ctx.ellipse(0, 28, 22, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      const furColor = '#9a3412'; // Rugged dark desert wolf orange-brown
+      const maneColor = '#451a03'; // Dark wild mane fur
+      const bellyColor = '#fed7aa'; 
+
+      // Wild Mane Spikes (Behind body)
+      ctx.fillStyle = maneColor;
+      ctx.beginPath();
+      ctx.moveTo(-14, -8);
+      ctx.lineTo(-24, -18);
+      ctx.lineTo(-10, -16);
+      ctx.lineTo(-18, -26);
+      ctx.lineTo(0, -22);
+      ctx.lineTo(18, -26);
+      ctx.lineTo(10, -16);
+      ctx.lineTo(24, -18);
+      ctx.lineTo(14, -8);
+      ctx.fill();
+
+      // Wolf Body
+      ctx.fillStyle = furColor;
+      ctx.beginPath();
+      ctx.ellipse(0, 5, 21, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = bellyColor;
+      ctx.beginPath();
+      ctx.ellipse(0, 7, 11, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Scrambling sharp legs
+      ctx.strokeStyle = furColor;
+      ctx.lineWidth = 5.5;
+      ctx.lineCap = 'round';
+      
+      const legRun = !state.isPaused ? Math.sin(gameTime * 0.35) : 0;
+      ctx.beginPath();
+      ctx.moveTo(-12, 10);
+      ctx.lineTo(-19 - legRun * 7, 23);
+      ctx.moveTo(-5, 10);
+      ctx.lineTo(-8 + legRun * 7, 23);
+      ctx.moveTo(5, 10);
+      ctx.lineTo(8 - legRun * 7, 23);
+      ctx.moveTo(12, 10);
+      ctx.lineTo(19 + legRun * 7, 23);
+      ctx.stroke();
+
+      // Sharp Claws
+      ctx.fillStyle = '#1c1917';
+      ctx.fillRect(-22 - legRun * 7, 22, 5, 3);
+      ctx.fillRect(17 + legRun * 7, 22, 5, 3);
+
+      // Head
+      ctx.fillStyle = furColor;
+      ctx.beginPath();
+      ctx.arc(0, -10, 11.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sharp Alert Ears
+      ctx.fillStyle = maneColor;
+      const earAlert = !state.isPaused ? (Math.sin(gameTime * 0.2) * 2) : 0;
+      
+      ctx.beginPath();
+      ctx.moveTo(-9, -12);
+      ctx.lineTo(-16, -30 + earAlert);
+      ctx.lineTo(-2, -17);
+      ctx.closePath();
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.moveTo(9, -12);
+      ctx.lineTo(16, -30 + earAlert);
+      ctx.lineTo(2, -17);
+      ctx.closePath();
+      ctx.fill();
+
+      // Inner ear detail
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.moveTo(-8, -13);
+      ctx.lineTo(-13, -25 + earAlert);
+      ctx.lineTo(-4, -16);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(8, -13);
+      ctx.lineTo(13, -25 + earAlert);
+      ctx.lineTo(4, -16);
+      ctx.closePath();
+      ctx.fill();
+
+      // Snarling Muzzle & Dark Open Mouth with Fangs!
+      ctx.fillStyle = '#18181b'; // Dark mouth interior
+      ctx.beginPath();
+      ctx.ellipse(0, -4, 7, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sharp White Fangs
+      ctx.fillStyle = '#ffffff';
+      // Upper fangs
+      ctx.beginPath();
+      ctx.moveTo(-4, -8);
+      ctx.lineTo(-2, -3);
+      ctx.lineTo(0, -8);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(0, -8);
+      ctx.lineTo(2, -3);
+      ctx.lineTo(4, -8);
+      ctx.fill();
+
+      // Lower fangs
+      ctx.beginPath();
+      ctx.moveTo(-3, -1);
+      ctx.lineTo(-2, -5);
+      ctx.lineTo(-1, -1);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(1, -1);
+      ctx.lineTo(2, -5);
+      ctx.lineTo(3, -1);
+      ctx.fill();
+
+      // Snarling Nose Bridge Wrinkles
+      ctx.strokeStyle = '#451a03';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(-3, -11);
+      ctx.lineTo(0, -9);
+      ctx.lineTo(3, -11);
+      ctx.stroke();
+
+      // Fiery Glowing Eyes (Red/Amber)
+      ctx.fillStyle = '#fef08a'; // Glowing yellow eye base
+      ctx.beginPath();
+      ctx.arc(-5, -13, 3.5, 0, Math.PI * 2);
+      ctx.arc(5, -13, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Slit Red Pupils
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.ellipse(-5, -13, 1.2, 2.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(5, -13, 1.2, 2.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Fierce Slanted Eyebrows (V-shape anger angle)
+      ctx.strokeStyle = '#451a03';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(-9, -17);
+      ctx.lineTo(-2, -14);
+      ctx.moveTo(9, -17);
+      ctx.lineTo(2, -14);
+      ctx.stroke();
+
+      // Black Nose
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(0, -9, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // End Game Screen Triggers
+    function endGame(victory) {
+      state.gameState = victory ? 'victory' : 'gameover';
+      sound.stopBGM();
+      
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+
+      const titleSub = document.querySelector('#gameover-screen .title-sub');
+      const mainHeader = document.querySelector('#gameover-screen h1');
+
+      if (victory) {
+        sound.playVictory();
+        
+        document.getElementById('vic-score').innerText = state.score;
+        
+        const total = state.currentLevelQuestions.length;
+        const correct = total - state.wrongAnswers.length;
+        const accuracyPct = total > 0 ? Math.round((correct / total) * 100) : 100;
+        document.getElementById('vic-accuracy').innerText = `${accuracyPct}%`;
+
+        const list = document.getElementById('vic-review-list');
+        list.innerHTML = '';
+        
+        // Show correct answers
+        if (state.answeredCorrectly.length > 0) {
+          const title = document.createElement('div');
+          title.style.margin = '5px 0 10px 0';
+          title.style.fontWeight = 'bold';
+          title.style.color = '#10b981';
+          title.style.fontSize = '0.9rem';
+          title.innerText = '🟢 Jawapan Betul Anda:';
+          list.appendChild(title);
+
+          state.answeredCorrectly.forEach(q => {
+            const item = document.createElement('div');
+            item.className = 'review-item';
+            item.style.borderColor = 'rgba(52, 211, 153, 0.3)';
+            item.innerHTML = `
+              <div style="font-weight: 700; margin-bottom: 6px; color: #fbbf24;">Soalan: "${q.active}"</div>
+              <div style="color: #34d399; display: flex; align-items: center; gap: 6px; margin-left: 10px;">
+                <span style="background: rgba(52, 211, 153, 0.15); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; border: 1px solid rgba(52, 211, 153, 0.3);">Betul ✅</span>
+                <span>"${q.passive}" (${q.type})</span>
+              </div>
+            `;
+            list.appendChild(item);
+          });
+        }
+
+        // Show wrong answers (if any)
+        if (state.wrongAnswers.length > 0) {
+          const divider = document.createElement('div');
+          divider.style.margin = '20px 0 10px 0';
+          divider.style.fontWeight = 'bold';
+          divider.style.color = '#ef4444';
+          divider.style.fontSize = '0.9rem';
+          divider.innerText = '🔴 Soalan Yang Perlu Diperbaiki:';
+          list.appendChild(divider);
+
+          state.wrongAnswers.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'review-item';
+            row.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            row.innerHTML = `
+              <div style="font-weight: 700; margin-bottom: 6px; color: #fbbf24;">Soalan: "${item.question.active}"</div>
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-left: 10px;">
+                <div style="color: #f87171; display: flex; align-items: center; gap: 6px;">
+                  <span style="background: rgba(239, 68, 68, 0.15); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; border: 1px solid rgba(239, 68, 68, 0.3);">Pilihan Anda ❌</span>
+                  <span style="text-decoration: line-through;">"${item.selected}"</span>
+                </div>
+                <div style="color: #34d399; display: flex; align-items: center; gap: 6px;">
+                  <span style="background: rgba(52, 211, 153, 0.15); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; border: 1px solid rgba(52, 211, 153, 0.3);">Jawapan Betul ✅</span>
+                  <span>"${item.question.passive}" (${item.question.type})</span>
+                </div>
+              </div>
+            `;
+            list.appendChild(row);
+          });
+        }
+
+        showScreen('victory-screen');
+      } else {
+        sound.playGameOver();
+        
+        document.getElementById('go-score').innerText = state.score;
+        document.getElementById('go-answered').innerText = state.currentQuestionIndex;
+
+        // Customise Game Over text based on death reason
+        if (state.deathReason === 'obstacle') {
+          mainHeader.innerText = 'Mario Kemalangan!';
+          titleSub.innerText = 'Baki nyawa habis! Sila elakkan halangan barikade & batu!';
+        } else {
+          mainHeader.innerText = 'Larian Terhenti!';
+          titleSub.innerText = 'Baki nyawa habis kerana pilihan jawapan salah!';
+        }
+
+        const list = document.getElementById('go-review-list');
+        const container = document.getElementById('go-review-container');
+        list.innerHTML = '';
+        
+        // Show correct answers they got right so far
+        if (state.answeredCorrectly.length > 0) {
+          const title = document.createElement('div');
+          title.style.margin = '5px 0 10px 0';
+          title.style.fontWeight = 'bold';
+          title.style.color = '#10b981';
+          title.style.fontSize = '0.9rem';
+          title.innerText = '🟢 Jawapan Betul Anda:';
+          list.appendChild(title);
+
+          state.answeredCorrectly.forEach(q => {
+            const item = document.createElement('div');
+            item.className = 'review-item';
+            item.style.borderColor = 'rgba(52, 211, 153, 0.3)';
+            item.innerHTML = `
+              <div style="font-weight: 700; margin-bottom: 6px; color: #fbbf24;">Soalan: "${q.active}"</div>
+              <div style="color: #34d399; display: flex; align-items: center; gap: 6px; margin-left: 10px;">
+                <span style="background: rgba(52, 211, 153, 0.15); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; border: 1px solid rgba(52, 211, 153, 0.3);">Betul ✅</span>
+                <span>"${q.passive}" (${q.type})</span>
+              </div>
+            `;
+            list.appendChild(item);
+          });
+        }
+
+        // Show wrong answers
+        if (state.wrongAnswers.length > 0) {
+          const divider = document.createElement('div');
+          divider.style.margin = '20px 0 10px 0';
+          divider.style.fontWeight = 'bold';
+          divider.style.color = '#ef4444';
+          divider.style.fontSize = '0.9rem';
+          divider.innerText = '🔴 Latihan Pembetulan (Salah):';
+          list.appendChild(divider);
+
+          state.wrongAnswers.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'review-item';
+            row.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            row.innerHTML = `
+              <div style="font-weight: 700; margin-bottom: 6px; color: #fbbf24;">Soalan: "${item.question.active}"</div>
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-left: 10px;">
+                <div style="color: #f87171; display: flex; align-items: center; gap: 6px;">
+                  <span style="background: rgba(239, 68, 68, 0.15); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; border: 1px solid rgba(239, 68, 68, 0.3);">Pilihan Anda ❌</span>
+                  <span style="text-decoration: line-through;">"${item.selected}"</span>
+                </div>
+                <div style="color: #34d399; display: flex; align-items: center; gap: 6px;">
+                  <span style="background: rgba(52, 211, 153, 0.15); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; border: 1px solid rgba(52, 211, 153, 0.3);">Jawapan Betul ✅</span>
+                  <span>"${item.question.passive}" (${item.question.type})</span>
+                </div>
+              </div>
+            `;
+            list.appendChild(row);
+          });
+        }
+        
+        container.style.display = (state.answeredCorrectly.length > 0 || state.wrongAnswers.length > 0) ? 'block' : 'none';
+
+        showScreen('gameover-screen');
+      }
+    }
+
+    // Feedback continue button
+    document.getElementById('btn-feedback-continue').addEventListener('click', () => {
+      document.getElementById('feedback-overlay').classList.remove('active');
+      
+      if (state.lives <= 0) {
+        state.deathReason = 'lives';
+        endGame(false);
+        return;
+      }
+
+      state.currentQuestionIndex++;
+      state.gameState = 'playing';
+      state.isPaused = false;
+      updatePauseButtonUI();
+      
+      loadQuestion();
+      // Reset timestamps to avoid physics jumps after popup closing
+      lastTime = 0;
+      animFrameId = requestAnimationFrame(gameLoop);
+    });
+
+    // START SCREEN BUTTON HANDLERS
+    document.getElementById('btn-play-menu').addEventListener('click', () => {
+      showScreen('level-screen');
+    });
+
+    document.getElementById('btn-back-levels').addEventListener('click', () => {
+      showScreen('start-screen');
+    });
+
+    // Difficulty clicks
+    document.querySelectorAll('.level-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const diff = card.getAttribute('data-difficulty');
+        startGame(diff);
+      });
+    });
+
+    // GAME OVER & VICTORY BUTTONS
+    document.getElementById('btn-restart-go').addEventListener('click', () => {
+      startGame(state.selectedDifficulty);
+    });
+
+    document.getElementById('btn-menu-go').addEventListener('click', () => {
+      showScreen('start-screen');
+      sound.stopBGM();
+    });
+
+    document.getElementById('btn-restart-vic').addEventListener('click', () => {
+      startGame(state.selectedDifficulty);
+    });
+
+    document.getElementById('btn-menu-vic').addEventListener('click', () => {
+      showScreen('start-screen');
+      sound.stopBGM();
+    });
+
+    // PANDUAN MODAL HANDLERS
+    const panduanModal = document.getElementById('panduan-modal');
+    
+    document.getElementById('btn-panduan').addEventListener('click', () => {
+      panduanModal.classList.add('active');
+      sound.init();
+    });
+
+    document.getElementById('btn-close-panduan').addEventListener('click', () => {
+      panduanModal.classList.remove('active');
+    });
+
+    // Pause screen buttons
+    document.getElementById('btn-pause-resume').addEventListener('click', () => {
+      togglePause();
+    });
+
+    document.getElementById('btn-pause-quit').addEventListener('click', () => {
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      sound.stopBGM();
+      state.gameState = 'menu';
+      state.isPaused = false;
+      document.getElementById('pause-overlay').style.display = 'none';
+      showScreen('start-screen');
+    });
+
+    // Mute control
+    document.getElementById('mute-btn').addEventListener('click', () => {
+      sound.toggleMute();
+    });
+
+    // Modal Tabs logic
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        const targetTab = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-content').forEach(content => {
+          if (content.id === targetTab) content.style.display = 'block';
+          else content.style.display = 'none';
+        });
+      });
+    });
+
+    // Close modal clicking outside
+    window.addEventListener('click', (e) => {
+      if (e.target === panduanModal) {
+        panduanModal.classList.remove('active');
+      }
+    });
+
+    // ============================================================
+    //  ANTARA MUKA LOBI — dipanggil oleh TataKembara.html
+    // ============================================================
+    // Butang Kembali ke Lobi (Menang)
+    document.getElementById('btn-lobi-vic').addEventListener('click', () => {
+      sound.stopBGM();
+      window.kembaliKeLobi();
+    });
+
+    // Butang Kembali ke Lobi (Kalah)
+    document.getElementById('btn-lobi-go').addEventListener('click', () => {
+      sound.stopBGM();
+      window.kembaliKeLobi();
+    });
+
+    // Fungsi ini akan disuntik oleh TataKembara.html selepas iframe dimuatkan.
+    // Secara lalai ia tidak membuat apa-apa — selamat jika game2 dibuka secara langsung.
+    window.kembaliKeLobi = function () {
+      // Diisi oleh induk (TataKembara) — jangan buang baris ini
+    };
+
+    // Skor boleh dibaca oleh induk selepas permainan selesai
+    window.getGameScore = function () {
+      return state.score;
+    };
+
+    // Speed Selector buttons click
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+        
+        const speedVal = btn.getAttribute('data-speed');
+        
+        // Find matching buttons in both instances and activate them
+        document.querySelectorAll(`.speed-btn[data-speed="${speedVal}"]`).forEach(b => b.classList.add('active'));
+        
+        state.gameSpeedSetting = speedVal;
+        sound.init();
+        sound.playTone(523.25, 'sine', 0.1, 0.15);
+      });
+    });
+
+  </script>
+</body>
+</html>

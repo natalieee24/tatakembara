@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Golongan Kata Nama Solitaire</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', 'Segoe UI', sans-serif;
+            background: radial-gradient(ellipse at 50% 30%, #1f4a3a, #0a1a12);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; margin: 0;
+        }
+        body::before {
+            content: ''; position: fixed; top: -30%; left: -30%;
+            width: 160%; height: 160%;
+            background: radial-gradient(ellipse at 40% 30%, rgba(255,215,0,0.04), transparent 60%);
+            pointer-events: none; z-index: 0;
+        }
+
+        @keyframes shimmerGold {
+            0%,100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        @keyframes floatIcon {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* ===== LOBBY ===== */
+        .lobby-screen {
+            position: fixed; inset: 0;
+            background: radial-gradient(ellipse at 50% 30%, #1f4a3a, #0a1a12);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2000; padding: 20px;
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .lobby-screen.hide { opacity: 0; pointer-events: none; transform: scale(1.04); }
+        .lobby-box {
+            background: linear-gradient(165deg, rgba(29,74,58,0.97), rgba(15,42,30,0.99));
+            border-radius: 40px; padding: 44px 40px 40px;
+            max-width: 540px; width: 100%;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center; position: relative; z-index: 1;
+        }
+        .lobby-box::before {
+            content: ''; position: absolute; inset: 0; border-radius: 40px;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        .lobby-icon { font-size: 60px; margin-bottom: 10px; display: block; animation: floatIcon 3s ease-in-out infinite; }
+        .lobby-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 30px; font-weight: 400;
+            background: linear-gradient(135deg, #f9e45b 0%, #f5a623 40%, #f9e45b 70%, #f5a623 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shimmerGold 4s ease-in-out infinite;
+            letter-spacing: 1px; margin-bottom: 6px;
+        }
+        .lobby-tagline { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 28px; line-height: 1.5; }
+        .rules-box {
+            background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 18px; padding: 20px; margin-bottom: 24px; text-align: left;
+        }
+        .rules-title { font-size: 11px; font-weight: 800; color: #f9e45b; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+        .rules-list { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+        .rules-list li {
+            display: grid; grid-template-columns: 24px 1fr;
+            align-items: start; gap: 8px;
+            font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.5;
+        }
+        .rules-list li .rule-icon { font-size: 14px; padding-top: 1px; text-align: center; }
+        .tag-gold { color: #f9e45b; font-weight: 700; }
+        .tag-blue { color: #a8d5ff; font-weight: 700; }
+        .tag-green { color: #6fcf97; font-weight: 700; }
+        .tag-red { color: #f28b82; font-weight: 700; }
+        .tag-white { color: #fff; font-weight: 700; }
+        .lobby-stats-row { display: flex; gap: 10px; margin-bottom: 24px; }
+        .lobby-stat {
+            flex: 1; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 14px; padding: 14px 8px; text-align: center;
+        }
+        .lobby-stat .stat-val { font-family: 'Fredoka One', cursive; font-size: 24px; font-weight: 400; color: #ffd966; display: block; }
+        .lobby-stat .stat-lbl { font-size: 10px; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+        .btn-start {
+            width: 100%; padding: 15px; border: none; border-radius: 50px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 16px; font-weight: 800; cursor: pointer;
+            background: linear-gradient(135deg, #f9e45b, #f5a623); color: #1a2a1f;
+            box-shadow: 0 5px 0 #b8832e, 0 10px 30px rgba(245,166,35,0.25);
+            letter-spacing: 0.5px; transition: 0.2s cubic-bezier(0.34,1.56,0.64,1);
+            position: relative; z-index: 1;
+        }
+        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #b8832e, 0 14px 40px rgba(245,166,35,0.35); }
+        .btn-start:active { transform: translateY(4px); box-shadow: 0 2px 0 #b8832e; }
+
+        /* ===== PAUSE ===== */
+        .pause-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .pause-overlay.show { opacity: 1; pointer-events: all; }
+        .pause-box {
+            background: linear-gradient(160deg, #1e4d3a, #0d2b1d);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 32px; padding: 44px 40px; text-align: center;
+            max-width: 360px; width: 90%; box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .pause-overlay.show .pause-box { transform: scale(1); }
+        .pause-icon { font-size: 56px; margin-bottom: 12px; display: block; }
+        .pause-title { font-family: 'Fredoka One', cursive; font-size: 28px; font-weight: 400; color: #f9e45b; margin-bottom: 6px; }
+        .pause-sub { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 28px; }
+        .pause-btn-row { display: flex; flex-direction: column; gap: 10px; }
+        .btn-resume {
+            padding: 13px; border: none; border-radius: 50px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            background: linear-gradient(135deg, #f9e45b, #f5a623); color: #1a2a1f;
+            box-shadow: 0 4px 0 #b8832e; transition: 0.2s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .btn-resume:hover { transform: translateY(-2px); }
+        .btn-resume:active { transform: translateY(3px); }
+        .btn-newgame-pause {
+            padding: 12px; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50px; font-family: 'Nunito', sans-serif;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); transition: 0.2s;
+        }
+        .btn-newgame-pause:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+        /* ===== CONFIRM ===== */
+        .confirm-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1800; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .confirm-overlay.show { opacity: 1; pointer-events: all; }
+        .confirm-box {
+            background: linear-gradient(160deg, #1e4d3a, #0d2b1d);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 28px; padding: 36px 32px; text-align: center;
+            max-width: 340px; width: 90%; box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .confirm-overlay.show .confirm-box { transform: scale(1); }
+        .confirm-icon { font-size: 44px; margin-bottom: 10px; display: block; }
+        .confirm-title { font-family: 'Fredoka One', cursive; font-size: 22px; font-weight: 400; color: #fff; margin-bottom: 8px; }
+        .confirm-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 24px; line-height: 1.5; }
+        .confirm-btn-row { display: flex; gap: 10px; }
+        .btn-confirm-yes {
+            flex: 1; padding: 12px; border: none; border-radius: 50px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 14px; font-weight: 700; cursor: pointer;
+            background: linear-gradient(135deg, #f9e45b, #f5a623); color: #1a2a1f;
+            box-shadow: 0 3px 0 #b8832e; transition: 0.2s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .btn-confirm-yes:hover { transform: translateY(-1px); }
+        .btn-confirm-yes:active { transform: translateY(2px); }
+        .btn-confirm-no {
+            flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50px; font-family: 'Nunito', sans-serif;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); transition: 0.2s;
+        }
+        .btn-confirm-no:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+        /* ===== PETUA BUTTON ===== */
+        .btn-petua {
+            position: fixed; bottom: 32px; right: 32px;
+            width: 58px; height: 58px; border-radius: 50%;
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            border: none; cursor: pointer;
+            box-shadow: 0 4px 0 #4a3ab8, 0 8px 24px rgba(108,92,231,0.4);
+            color: #fff; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 1px;
+            transition: 0.2s cubic-bezier(0.34,1.56,0.64,1); z-index: 100;
+        }
+        .btn-petua:hover { transform: translateY(-3px) scale(1.06); box-shadow: 0 7px 0 #4a3ab8, 0 14px 32px rgba(108,92,231,0.5); }
+        .btn-petua:active { transform: translateY(2px); box-shadow: 0 2px 0 #4a3ab8; }
+        .btn-petua .petua-icon { font-size: 20px; line-height: 1; }
+        .btn-petua .petua-label { font-size: 9px; font-weight: 800; letter-spacing: 0.5px; opacity: 0.9; }
+        .btn-petua.no-hint { opacity: 0.35; pointer-events: none; }
+
+        /* ===== BGM BUTTON ===== */
+        .btn-bgm {
+            position: fixed; bottom: 100px; right: 32px;
+            width: 58px; height: 58px; border-radius: 50%;
+            background: linear-gradient(135deg, #fdcb6e, #e17055);
+            border: none; cursor: pointer;
+            box-shadow: 0 4px 0 #a0522d, 0 8px 24px rgba(225,112,85,0.4);
+            color: #fff; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 1px;
+            transition: 0.2s cubic-bezier(0.34,1.56,0.64,1); z-index: 100;
+        }
+        .btn-bgm:hover { transform: translateY(-3px) scale(1.06); box-shadow: 0 7px 0 #a0522d, 0 14px 32px rgba(225,112,85,0.5); }
+        .btn-bgm:active { transform: translateY(2px); box-shadow: 0 2px 0 #a0522d; }
+        .btn-bgm .bgm-icon { font-size: 20px; line-height: 1; }
+        .btn-bgm .bgm-label { font-size: 9px; font-weight: 800; letter-spacing: 0.5px; opacity: 0.9; }
+        .btn-bgm.muted { background: linear-gradient(135deg, #636e72, #2d3436); box-shadow: 0 4px 0 #1a1a1a, 0 8px 24px rgba(0,0,0,0.3); }
+
+        /* ===== MASCOT ===== */
+        .mascot-container {
+            position: fixed; bottom: 168px; right: 20px;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            z-index: 99; pointer-events: none;
+        }
+        .mascot-bubble {
+            background: rgba(255,255,255,0.95); color: #1a2a1f;
+            font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 700;
+            padding: 6px 12px; border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            white-space: nowrap; opacity: 0; transform: translateY(6px);
+            transition: opacity 0.4s, transform 0.4s; position: relative;
+        }
+        .mascot-bubble::after {
+            content: ''; position: absolute; bottom: -6px; left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent; border-top-color: rgba(255,255,255,0.95); border-bottom: none;
+        }
+        .mascot-bubble.show { opacity: 1; transform: translateY(0); }
+        .mascot-svg-wrap {
+            width: 64px; height: 80px; cursor: default;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+        }
+
+        /* ===== PETUA MODAL ===== */
+        .petua-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1600; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .petua-overlay.show { opacity: 1; pointer-events: all; }
+        .petua-box {
+            background: linear-gradient(160deg, #1e2d4a, #0d1b2b);
+            border: 1px solid rgba(162,155,254,0.2);
+            border-radius: 28px; padding: 36px 32px; text-align: left;
+            max-width: 440px; width: 90%;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(162,155,254,0.08);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .petua-overlay.show .petua-box { transform: scale(1) translateY(0); }
+        .petua-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+        .petua-header-icon { font-size: 28px; }
+        .petua-header-text { flex: 1; }
+        .petua-header-title { font-family: 'Fredoka One', cursive; font-size: 16px; font-weight: 400; color: #a29bfe; text-transform: uppercase; letter-spacing: 1px; }
+        .petua-header-sub { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+        .petua-question {
+            font-size: 15px; font-weight: 700; color: #fff;
+            margin-bottom: 14px; line-height: 1.5; padding: 12px 16px;
+            background: rgba(162,155,254,0.08);
+            border-left: 3px solid #a29bfe; border-radius: 0 10px 10px 0;
+        }
+        .petua-answer { font-size: 13.5px; color: rgba(255,255,255,0.78); line-height: 1.7; margin-bottom: 24px; }
+        .petua-answer strong { color: #f9e45b; font-weight: 700; }
+        .petua-tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 16px; }
+        .petua-tag.correct { background: rgba(111,207,151,0.15); color: #6fcf97; border: 1px solid rgba(111,207,151,0.25); }
+        .petua-tag.wrong { background: rgba(242,139,130,0.15); color: #f28b82; border: 1px solid rgba(242,139,130,0.25); }
+        .btn-petua-close {
+            width: 100%; padding: 12px; border: none; border-radius: 50px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 14px; font-weight: 700; cursor: pointer;
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: #fff;
+            box-shadow: 0 3px 0 #4a3ab8; transition: 0.2s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .btn-petua-close:hover { transform: translateY(-1px); }
+        .btn-petua-close:active { transform: translateY(2px); }
+
+        /* ===== RESULT MODAL ===== */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.4s;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: all; }
+        .modal-box {
+            background: linear-gradient(160deg, #1e4d3a, #0d2b1d);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 32px; padding: 44px 36px 36px; text-align: center;
+            max-width: 420px; width: 90%;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.06);
+            transform: scale(0.85) translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .modal-overlay.show .modal-box { transform: scale(1) translateY(0); }
+        .modal-icon { font-size: 68px; margin-bottom: 14px; display: block; animation: iconBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both; }
+        @keyframes iconBounce { 0% { transform: scale(0) rotate(-10deg); } 100% { transform: scale(1) rotate(0deg); } }
+        .modal-title { font-family: 'Fredoka One', cursive; font-size: 36px; font-weight: 400; margin-bottom: 8px; letter-spacing: 1px; }
+        .modal-title.win-title { background: linear-gradient(135deg, #f9e45b, #f5a623); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .modal-title.lose-title { color: #f28b82; }
+        .modal-subtitle { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 22px; line-height: 1.5; }
+        .modal-score { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 12px 28px; margin-bottom: 24px; display: inline-block; }
+        .modal-score .score-num { font-family: 'Fredoka One', cursive; font-size: 42px; font-weight: 400; color: #ffd966; display: block; }
+        .modal-score .score-label { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .modal-btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .modal-btn-primary {
+            padding: 13px; border: none; border-radius: 50px;
+            font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer;
+            background: linear-gradient(135deg, #f9e45b, #f5a623); color: #1a2a1f;
+            box-shadow: 0 4px 0 #b8832e; width: 100%;
+            transition: 0.2s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .modal-btn-primary:hover { transform: translateY(-2px); }
+        .modal-btn-primary:active { transform: translateY(3px); }
+        .modal-btn-secondary {
+            padding: 12px; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50px; font-family: 'Nunito', sans-serif;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); width: 100%; transition: 0.2s;
+        }
+        .modal-btn-secondary:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
+        /* ===== GAME WRAPPER ===== */
+        .game-wrapper {
+            background: linear-gradient(165deg, rgba(29,74,58,0.95), rgba(15,42,30,0.98));
+            border-radius: 48px; padding: 28px 32px 32px;
+            max-width: 1200px; width: 100%;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.03);
+            position: relative; z-index: 1; backdrop-filter: blur(2px);
+        }
+        .game-wrapper::before {
+            content: ''; position: absolute; inset: 0; border-radius: 48px;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            color: #fff; padding-bottom: 14px;
+            border-bottom: 2px solid rgba(255,255,255,0.04);
+            margin-bottom: 22px; flex-wrap: wrap; gap: 10px;
+            position: relative; z-index: 1;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 22px; font-weight: 400;
+            background: linear-gradient(135deg, #f9e45b 0%, #f5a623 40%, #f9e45b 70%, #f5a623 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shimmerGold 4s ease-in-out infinite; letter-spacing: 1px;
+        }
+        .btn-pause {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08);
+            color: #fff; width: 36px; height: 36px; border-radius: 50%;
+            font-size: 15px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; flex-shrink: 0;
+        }
+        .btn-pause:hover { background: rgba(255,255,255,0.18); transform: scale(1.08); }
+        .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .stats {
+            display: flex; gap: 16px; font-size: 14px; font-weight: 700;
+            background: rgba(0,0,0,0.4); padding: 6px 20px; border-radius: 50px;
+            color: #fff; border: 1px solid rgba(255,255,255,0.04);
+            backdrop-filter: blur(4px); align-items: center;
+        }
+        .stats span { color: #ffd966; font-weight: 800; }
+        .timer-display {
+            font-size: 14px; font-weight: 700; color: #fff;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);
+            padding: 6px 16px; border-radius: 50px; backdrop-filter: blur(4px);
+            transition: all 0.3s; display: flex; align-items: center; gap: 6px;
+        }
+        .timer-display.danger {
+            color: #ff4444; border-color: rgba(255,68,68,0.4);
+            background: rgba(255,68,68,0.12); animation: timerPulse 0.5s ease-in-out infinite;
+        }
+        @keyframes timerPulse {
+            0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,68,68,0); }
+            50% { transform: scale(1.05); box-shadow: 0 0 16px 4px rgba(255,68,68,0.3); }
+        }
+
+        /* ===== SLOTS ===== */
+        .slots { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 24px; position: relative; z-index: 1; }
+        .slot-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; width: 100%; }
+        .slot-label {
+            background: linear-gradient(135deg, #f9e45b, #e8c84a); color: #1a2a1f;
+            font-size: 9px; font-weight: 800; padding: 3px 10px; border-radius: 20px;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            box-shadow: 0 2px 16px rgba(249,228,91,0.25);
+            border: 1px solid rgba(255,255,255,0.25);
+            white-space: nowrap; opacity: 0; visibility: hidden;
+            transition: 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            min-height: 22px; display: flex; align-items: center; gap: 3px;
+            max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+        }
+        .slot-label.visible { opacity: 1; visibility: visible; }
+        .slot-label .label-emoji { font-size: 10px; flex-shrink: 0; }
+        .slot-label .label-text { overflow: hidden; text-overflow: ellipsis; }
+        .slot-progress { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.3); min-height: 15px; transition: 0.3s; }
+        .slot-progress.has-data { color: #f9e45b; }
+        .slot {
+            background: rgba(0,0,0,0.25); border-radius: 18px;
+            border: 3px dashed rgba(255,255,255,0.06); transition: 0.3s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative; aspect-ratio: 5/7; width: 100%; overflow: hidden;
+            min-width: 0; box-shadow: inset 0 0 40px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.03);
+        }
+        .slot.highlight { border-color: #ffd966; background: rgba(255,215,0,0.06); box-shadow: 0 0 30px rgba(255,215,0,0.1), inset 0 0 40px rgba(255,215,0,0.04); transform: scale(1.01); }
+        .slot.has-category { border-style: solid; border-color: rgba(255,215,0,0.08); background: rgba(255,215,0,0.02); }
+        .slot-empty-display { color: rgba(255,255,255,0.05); font-size: 13px; font-weight: 700; letter-spacing: 2px; text-align: center; user-select: none; }
+        .slot.has-category .slot-empty-display { display: none; }
+
+        /* ===== CARDS ===== */
+        .card {
+            border-radius: 16px; text-align: center; font-weight: 800; color: #1a2a1f;
+            border: 2px solid rgba(255,255,255,0.25); user-select: none;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+            line-height: 1.2; position: relative; transition: 0.15s;
+            aspect-ratio: 5/7; width: 100%; height: 100%; overflow: hidden;
+        }
+        .card:active { transform: scale(0.94); }
+        .card.dragging { opacity: 0.3; transform: scale(0.9); }
+        .card .emoji { font-size: 26px; margin-bottom: 3px; position: relative; z-index: 1; }
+        .card .sub-label { font-size: 10px; font-weight: 600; color: rgba(0,0,0,0.35); margin-top: 2px; position: relative; z-index: 1; }
+        .card .card-word { position: relative; z-index: 1; }
+
+        /* Blue example card */
+        .card.example-card {
+            background: linear-gradient(160deg, #dbeeff, #aed4f5, #85b8e8);
+            border-color: rgba(100,160,230,0.5);
+            box-shadow: 0 6px 0 #3a7abf, 0 10px 28px rgba(0,0,0,0.35),
+                        inset 0 1px 0 rgba(255,255,255,0.55);
+            padding: 14px 8px; font-size: 15px; border-radius: 16px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
+            color: #0d2d4a;
+        }
+        .card.example-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 20% 15%, rgba(255,255,255,0.5) 0%, transparent 50%),
+                radial-gradient(circle at 80% 85%, rgba(50,120,200,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .card.example-card::after {
+            content: ''; position: absolute; inset: 6px;
+            border: 1px solid rgba(80,140,210,0.25);
+            border-radius: 11px; pointer-events: none;
+        }
+        .card.example-card .emoji { font-size: 26px; margin-bottom: 4px; position: relative; z-index: 1; }
+        .card.example-card .card-word { position: relative; z-index: 1; font-size: 14px; font-weight: 800; color: #0d2d4a; }
+
+        /* Gold category card */
+        .card.category-card {
+            background: linear-gradient(145deg, #ffe87a, #f5c842, #e8a820);
+            border-color: rgba(255,220,80,0.6);
+            box-shadow: 0 6px 0 #a06820, 0 12px 30px rgba(0,0,0,0.4),
+                        inset 0 1px 0 rgba(255,255,200,0.5);
+            padding: 12px 8px; font-size: 13px; border-radius: 16px;
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;
+            color: #3d2200;
+        }
+        .card.category-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse at 30% 20%, rgba(255,255,200,0.4) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 80%, rgba(160,100,0,0.15) 0%, transparent 50%);
+            pointer-events: none; border-radius: 14px;
+        }
+        .card.category-card::after {
+            content: ''; position: absolute; inset: 6px;
+            border: 1px solid rgba(255,200,50,0.35);
+            border-radius: 11px; pointer-events: none;
+        }
+        .card.category-card .emoji { font-size: 26px; margin-bottom: 4px; position: relative; z-index: 1; }
+        .card.category-card .card-word { position: relative; z-index: 1; font-size: 12px; font-weight: 800; color: #3d2200; line-height: 1.3; }
+        .card.category-card .sub-label {
+            position: relative; z-index: 1;
+            color: rgba(80,40,0,0.65); font-size: 9px; font-weight: 800;
+            background: rgba(255,255,255,0.25);
+            padding: 2px 10px; border-radius: 20px; margin-top: 4px;
+            letter-spacing: 0.5px; text-transform: uppercase;
+        }
+
+        /* ===== DRAW SECTION ===== */
+        .draw-section {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            flex-wrap: wrap; gap: 16px; margin-top: 4px;
+            padding-top: 18px; border-top: 2px solid rgba(255,255,255,0.04);
+            position: relative; z-index: 1;
+        }
+        .draw-pile {
+            display: flex; flex-wrap: nowrap; gap: 10px; align-items: center;
+            flex: 1; min-height: 80px; background: rgba(0,0,0,0.12); border-radius: 24px;
+            padding: 14px 16px; justify-content: center;
+            border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: inset 0 2px 30px rgba(0,0,0,0.12); overflow: hidden;
+        }
+        .draw-pile .card {
+            flex: 0 0 calc((100% - 60px) / 7); min-width: 60px; max-width: 100px;
+            cursor: grab; border-radius: 14px; padding: 10px 6px; font-size: 11px;
+            aspect-ratio: 5/7; position: relative !important; top: auto !important; left: auto !important;
+            margin: 0 !important; min-height: unset !important; height: auto !important;
+            transition: 0.2s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .draw-pile .card:hover { transform: translateY(-8px) scale(1.04); }
+        .draw-pile .card .emoji { font-size: 18px; }
+        .draw-pile .card:active { cursor: grabbing; }
+        .draw-pile .card.category-card { min-height: unset; padding: 8px 5px; font-size: 10px; height: auto !important; }
+        .draw-pile .card.category-card .emoji { font-size: 17px; }
+        .draw-pile .card.example-card { padding: 10px 6px; font-size: 11px; position: relative !important; top: auto !important; left: auto !important; height: auto !important; }
+        .draw-pile .card.example-card .emoji { font-size: 16px; }
+
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
+        .btn {
+            padding: 10px 26px; border: none; border-radius: 50px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700; font-size: 14px; cursor: pointer;
+            transition: 0.25s cubic-bezier(0.34,1.56,0.64,1);
+            letter-spacing: 0.5px; position: relative; overflow: hidden;
+        }
+        .btn::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.1), transparent 60%); pointer-events: none; }
+        .btn-primary { background: linear-gradient(135deg, #f9e45b, #f5a623); color: #1a2a1f; box-shadow: 0 4px 0 #b8832e; }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:active { transform: translateY(3px); }
+        .btn-primary:disabled { opacity: 0.3; transform: translateY(3px); pointer-events: none; }
+        .btn-secondary { background: rgba(255,255,255,0.06); color: #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.06); backdrop-filter: blur(4px); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.14); transform: translateY(-2px); }
+        .btn-secondary:active { transform: translateY(3px); }
+
+        .message {
+            color: #ffd966; font-size: 15px; font-weight: 700;
+            text-align: center; padding: 10px 14px; min-height: 44px; margin-top: 4px;
+            background: rgba(0,0,0,0.12); border-radius: 18px;
+            position: relative; z-index: 1;
+            border: 1px solid rgba(255,255,255,0.03);
+            backdrop-filter: blur(4px); transition: 0.3s;
+        }
+        .message.success { color: #6fcf97; border-color: rgba(111,207,151,0.1); }
+        .message.error { color: #f28b82; border-color: rgba(242,139,130,0.1); }
+        .message.win { color: #f9e45b; font-size: 20px; background: rgba(255,215,0,0.04); border: 1px solid rgba(255,215,0,0.08); animation: winPulse 2s ease-in-out infinite; }
+        .message.hint { color: #a8d5ff; }
+        @keyframes winPulse { 0%,100% { box-shadow: 0 0 20px rgba(255,215,0,0); } 50% { box-shadow: 0 0 40px rgba(255,215,0,0.05); } }
+        @keyframes cardShake {
+            0%,100% { transform: translateX(0); }
+            20% { transform: translateX(-12px) rotate(-2deg); }
+            40% { transform: translateX(12px) rotate(2deg); }
+            60% { transform: translateX(-8px) rotate(-1deg); }
+            80% { transform: translateX(8px) rotate(1deg); }
+        }
+        .card.shake { animation: cardShake 0.4s ease-in-out; }
+        .celebration-overlay { position: fixed; top:0;left:0;right:0;bottom:0; pointer-events:none; z-index:999; overflow:hidden; }
+        .confetti-piece { position:absolute; width:10px; height:10px; opacity:0; animation:confettiFall linear forwards; }
+        @keyframes confettiFall {
+            0% { opacity:1; transform:translateY(-20px) rotate(0deg) scale(0); }
+            10% { transform:translateY(10vh) rotate(72deg) scale(1); }
+            100% { opacity:0; transform:translateY(110vh) rotate(720deg) scale(0.5); }
+        }
+
+        @media (max-width:1050px) { .slots { grid-template-columns:repeat(3,1fr); } }
+        @media (max-width:750px) {
+            .slots { grid-template-columns:repeat(2,1fr); gap:10px; }
+            .game-wrapper { padding:14px 12px 18px; border-radius:32px; }
+            .header { flex-direction:column; align-items:stretch; text-align:center; }
+            .header-left { justify-content:center; }
+            .header-right { justify-content:center; }
+            .header h1 { font-size:16px; }
+            .stats { font-size:12px; padding:4px 14px; gap:10px; }
+            .draw-section { flex-direction:column; align-items:stretch; }
+            .btn-group { justify-content:center; }
+            .btn { padding:8px 16px; font-size:12px; flex:1; min-width:60px; }
+            .draw-pile { padding:10px 12px; gap:6px; }
+            .draw-pile .card { font-size:9px; padding:6px 3px; border-radius:10px; }
+            .draw-pile .card .emoji { font-size:12px; }
+            .message { font-size:12px; padding:8px 10px; min-height:38px; }
+            .btn-petua { bottom:16px; right:16px; width:50px; height:50px; }
+            .btn-bgm { bottom:80px; right:16px; width:50px; height:50px; }
+            .mascot-container { display:none; }
+        }
+        @media (max-width:480px) {
+            .slots { grid-template-columns:1fr 1fr; gap:6px; }
+            .draw-pile .card { font-size:8px; padding:5px 2px; border-radius:8px; }
+            .draw-pile .card .emoji { font-size:10px; }
+            .btn { font-size:10px; padding:6px 10px; min-width:45px; }
+            .message { font-size:11px; padding:6px 8px; min-height:32px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOBBY -->
+<div class="lobby-screen" id="lobbyScreen">
+    <div class="lobby-box">
+        <span class="lobby-icon">♠️</span>
+        <div class="lobby-title">Golongan Kata Nama Solitaire</div>
+        <div class="lobby-tagline">Uji pengetahuan anda tentang golongan kata nama!</div>
+        <div class="rules-box">
+            <div class="rules-title">📋 Cara bermain</div>
+            <ul class="rules-list">
+                <li><span class="rule-icon">🟡</span><span>Cari kad <span class="tag-gold">Kategori</span> (warna emas) dan seret ke mana-mana slot kosong.</span></li>
+                <li><span class="rule-icon">🔵</span><span>Kemudian seret kad <span class="tag-blue">contoh</span> (warna biru) ke slot yang mempunyai kategori yang betul.</span></li>
+                <li><span class="rule-icon">🔄</span><span>Gunakan butang <span class="tag-white">Kocok</span> untuk mengacak kad dalam timbunan.</span></li>
+                <li><span class="rule-icon">⏱️</span><span>Anda mempunyai <span class="tag-gold">150 saat</span> untuk menyiapkan semua kad!</span></li>
+                <li><span class="rule-icon">🏆</span><span>Kad kategori = <span class="tag-gold">+15 mata</span> &nbsp;|&nbsp; Kad contoh betul = <span class="tag-green">+10 mata</span> &nbsp;|&nbsp; Kad contoh salah = <span class="tag-red">-10 mata</span></span></li>
+            </ul>
+        </div>
+        <div class="lobby-stats-row">
+            <div class="lobby-stat"><span class="stat-val">5</span><span class="stat-lbl">Kategori</span></div>
+            <div class="lobby-stat"><span class="stat-val">56</span><span class="stat-lbl">Jumlah kad</span></div>
+            <div class="lobby-stat"><span class="stat-val">2:30</span><span class="stat-lbl">Had masa</span></div>
+        </div>
+        <button class="btn-start" onclick="startGame()">▶ Mula permainan</button>
+    </div>
+</div>
+
+<!-- PAUSE -->
+<div class="pause-overlay" id="pauseOverlay">
+    <div class="pause-box">
+        <span class="pause-icon">⏸️</span>
+        <div class="pause-title">Permainan dijeda</div>
+        <div class="pause-sub">Masa telah dihentikan sementara.</div>
+        <div class="pause-btn-row">
+            <button class="btn-resume" onclick="resumeGame()">▶ Teruskan permainan</button>
+            <button class="btn-newgame-pause" onclick="showConfirm()">⟳ Permainan baharu</button>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+        <span class="confirm-icon">🔄</span>
+        <div class="confirm-title">Mula semula?</div>
+        <div class="confirm-sub">Kemajuan semasa akan hilang. Adakah anda pasti?</div>
+        <div class="confirm-btn-row">
+            <button class="btn-confirm-yes" onclick="confirmYes()">Ya, mula semula</button>
+            <button class="btn-confirm-no" onclick="confirmNo()">Tidak, teruskan</button>
+        </div>
+    </div>
+</div>
+
+<!-- PETUA MODAL -->
+<div class="petua-overlay" id="petuaOverlay">
+    <div class="petua-box">
+        <div class="petua-header">
+            <div class="petua-header-icon">💡</div>
+            <div class="petua-header-text">
+                <div class="petua-header-title">Petua &amp; penerangan</div>
+                <div class="petua-header-sub">Berdasarkan langkah terakhir anda</div>
+            </div>
+        </div>
+        <div id="petuaTag"></div>
+        <div class="petua-question" id="petuaQuestion"></div>
+        <div class="petua-answer" id="petuaAnswer"></div>
+        <button class="btn-petua-close" onclick="closePetua()">Faham, teruskan!</button>
+    </div>
+</div>
+
+<!-- RESULT MODAL -->
+<div class="modal-overlay" id="resultModal">
+    <div class="modal-box">
+        <span class="modal-icon" id="modalIcon">🎉</span>
+        <div class="modal-title" id="modalTitle">Tahniah!</div>
+        <div class="modal-subtitle" id="modalSubtitle">Anda berjaya!</div>
+        <div class="modal-score">
+            <span class="score-num" id="modalScore">0</span>
+            <span class="score-label">Mata</span>
+        </div>
+        <div class="modal-btn-group">
+            <button class="modal-btn-primary" onclick="closeModalAndReset();">🔄 Permainan baharu</button>
+            <button class="modal-btn-secondary" onclick="window.kembaliKeMenu();">📋 Laman utama</button>
+            <button class="modal-btn-secondary" onclick="window.kembaliKeLobi && window.kembaliKeLobi();">🏠 Kembali ke lobi</button>
+        </div>
+    </div>
+</div>
+
+<!-- GAME -->
+<div class="game-wrapper" id="app">
+    <div class="header">
+        <div class="header-left">
+            <button class="btn-pause" id="pauseBtn" onclick="togglePause()" title="Jeda">⏸</button>
+            <h1>♠️ Golongan Kata Nama Solitaire</h1>
+        </div>
+        <div class="header-right">
+            <div class="stats">
+                <span>🏆 <span id="scoreDisplay">0</span></span>
+                <span>🃏 <span id="remainingDisplay">0</span></span>
+            </div>
+            <div class="timer-display" id="timerDisplay">⏱ <span id="timerText">2:30</span></div>
+        </div>
+    </div>
+    <div class="slots" id="slotsContainer"></div>
+    <div class="draw-section">
+        <div class="draw-pile" id="drawPile"></div>
+        <div class="btn-group">
+            <button class="btn btn-primary" id="shuffleBtn">🔄 Kocok</button>
+            <button class="btn btn-secondary" id="resetBtn">⟳ Permainan baharu</button>
+        </div>
+    </div>
+    <div class="message hint" id="messageBox">🎯 Cari kad Kategori (warna emas) dan isi ke mana-mana slot!</div>
+</div>
+
+<!-- PETUA BUTTON -->
+<button class="btn-petua no-hint" id="petuaBtn" onclick="openPetua()">
+    <span class="petua-icon">💡</span>
+    <span class="petua-label">PETUA</span>
+</button>
+
+<!-- BGM BUTTON -->
+<button class="btn-bgm" id="bgmBtn" onclick="toggleBGM()" title="BGM">
+    <span class="bgm-icon">🎷</span>
+    <span class="bgm-label">BGM</span>
+</button>
+
+<!-- MASCOT -->
+<div class="mascot-container" id="mascotContainer">
+    <div class="mascot-bubble" id="mascotBubble">Anda boleh!</div>
+    <svg class="mascot-svg-wrap" id="mascotSvg" viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="32" cy="62" rx="12" ry="10" fill="#2d6a4f"/>
+        <rect x="24" y="68" width="6" height="10" rx="3" fill="#1b4332"/>
+        <rect x="34" y="68" width="6" height="10" rx="3" fill="#1b4332"/>
+        <rect id="armL" x="14" y="52" width="5" height="12" rx="2.5" fill="#2d6a4f" transform-origin="17 52"/>
+        <rect id="armR" x="45" y="52" width="5" height="12" rx="2.5" fill="#2d6a4f" transform-origin="47 52"/>
+        <rect x="29" y="44" width="6" height="6" rx="2" fill="#52b788"/>
+        <g id="mascotHead">
+            <ellipse cx="32" cy="36" rx="16" ry="15" fill="#52b788"/>
+            <ellipse cx="26" cy="28" rx="5" ry="3" fill="rgba(255,255,255,0.15)" transform="rotate(-20,26,28)"/>
+            <circle id="eyeL" cx="26" cy="34" r="4" fill="white"/>
+            <circle id="eyeR" cx="38" cy="34" r="4" fill="white"/>
+            <circle id="pupilL" cx="27" cy="35" r="2.2" fill="#1b4332"/>
+            <circle id="pupilR" cx="39" cy="35" r="2.2" fill="#1b4332"/>
+            <circle cx="28" cy="34" r="0.8" fill="white"/>
+            <circle cx="40" cy="34" r="0.8" fill="white"/>
+            <path id="mascotMouth" d="M 26 41 Q 32 46 38 41" stroke="#1b4332" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="32" cy="22" rx="18" ry="4" fill="#1b4332"/>
+            <rect x="22" y="8" width="20" height="16" rx="4" fill="#1b4332"/>
+            <rect x="22" y="20" width="20" height="4" rx="1" fill="#f9e45b"/>
+            <text x="32" y="18" text-anchor="middle" font-size="8" fill="#f9e45b">★</text>
+        </g>
+    </svg>
+</div>
+
+<script>
+// ==============================================================
+//  BGM — Jazz Lounge (Web Audio API)
+// ==============================================================
+const BGM = {
+    ctx: null, masterGain: null, nodes: [], running: false, enabled: true,
+    scheduleAhead: 0.3,
+
+    init() {
+        if (this.ctx) return;
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.value = 0.22;
+        this.masterGain.connect(this.ctx.destination);
+    },
+
+    resume() { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); },
+
+    start() {
+        this.init(); this.resume();
+        if (this.running) return;
+        this.running = true;
+        this.scheduleLoop(this.ctx.currentTime + 0.1);
+    },
+
+    stop() {
+        this.nodes.forEach(n => { try { n.stop(0); } catch(e){} });
+        this.nodes = []; this.running = false;
+    },
+
+    fadeOut() {
+        if (!this.masterGain) return;
+        this.masterGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.8);
+        setTimeout(() => this.stop(), 3000);
+    },
+
+    fadeIn() {
+        if (!this.masterGain) return;
+        this.masterGain.gain.setTargetAtTime(0.22, this.ctx.currentTime, 0.8);
+    },
+
+    mkOsc(type, freq, gainVal, start, dur) {
+        const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+        o.type = type; o.frequency.value = freq;
+        g.gain.setValueAtTime(gainVal, start);
+        g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+        o.connect(g); g.connect(this.masterGain);
+        o.start(start); o.stop(start + dur + 0.05);
+        this.nodes.push(o);
+    },
+
+    mkNoise(gainVal, lpFreq, start, dur) {
+        const bufSz = Math.floor(this.ctx.sampleRate * dur);
+        const buf = this.ctx.createBuffer(1, bufSz, this.ctx.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < bufSz; i++) d[i] = Math.random() * 2 - 1;
+        const src = this.ctx.createBufferSource();
+        const lpf = this.ctx.createBiquadFilter();
+        const g = this.ctx.createGain();
+        src.buffer = buf; lpf.type = 'lowpass'; lpf.frequency.value = lpFreq;
+        g.gain.setValueAtTime(gainVal, start);
+        g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+        src.connect(lpf); lpf.connect(g); g.connect(this.masterGain);
+        src.start(start); this.nodes.push(src);
+    },
+
+    scheduleLoop(t) {
+        if (!this.running) return;
+        const bpm = 88, beat = 60 / bpm, bars = 8, loopDur = beat * bars * 2;
+
+        // Jazz chord progression: Dm7 - G7 - Cmaj7 - Am7 (ii-V-I-vi in C)
+        const chords = [
+            [293.66, 349.23, 440, 523.25],    // Dm7
+            [246.94, 311.13, 392.00, 493.88],  // G7
+            [261.63, 329.63, 392.00, 493.88],  // Cmaj7
+            [220.00, 261.63, 329.63, 415.30],  // Am7
+            [293.66, 349.23, 440.00, 523.25],  // Dm7
+            [246.94, 311.13, 369.99, 493.88],  // G7b9
+            [261.63, 329.63, 392.00, 493.88],  // Cmaj7
+            [261.63, 311.13, 369.99, 440.00],  // C7 (turnaround)
+        ];
+
+        chords.forEach((ch, ci) => {
+            const st = t + ci * beat * 2;
+            // Chord voicing — triangle for warmth
+            ch.forEach(f => this.mkOsc('triangle', f, 0.035, st, beat * 1.7));
+            // Melody note on top (add a 9th or 11th color tone)
+            const melNote = ch[ch.length - 1] * 1.5;
+            this.mkOsc('sine', melNote, 0.025, st + beat * 0.5, beat * 1.2);
+        });
+
+        // Walking bass line (sawtooth, one octave below chords)
+        const bassWalk = [
+            146.83, 155.56, 164.81, 174.61,
+            123.47, 130.81, 138.59, 146.83,
+            130.81, 138.59, 146.83, 155.56,
+            110.00, 116.54, 123.47, 130.81,
+            146.83, 155.56, 164.81, 174.61,
+            123.47, 130.81, 138.59, 146.83,
+            130.81, 146.83, 164.81, 146.83,
+            130.81, 123.47, 130.81, 146.83,
+        ];
+        bassWalk.forEach((f, i) => this.mkOsc('sawtooth', f, 0.055, t + i * beat, beat * 0.82));
+
+        // Brushed snare on 2 & 4
+        for (let bar = 0; bar < bars * 2; bar++) {
+            const barT = t + bar * beat;
+            [1, 3].forEach(b => this.mkNoise(0.03, 600, barT + b * beat, 0.14));
+            // Hi-hat 8ths
+            for (let h = 0; h < 4; h++) this.mkNoise(0.012, 5000, barT + h * beat * 0.5, 0.04);
+            // Kick on 1
+            this.mkNoise(0.06, 120, barT, 0.1);
+        }
+
+        // Soft piano fills every 4 bars
+        const fillNotes = [523.25, 587.33, 659.25, 698.46, 659.25, 587.33, 523.25, 493.88];
+        fillNotes.forEach((f, i) => this.mkOsc('sine', f, 0.018, t + beat * 8 + i * beat * 0.75, beat * 0.6));
+
+        const nextT = t + loopDur;
+        const delay = (nextT - this.ctx.currentTime - this.scheduleAhead) * 1000;
+        setTimeout(() => this.scheduleLoop(nextT), Math.max(0, delay));
+    }
+};
+
+// ==============================================================
+//  BGM toggle
+// ==============================================================
+let bgmStarted = false;
+
+function toggleBGM() {
+    BGM.enabled = !BGM.enabled;
+    const btn = document.getElementById('bgmBtn');
+    const icon = btn.querySelector('.bgm-icon');
+    if (BGM.enabled) {
+        btn.classList.remove('muted');
+        icon.textContent = '🎷';
+        BGM.init(); BGM.resume();
+        if (!BGM.running) BGM.start();
+        else BGM.fadeIn();
+    } else {
+        btn.classList.add('muted');
+        icon.textContent = '🔇';
+        BGM.fadeOut();
+    }
+}
+
+function startBGMOnFirstClick() {
+    if (bgmStarted || !BGM.enabled) return;
+    bgmStarted = true;
+    BGM.start();
+}
+
+// ==============================================================
+//  MASCOT
+// ==============================================================
+const MOTIVATIONS = [
+    'Anda boleh!', 'Sikit lagi!', 'Teruskan!',
+    'Bagus!', 'Jangan putus asa!', 'Hebat!',
+    'Cuba lagi!', 'Syabas!', 'Fokus!'
+];
+let mascotBubbleTimer = null, mascotMsgIndex = 0;
+
+function showMascotBubble(msg) {
+    const bubble = document.getElementById('mascotBubble');
+    bubble.textContent = msg;
+    bubble.classList.add('show');
+    clearTimeout(mascotBubbleTimer);
+    mascotBubbleTimer = setTimeout(() => bubble.classList.remove('show'), 3000);
+}
+
+setInterval(() => {
+    mascotMsgIndex = (mascotMsgIndex + 1) % MOTIVATIONS.length;
+    showMascotBubble(MOTIVATIONS[mascotMsgIndex]);
+}, 12000);
+setTimeout(() => showMascotBubble('Anda boleh!'), 3000);
+
+let mascotT = 0;
+function animateMascot() {
+    mascotT += 0.04;
+    const bob = Math.sin(mascotT) * 3;
+    const armSwing = Math.sin(mascotT) * 12;
+    document.getElementById('mascotSvg').style.transform = `translateY(${bob}px)`;
+    document.getElementById('armL').setAttribute('transform', `rotate(${armSwing}, 17, 52)`);
+    document.getElementById('armR').setAttribute('transform', `rotate(${-armSwing}, 47, 52)`);
+    requestAnimationFrame(animateMascot);
+}
+animateMascot();
+
+document.addEventListener('mousemove', (e) => {
+    const el = document.getElementById('mascotContainer');
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2, cy = rect.top + 50;
+    const dx = e.clientX - cx, dy = e.clientY - cy;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const maxMove = 3;
+    const nx = dist > 0 ? (dx/dist) * Math.min(dist/80,1) * maxMove : 0;
+    const ny = dist > 0 ? (dy/dist) * Math.min(dist/80,1) * maxMove : 0;
+    document.getElementById('pupilL').setAttribute('cx', 27 + nx);
+    document.getElementById('pupilL').setAttribute('cy', 35 + ny);
+    document.getElementById('pupilR').setAttribute('cx', 39 + nx);
+    document.getElementById('pupilR').setAttribute('cy', 35 + ny);
+    const headAngle = Math.max(-8, Math.min(8, dx / 30));
+    document.getElementById('mascotHead').setAttribute('transform', `rotate(${headAngle}, 32, 36)`);
+});
+
+document.getElementById('mascotSvg').style.pointerEvents = 'all';
+document.getElementById('mascotSvg').addEventListener('click', () => {
+    showMascotBubble(MOTIVATIONS[Math.floor(Math.random() * MOTIVATIONS.length)]);
+});
+
+// ==============================================================
+//  KNOWLEDGE BASE
+// ==============================================================
+const CATEGORY_INFO = {
+    am: {
+        name: 'Kata nama am',
+        definition: 'Kata nama am merujuk benda atau perkara yang umum sifatnya.',
+        why(word) {
+            return `<strong>${word}</strong> ialah kata nama yang merujuk benda atau perkara yang bersifat umum, dan tidak merujuk benda atau orang yang khusus. Kata nama am tidak perlu ditulis dengan huruf besar.`;
+        }
+    },
+    khas: {
+        name: 'Kata nama khas',
+        definition: 'Kata nama khas merujuk nama sesuatu benda yang khusus, dan ejaannya berpangkalkan huruf besar.',
+        why(word) {
+            return `<strong>${word}</strong> ialah kata nama yang merujuk nama sesuatu benda yang khusus, dan ejaannya berpangkalkan huruf besar. Kata nama khas merujuk orang, tempat, atau benda tertentu yang unik.`;
+        }
+    },
+    pertama: {
+        name: 'Kata ganti nama diri pertama',
+        definition: 'Kata ganti nama diri pertama merujuk orang yang bercakap (penutur itu sendiri).',
+        why(word) {
+            return `<strong>${word}</strong> ialah kata ganti nama diri pertama, dan merujuk orang yang bercakap atau penutur itu sendiri semasa bercakap atau menulis.`;
+        }
+    },
+    kedua: {
+        name: 'Kata ganti nama diri kedua',
+        definition: 'Kata ganti nama diri kedua merujuk orang yang mendengar ujaran orang pertama (pendengar).',
+        why(word) {
+            return `<strong>${word}</strong> ialah kata ganti nama diri kedua, dan merujuk orang yang sedang mendengar atau membaca — iaitu orang yang diajak bercakap.`;
+        }
+    },
+    ketiga: {
+        name: 'Kata ganti nama diri ketiga',
+        definition: 'Kata ganti nama diri ketiga merujuk orang yang dibicarakan oleh orang pertama dan orang kedua.',
+        why(word) {
+            return `<strong>${word}</strong> ialah kata ganti nama diri ketiga, dan merujuk orang atau perkara yang sedang dibicarakan — bukan penutur dan bukan pendengar.`;
+        }
+    }
+};
+
+// ==============================================================
+//  SOUND ENGINE (SFX)
+// ==============================================================
+const SoundFX = {
+    ctx: null,
+    init() { if (!BGM.ctx) { BGM.init(); } this.ctx = BGM.ctx; },
+    _r() { BGM.resume(); },
+
+    playCorrect() {
+        this.init(); this._r();
+        const now = this.ctx.currentTime;
+        for (let i = 0; i < 3; i++) {
+            const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+            o.connect(g); g.connect(this.ctx.destination); o.type = 'square';
+            o.frequency.setValueAtTime(800+i*200, now+i*0.06);
+            o.frequency.exponentialRampToValueAtTime(600+i*150, now+i*0.06+0.08);
+            g.gain.setValueAtTime(0.06, now+i*0.06);
+            g.gain.exponentialRampToValueAtTime(0.001, now+i*0.06+0.1);
+            o.start(now+i*0.06); o.stop(now+i*0.06+0.1);
+        }
+        const bSz = this.ctx.sampleRate*0.04, buf = this.ctx.createBuffer(1,bSz,this.ctx.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i=0;i<bSz;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/bSz*3);
+        const ns=this.ctx.createBufferSource(), ng=this.ctx.createGain();
+        ns.buffer=buf; ng.gain.setValueAtTime(0.04,now); ng.gain.exponentialRampToValueAtTime(0.001,now+0.05);
+        ns.connect(ng); ng.connect(this.ctx.destination); ns.start(now+0.02); ns.stop(now+0.07);
+    },
+
+    playError() {
+        this.init(); this._r();
+        const now = this.ctx.currentTime;
+        const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+        o.connect(g); g.connect(this.ctx.destination); o.type='sawtooth';
+        o.frequency.setValueAtTime(200,now); o.frequency.exponentialRampToValueAtTime(120,now+0.3);
+        g.gain.setValueAtTime(0.04,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.3);
+        o.start(now); o.stop(now+0.3);
+        const o2=this.ctx.createOscillator(), g2=this.ctx.createGain();
+        o2.connect(g2); g2.connect(this.ctx.destination); o2.type='sine';
+        o2.frequency.setValueAtTime(160,now+0.12); o2.frequency.exponentialRampToValueAtTime(100,now+0.35);
+        g2.gain.setValueAtTime(0.03,now+0.12); g2.gain.exponentialRampToValueAtTime(0.001,now+0.35);
+        o2.start(now+0.12); o2.stop(now+0.35);
+    },
+
+    playWin() {
+        this.init(); this._r();
+        const now = this.ctx.currentTime;
+        [523,659,784,1047,784,659,523].forEach((freq,i) => {
+            const dur=[0.15,0.15,0.15,0.25,0.15,0.15,0.4][i];
+            const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+            o.connect(g); g.connect(this.ctx.destination); o.type='square';
+            o.frequency.setValueAtTime(freq,now+i*0.18);
+            const vib=this.ctx.createOscillator(), vg=this.ctx.createGain();
+            vib.connect(vg); vg.connect(o.frequency);
+            vib.frequency.setValueAtTime(5,now+i*0.18); vg.gain.setValueAtTime(8,now+i*0.18);
+            vib.start(now+i*0.18); vib.stop(now+i*0.18+dur);
+            g.gain.setValueAtTime(0.02,now+i*0.18);
+            g.gain.exponentialRampToValueAtTime(0.001,now+i*0.18+dur);
+            o.start(now+i*0.18); o.stop(now+i*0.18+dur);
+        });
+    },
+
+    playClick() {
+        this.init(); this._r();
+        const now = this.ctx.currentTime;
+        const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+        o.connect(g); g.connect(this.ctx.destination); o.type='sine';
+        o.frequency.setValueAtTime(1200,now); o.frequency.exponentialRampToValueAtTime(800,now+0.04);
+        g.gain.setValueAtTime(0.02,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.04);
+        o.start(now); o.stop(now+0.04);
+    },
+
+    playKocok() {
+        this.init(); this._r();
+        const ctx = this.ctx;
+        const now=ctx.currentTime, dur=0.55, sr=ctx.sampleRate;
+        const buf=ctx.createBuffer(1,Math.floor(sr*dur),sr);
+        const d=buf.getChannelData(0);
+        for(let i=0;i<d.length;i++){const t=i/sr; d[i]=(Math.random()*2-1)*(Math.sin(2*Math.PI*18*t)*0.4+0.6);}
+        const ns=ctx.createBufferSource(); ns.buffer=buf;
+        const bpf=ctx.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.setValueAtTime(2200,now); bpf.Q.value=1.2;
+        const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.setValueAtTime(900,now);
+        const ng=ctx.createGain();
+        ng.gain.setValueAtTime(0,now); ng.gain.linearRampToValueAtTime(0.55,now+0.04);
+        ng.gain.setValueAtTime(0.50,now+0.30); ng.gain.linearRampToValueAtTime(0,now+dur);
+        ns.connect(hpf); hpf.connect(bpf); bpf.connect(ng); ng.connect(ctx.destination);
+        ns.start(now); ns.stop(now+dur);
+        [0.05,0.16,0.28,0.38,0.47].forEach((t,i)=>{
+            const o=ctx.createOscillator(), g=ctx.createGain();
+            o.connect(g); g.connect(ctx.destination); o.type='triangle';
+            const bf=1100+(i%3)*180;
+            o.frequency.setValueAtTime(bf,now+t); o.frequency.exponentialRampToValueAtTime(bf*0.55,now+t+0.06);
+            g.gain.setValueAtTime(0.18,now+t); g.gain.exponentialRampToValueAtTime(0.001,now+t+0.07);
+            o.start(now+t); o.stop(now+t+0.08);
+        });
+        const ib=ctx.createBuffer(1,Math.floor(sr*0.05),sr);
+        const id_=ib.getChannelData(0);
+        for(let i=0;i<id_.length;i++) id_[i]=(Math.random()*2-1)*Math.exp(-i/id_.length*8);
+        const is_=ctx.createBufferSource(), il=ctx.createBiquadFilter(), ig=ctx.createGain();
+        is_.buffer=ib; il.type='lowpass'; il.frequency.value=380;
+        ig.gain.setValueAtTime(0.30,now+0.01); ig.gain.exponentialRampToValueAtTime(0.001,now+0.06);
+        is_.connect(il); il.connect(ig); ig.connect(ctx.destination);
+        is_.start(now+0.01); is_.stop(now+0.06);
+    },
+
+    playCountdownBeep(s) {
+        this.init(); this._r();
+        const now=this.ctx.currentTime;
+        const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+        o.connect(g); g.connect(this.ctx.destination); o.type='sine';
+        o.frequency.setValueAtTime(s<=3?1200:s<=6?900:700,now);
+        g.gain.setValueAtTime(0.12,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.18);
+        o.start(now); o.stop(now+0.18);
+    }
+};
+
+// ==============================================================
+//  CONFETTI
+// ==============================================================
+function launchConfetti() {
+    const ov=document.createElement('div'); ov.className='celebration-overlay'; document.body.appendChild(ov);
+    const col=['#f9e45b','#f5a623','#ff6b6b','#4ecdc4','#45b7d1','#96ceb4','#ffd93d','#a29bfe'];
+    const em=['🎉','✨','⭐','🎊','🌟','💫','🎈','🏆'];
+    for(let i=0;i<80;i++){
+        const p=document.createElement('div'); p.className='confetti-piece';
+        const ie=Math.random()>0.6, c=col[Math.floor(Math.random()*col.length)];
+        p.textContent=ie?em[Math.floor(Math.random()*em.length)]:'';
+        p.style.cssText=`left:${Math.random()*100}%;top:-10%;background:${ie?'transparent':c};width:${ie?'24':(Math.random()*8+4)}px;height:${ie?'24':(Math.random()*8+4)}px;border-radius:${Math.random()>0.5?'50%':'2px'};font-size:20px;animation-duration:${Math.random()*2+2}s;animation-delay:${Math.random()*1.5}s;transform:rotate(${Math.random()*360}deg);`;
+        ov.appendChild(p);
+    }
+    setTimeout(()=>ov.remove(),5000);
+}
+
+// ==============================================================
+//  DATA
+// ==============================================================
+const CATEGORY_LABELS = {
+    am:      { label: 'Kata nama am', emoji: '📘' },
+    khas:    { label: 'Kata nama khas', emoji: '📕' },
+    pertama: { label: 'Kata ganti nama diri pertama', emoji: '1️⃣' },
+    kedua:   { label: 'Kata ganti nama diri kedua', emoji: '2️⃣' },
+    ketiga:  { label: 'Kata ganti nama diri ketiga', emoji: '3️⃣' }
+};
+
+const CATEGORY_CARDS = [
+    { word: 'Kata nama am', type: 'am', isCategory: true, emoji: '📘' },
+    { word: 'Kata nama khas', type: 'khas', isCategory: true, emoji: '📕' },
+    { word: 'Kata ganti nama diri pertama', type: 'pertama', isCategory: true, emoji: '1️⃣' },
+    { word: 'Kata ganti nama diri kedua', type: 'kedua', isCategory: true, emoji: '2️⃣' },
+    { word: 'Kata ganti nama diri ketiga', type: 'ketiga', isCategory: true, emoji: '3️⃣' }
+];
+
+const EXAMPLE_CARDS = [
+    {word:'tangan',type:'am'},{word:'rumah',type:'am'},{word:'kambing',type:'am'},
+    {word:'lautan',type:'am'},{word:'pekerja',type:'am'},{word:'pelabuhan',type:'am'},
+    {word:'ketua',type:'am'},{word:'jambatan',type:'am'},{word:'kereta',type:'am'},
+    {word:'mimpi',type:'am'},{word:'kemerdekaan',type:'am'},{word:'demokrasi',type:'am'},
+    {word:'perpaduan',type:'am'},{word:'kedamaian',type:'am'},{word:'idaman',type:'am'},
+    {word:'Ahmad',type:'khas'},{word:'Hamid',type:'khas'},{word:'Tun Abdul Razak',type:'khas'},
+    {word:'P. Ramlee',type:'khas'},{word:'Sultan Mahmud Shah',type:'khas'},{word:'Sang Lamri',type:'khas'},
+    {word:'Pak Belang',type:'khas'},{word:'Kuala Lumpur',type:'khas'},{word:'Seremban',type:'khas'},
+    {word:'Pasir Mas',type:'khas'},{word:'Planet Marikh',type:'khas'},{word:'Polis Diraja Malaysia',type:'khas'},
+    {word:'Proton',type:'khas'},{word:'Kamus Dewan',type:'khas'},{word:'Gunung Ledang',type:'khas'},
+    {word:'saya',type:'pertama'},{word:'aku',type:'pertama'},{word:'kami',type:'pertama'},
+    {word:'kita',type:'pertama'},{word:'hamba',type:'pertama'},{word:'patik',type:'pertama'},{word:'beta',type:'pertama'},
+    {word:'awak',type:'kedua'},{word:'kamu',type:'kedua'},{word:'anda',type:'kedua'},
+    {word:'kalian',type:'kedua'},{word:'engkau',type:'kedua'},{word:'tuanku',type:'kedua'},
+    {word:'tuan hamba',type:'kedua'},{word:'saudara',type:'kedua'},
+    {word:'ia',type:'ketiga'},{word:'dia',type:'ketiga'},{word:'beliau',type:'ketiga'},
+    {word:'mereka',type:'ketiga'},{word:'baginda',type:'ketiga'},{word:'-nya',type:'ketiga'}
+];
+
+const TOTAL_PER_CATEGORY = {};
+EXAMPLE_CARDS.forEach(c => { TOTAL_PER_CATEGORY[c.type] = (TOTAL_PER_CATEGORY[c.type]||0)+1; });
+
+// ==============================================================
+//  STATE
+// ==============================================================
+let state = {
+    slots: Array.from({length:5},()=>({category:null,examples:[]})),
+    drawPile: [], score: 0,
+    placedIds: new Set(), cardIdCounter: 0, totalCards: 0
+};
+let lastMove = null;
+
+// ==============================================================
+//  TIMER
+// ==============================================================
+const GAME_DURATION = 150;
+let timerSeconds = GAME_DURATION, timerInterval = null, gameOver = false;
+
+const pauseFlags = { manual:false, confirm:false, petua:false, result:false };
+function isTimerPaused() { return Object.values(pauseFlags).some(v=>v); }
+
+function startTimer() {
+    clearInterval(timerInterval);
+    timerSeconds = GAME_DURATION; gameOver = false;
+    Object.keys(pauseFlags).forEach(k=>pauseFlags[k]=false);
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        if (gameOver || isTimerPaused()) return;
+        timerSeconds--;
+        updateTimerDisplay();
+        if (timerSeconds<=10 && timerSeconds>0) SoundFX.playCountdownBeep(timerSeconds);
+        if (timerSeconds<=0) { clearInterval(timerInterval); triggerGameOver(); }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const m=Math.floor(timerSeconds/60), s=timerSeconds%60;
+    document.getElementById('timerText').textContent = m+':'+(s<10?'0':'')+s;
+    const el=document.getElementById('timerDisplay');
+    timerSeconds<=10 ? el.classList.add('danger') : el.classList.remove('danger');
+}
+
+function stopTimer() { clearInterval(timerInterval); gameOver=true; }
+
+// ==============================================================
+//  LOBBY
+// ==============================================================
+function startGame() {
+    startBGMOnFirstClick();
+    const lobby=document.getElementById('lobbyScreen');
+    lobby.classList.add('hide');
+    setTimeout(()=>{ lobby.style.display='none'; },500);
+    initGame();
+}
+
+// ==============================================================
+//  PAUSE
+// ==============================================================
+function togglePause() {
+    if (gameOver) return;
+    if (pauseFlags.manual) {
+        pauseFlags.manual=false;
+        document.getElementById('pauseOverlay').classList.remove('show');
+        document.getElementById('pauseBtn').textContent='⏸';
+        SoundFX.playClick();
+    } else {
+        pauseFlags.manual=true;
+        document.getElementById('pauseOverlay').classList.add('show');
+        document.getElementById('pauseBtn').textContent='▶';
+    }
+}
+
+function resumeGame() {
+    pauseFlags.manual=false;
+    document.getElementById('pauseOverlay').classList.remove('show');
+    document.getElementById('pauseBtn').textContent='⏸';
+    SoundFX.playClick();
+}
+
+// ==============================================================
+//  CONFIRM
+// ==============================================================
+function showConfirm() {
+    pauseFlags.confirm=true;
+    document.getElementById('confirmOverlay').classList.add('show');
+}
+function confirmYes() {
+    pauseFlags.confirm=false; pauseFlags.manual=false;
+    document.getElementById('confirmOverlay').classList.remove('show');
+    document.getElementById('pauseOverlay').classList.remove('show');
+    document.getElementById('pauseBtn').textContent='⏸';
+    setTimeout(()=>{ initGame(); SoundFX.playClick(); },150);
+}
+function confirmNo() {
+    pauseFlags.confirm=false;
+    document.getElementById('confirmOverlay').classList.remove('show');
+}
+
+// ==============================================================
+//  PETUA
+// ==============================================================
+function buildPetuaContent(move) {
+    const info=CATEGORY_INFO[move.cardType];
+    const targetInfo=move.targetCategoryType?CATEGORY_INFO[move.targetCategoryType]:null;
+    if (move.isCorrect) {
+        return {
+            isCorrect:true,
+            question:`Mengapakah <em>${move.cardWord}</em> ialah ${info.name}?`,
+            answer: info.why(move.cardWord)+`<br><br>Definisi: ${info.definition}`
+        };
+    } else {
+        const wrongName=targetInfo?targetInfo.name:move.targetCategoryName;
+        const correctInfo=CATEGORY_INFO[move.cardType];
+        return {
+            isCorrect:false,
+            question:`Mengapakah <em>${move.cardWord}</em> bukan ${wrongName}?`,
+            answer:`<strong>${move.cardWord}</strong> bukan ${wrongName}. Sebaliknya, <strong>${move.cardWord}</strong> ialah <strong>${correctInfo.name}</strong>.<br><br>${correctInfo.why(move.cardWord)}<br><br>Definisi: ${correctInfo.definition}`
+        };
+    }
+}
+
+function openPetua() {
+    if (!lastMove) return;
+    pauseFlags.petua=true;
+    const content=buildPetuaContent(lastMove);
+    document.getElementById('petuaTag').innerHTML=content.isCorrect
+        ?'<span class="petua-tag correct">✅ Langkah betul</span>'
+        :'<span class="petua-tag wrong">❌ Langkah salah</span>';
+    document.getElementById('petuaQuestion').innerHTML=content.question;
+    document.getElementById('petuaAnswer').innerHTML=content.answer;
+    document.getElementById('petuaOverlay').classList.add('show');
+}
+
+function closePetua() {
+    pauseFlags.petua=false;
+    document.getElementById('petuaOverlay').classList.remove('show');
+    SoundFX.playClick();
+}
+
+function updatePetuaBtn() {
+    const btn=document.getElementById('petuaBtn');
+    lastMove?btn.classList.remove('no-hint'):btn.classList.add('no-hint');
+}
+
+// ==============================================================
+//  RESULT MODAL
+// ==============================================================
+function showModal(isWin) {
+    pauseFlags.result=true;
+    document.getElementById('modalIcon').textContent=isWin?'🏆':'😔';
+    document.getElementById('modalTitle').textContent=isWin?'Tahniah!':'Maaf, anda gagal';
+    document.getElementById('modalTitle').className='modal-title '+(isWin?'win-title':'lose-title');
+    document.getElementById('modalSubtitle').textContent=isWin
+        ?'Anda berjaya menyiapkan semua kad dalam masa yang ditetapkan! Hebat!'
+        :'Masa telah tamat. Jangan putus asa, cuba lagi!';
+    document.getElementById('modalScore').textContent=state.score;
+    document.getElementById('resultModal').classList.add('show');
+    showMascotBubble(isWin?'Tahniah! Hebat!':'Cuba lagi! Anda boleh!');
+}
+
+function closeModalAndReset() {
+    pauseFlags.result=false;
+    document.getElementById('resultModal').classList.remove('show');
+    setTimeout(()=>initGame(),200);
+}
+
+function triggerGameOver() {
+    gameOver=true; stopTimer();
+    SoundFX.playError();
+    messageBox.textContent='⏰ Masa tamat! Cuba lagi!';
+    messageBox.className='message error';
+    shuffleBtn.disabled=true;
+    showMascotBubble('Jangan putus asa!');
+    setTimeout(()=>showModal(false),600);
+}
+
+// ==============================================================
+//  DOM REFS
+// ==============================================================
+const slotsContainer=document.getElementById('slotsContainer');
+const drawPileEl=document.getElementById('drawPile');
+const scoreDisplay=document.getElementById('scoreDisplay');
+const remainingDisplay=document.getElementById('remainingDisplay');
+const messageBox=document.getElementById('messageBox');
+const shuffleBtn=document.getElementById('shuffleBtn');
+const resetBtn=document.getElementById('resetBtn');
+
+// ==============================================================
+//  HELPERS
+// ==============================================================
+function shuffle(arr) {
+    for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+    return arr;
+}
+function createCard(data) {
+    return {id:state.cardIdCounter++,word:data.word,type:data.type,isCategory:data.isCategory||false,emoji:data.emoji||'📄'};
+}
+function isCategoryAlreadyPlaced(type) { return state.slots.some(s=>s.category&&s.category.type===type); }
+function getCardElementById(id) { return document.querySelector(`.card[data-card-id="${id}"]`); }
+
+// ==============================================================
+//  INIT
+// ==============================================================
+function initGame() {
+    state.slots=Array.from({length:5},()=>({category:null,examples:[]}));
+    state.placedIds=new Set(); state.score=0; state.cardIdCounter=0;
+    lastMove=null; updatePetuaBtn();
+    const allCards=[...CATEGORY_CARDS,...EXAMPLE_CARDS];
+    state.drawPile=shuffle(allCards).map(c=>createCard(c));
+    state.totalCards=state.drawPile.length;
+    renderAll(); updateStats();
+    messageBox.textContent='🎯 Cari kad Kategori (warna emas) dan isi ke mana-mana slot!';
+    messageBox.className='message hint';
+    shuffleBtn.disabled=false;
+    startTimer();
+}
+
+// ==============================================================
+//  RENDER
+// ==============================================================
+function renderAll() { renderSlots(); renderDrawPile(); updateStats(); }
+
+function renderSlots() {
+    slotsContainer.innerHTML='';
+    state.slots.forEach((slotData,i)=>{
+        const wrapper=document.createElement('div'); wrapper.className='slot-wrapper';
+        const label=document.createElement('div'); label.className='slot-label';
+        if(slotData.category){
+            const info=CATEGORY_LABELS[slotData.category.type];
+            if(info){label.innerHTML=`<span class="label-emoji">${info.emoji}</span><span class="label-text">${info.label}</span>`;label.classList.add('visible');}
+        }
+        wrapper.appendChild(label);
+        const progress=document.createElement('div'); progress.className='slot-progress';
+        if(slotData.category){
+            progress.textContent=slotData.examples.length+' / '+(TOTAL_PER_CATEGORY[slotData.category.type]||0);
+            progress.classList.add('has-data');
+        }
+        wrapper.appendChild(progress);
+        const div=document.createElement('div'); div.className='slot';
+        if(slotData.category) div.classList.add('has-category');
+        div.dataset.slotIndex=i;
+        if(slotData.category){
+            div.appendChild(createCategoryElement(slotData.category));
+            if(slotData.examples.length>0) div.appendChild(createExampleElement(slotData.examples[slotData.examples.length-1]));
+        } else {
+            const ed=document.createElement('div'); ed.className='slot-empty-display';
+            ed.textContent='SLOT '+(i+1); div.appendChild(ed);
+        }
+        div.addEventListener('dragover',handleDragOver);
+        div.addEventListener('drop',handleDrop);
+        wrapper.appendChild(div);
+        slotsContainer.appendChild(wrapper);
+    });
+}
+
+function createCategoryElement(card) {
+    const div=document.createElement('div'); div.className='card category-card';
+    div.draggable=false; div.style.cursor='default';
+    div.dataset.cardId=card.id; div.dataset.type=card.type;
+    div.innerHTML=`<div class="emoji">${card.emoji}</div><div class="card-word">${card.word}</div><div class="sub-label">Kategori</div>`;
+    return div;
+}
+
+function createExampleElement(card) {
+    const div=document.createElement('div'); div.className='card example-card';
+    div.draggable=false; div.style.cursor='default';
+    div.dataset.cardId=card.id; div.dataset.type=card.type;
+    div.innerHTML=`<div class="emoji">📄</div><div class="card-word">${card.word}</div>`;
+    return div;
+}
+
+function createDrawCardElement(card) {
+    const div=document.createElement('div');
+    div.className='card '+(card.isCategory?'category-card':'example-card');
+    div.draggable=true;
+    div.addEventListener('dragstart',handleDragStart);
+    div.addEventListener('dragend',handleDragEnd);
+    div.dataset.cardId=card.id; div.dataset.type=card.type;
+    div.dataset.isCategory=card.isCategory?'true':'false';
+    div.innerHTML=`<div class="emoji">${card.isCategory?card.emoji:'📄'}</div><div class="card-word">${card.word}</div>${card.isCategory?'<div class="sub-label">Kategori</div>':''}`;
+    return div;
+}
+
+function renderDrawPile() {
+    drawPileEl.innerHTML='';
+    const show=state.drawPile.slice(0,7);
+    if(show.length===0){
+        const msg=document.createElement('div');
+        msg.style.cssText='color:rgba(255,255,255,0.2);font-size:18px;padding:16px;font-weight:600;text-align:center;width:100%;';
+        msg.textContent='✨ Semua kad selesai!';
+        drawPileEl.appendChild(msg); shuffleBtn.disabled=true; return;
+    }
+    show.forEach(card=>drawPileEl.appendChild(createDrawCardElement(card)));
+    shuffleBtn.disabled=false;
+}
+
+function updateStats() {
+    scoreDisplay.textContent=state.score;
+    remainingDisplay.textContent=state.totalCards-state.placedIds.size;
+}
+
+// ==============================================================
+//  DRAG & DROP
+// ==============================================================
+let draggedId=null;
+
+function handleDragStart(e) {
+    const el=e.target.closest('.card');
+    if(!el||el.draggable===false) return;
+    draggedId=parseInt(el.dataset.cardId);
+    e.dataTransfer.setData('text/plain',draggedId);
+    el.classList.add('dragging');
+    SoundFX.playClick();
+}
+
+function handleDragEnd(e) {
+    const el=e.target.closest('.card');
+    if(el) el.classList.remove('dragging');
+    document.querySelectorAll('.slot.highlight').forEach(el=>el.classList.remove('highlight'));
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    const slot=e.target.closest('.slot');
+    if(slot){
+        document.querySelectorAll('.slot.highlight').forEach(el=>el.classList.remove('highlight'));
+        slot.classList.add('highlight');
+    }
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    if(gameOver||isTimerPaused()) return;
+    const slotEl=e.target.closest('.slot');
+    if(!slotEl) return;
+    document.querySelectorAll('.slot.highlight').forEach(el=>el.classList.remove('highlight'));
+    const id=parseInt(e.dataTransfer.getData('text/plain'));
+    if(isNaN(id)) return;
+    const idx=state.drawPile.findIndex(c=>c.id===id);
+    if(idx===-1) return;
+    const card=state.drawPile[idx];
+    const slotIndex=parseInt(slotEl.dataset.slotIndex);
+    const slotData=state.slots[slotIndex];
+
+    let isCorrect=false;
+    if(card.isCategory){
+        if(!isCategoryAlreadyPlaced(card.type)&&slotData.category===null) isCorrect=true;
+    } else {
+        if(slotData.category!==null&&card.type===slotData.category.type) isCorrect=true;
+    }
+
+    if(isCorrect){
+        SoundFX.playCorrect();
+        state.drawPile.splice(idx,1);
+        if(card.isCategory){
+            slotData.category={...card};
+            state.placedIds.add(card.id);
+            state.score+=15;
+            messageBox.textContent=`✅ Betul! "${card.word}" diletakkan di slot ${slotIndex+1}! +15 mata`;
+            messageBox.className='message success';
+            lastMove={isCorrect:true,cardWord:card.word,cardType:card.type,targetCategoryType:card.type};
+        } else {
+            slotData.examples.push({...card});
+            state.placedIds.add(card.id);
+            state.score+=10;
+            const catName=CATEGORY_LABELS[slotData.category.type].label;
+            messageBox.textContent=`✅ Betul, ${card.word} ialah ${catName}! +10 mata`;
+            messageBox.className='message success';
+            lastMove={isCorrect:true,cardWord:card.word,cardType:card.type,targetCategoryType:slotData.category.type};
+            if(state.score>0&&state.score%50===0) showMascotBubble('Hebat! Teruskan!');
+        }
+        updatePetuaBtn(); renderAll();
+        if(state.placedIds.size===state.totalCards){
+            stopTimer();
+            messageBox.textContent='🎉🎉 Tahniah! Semua kad selesai! 🎉🎉';
+            messageBox.className='message win';
+            shuffleBtn.disabled=true;
+            SoundFX.playWin(); launchConfetti();
+            setTimeout(()=>showModal(true),800);
+        }
+    } else {
+        SoundFX.playError();
+        if(card.isCategory){
+            if(isCategoryAlreadyPlaced(card.type)) messageBox.textContent=`⚠️ Kategori "${card.word}" sudah diletakkan di slot lain!`;
+            else if(slotData.category!==null) messageBox.textContent=`⚠️ Slot ini sudah ada kategori!`;
+            else messageBox.textContent=`❌ "${card.word}" tidak sesuai di sini!`;
+            messageBox.className='message error'; lastMove=null;
+        } else {
+            state.score=Math.max(0,state.score-10); updateStats();
+            if(slotData.category===null){
+                messageBox.textContent=`⚠️ Letakkan kategori (warna emas) dahulu!`; lastMove=null;
+            } else {
+                const targetCatName=CATEGORY_LABELS[slotData.category.type].label;
+                messageBox.textContent=`❌ Salah, ${card.word} bukan ${targetCatName}! -10 mata`;
+                lastMove={isCorrect:false,cardWord:card.word,cardType:card.type,targetCategoryType:slotData.category.type,targetCategoryName:targetCatName};
+                showMascotBubble('Cuba lagi! Jangan putus asa!');
+            }
+            messageBox.className='message error';
+        }
+        updatePetuaBtn();
+        const cardEl=getCardElementById(id);
+        if(cardEl){cardEl.classList.add('shake');setTimeout(()=>cardEl.classList.remove('shake'),500);}
+        renderAll();
+    }
+}
+
+// ==============================================================
+//  SHUFFLE
+// ==============================================================
+function handleShuffle() {
+    if(state.drawPile.length===0) return;
+    state.drawPile=shuffle(state.drawPile);
+    renderAll();
+    messageBox.textContent='🔄 Kad dikocok!';
+    messageBox.className='message';
+    SoundFX.playKocok();
+}
+
+// ==============================================================
+//  EVENTS
+// ==============================================================
+shuffleBtn.addEventListener('click',handleShuffle);
+resetBtn.addEventListener('click',()=>showConfirm());
+
+// Start BGM on first user interaction anywhere
+document.addEventListener('click', () => { startBGMOnFirstClick(); }, { once: true });
+
+// ==============================================================
+//  LOBBY HOOKS
+// ==============================================================
+window.ulangGame = function() { closeModalAndReset(); };
+
+window.kembaliKeMenu = function() {
+    pauseFlags.result=false;
+    document.getElementById('resultModal').classList.remove('show');
+    stopTimer();
+    const lobby=document.getElementById('lobbyScreen');
+    lobby.style.display='';
+    lobby.style.transition='none';
+    lobby.style.opacity='0';
+    lobby.style.transform='scale(1.04)';
+    lobby.classList.remove('hide');
+    requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+            lobby.style.transition='';
+            lobby.style.opacity='';
+            lobby.style.transform='';
+        });
+    });
+};
+
+window.kembaliKeLobi = function() { /* dikendalikan oleh induk */ };
+window.getGameScore = function() { return state.score; };
+window.resetGame = function() { initGame(); };
+</script>
+</body>
+</html>

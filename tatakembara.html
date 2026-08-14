@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TataKembara: Permainan Pengembaraan Digital untuk Pembelajaran Ayat Aktif dan Ayat Pasif</title>
+    <style>
+        /* ===== 全局重置 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ===== 外部背景 ===== */
+        body {
+            background: #1a1a2e;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 外部背景图（深色，降低透明度） */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.ibb.co/Qj3y0Zs7/Chat-GPT-Image-Aug-8-2026-11-19-09-PM.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.25;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .game-wrapper {
+            background: transparent;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            border: 4px solid rgba(74, 124, 89, 0.6);
+            position: relative;
+            z-index: 1;
+        }
+
+        .game-container {
+            width: 1000px;
+            height: 650px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #5a3e1b;
+            background: #7ec850;
+        }
+
+        /* ===== 游戏内部草坪背景 (PNG) ===== */
+        #bgImage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ===== HUD ===== */
+        #hud {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            right: 16px;
+            height: 42px;
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 30;
+            backdrop-filter: blur(4px);
+        }
+        #hud .title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #FFD700;
+            text-shadow: 2px 2px 0 #8B4513;
+        }
+        #lives-display {
+            display: flex;
+            gap: 4px;
+            font-size: 20px;
+        }
+        .heart.lost {
+            opacity: 0.2;
+            transform: scale(0.7);
+        }
+        #progress-label {
+            font-size: 11px;
+            color: #FFD700;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 14px;
+            border-radius: 20px;
+        }
+
+        /* ===== 音乐开关按钮 ===== */
+        #musicBtn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #FFD700;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            padding: 0;
+        }
+        #musicBtn:hover {
+            background: rgba(255, 215, 0, 0.25);
+            transform: scale(1.1);
+        }
+        #musicBtn.muted {
+            opacity: 0.4;
+        }
+
+        /* ===== Canvas 路径 ===== */
+        #pathCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* ===== 玩家 ===== */
+        #player {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            z-index: 20;
+            transition: left 0.12s ease, top 0.12s ease;
+            pointer-events: none;
+        }
+        #player img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* ===== 事件物品 ===== */
+        .event-obj {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            z-index: 12;
+            cursor: pointer;
+            transition: transform 0.15s;
+            animation: float 3s ease-in-out infinite;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .event-obj.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .event-obj:hover {
+            transform: scale(1.15) translateY(-4px);
+        }
+        .event-obj img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* ===== 门 ===== */
+        .gate {
+            position: absolute;
+            width: 56px;
+            height: 78px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            z-index: 10;
+        }
+        .gate-arch {
+            width: 56px;
+            height: 66px;
+            border-radius: 28px 28px 0 0;
+            border: 3px solid #8B4513;
+            border-bottom: none;
+            background: rgba(139, 69, 19, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .gate-arch::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            bottom: 0;
+            border-radius: 22px 22px 0 0;
+            border: 2px solid rgba(139, 69, 19, 0.15);
+            border-bottom: none;
+        }
+        .gate-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #5a2d0c;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+        .gate-stars { font-size: 16px; }
+        #gate-start .gate-arch { border-color: #2ECC71; background: rgba(46, 204, 113, 0.10); }
+        #gate-start .gate-label { color: #1a7a42; }
+        #gate-end .gate-arch { border-color: #E74C3C; background: rgba(231, 76, 60, 0.10); }
+        #gate-end .gate-label { color: #922B21; }
+
+        /* ===== 游戏板 ===== */
+        .board {
+            position: absolute;
+            width: 68px;
+            height: 68px;
+            background: #F5DEB3;
+            border: 3px solid #D4A017;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
+            z-index: 15;
+            box-shadow: 3px 3px 0 #b8860b;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .board.near {
+            cursor: pointer;
+            animation: boardPulse 0.8s ease-in-out infinite;
+        }
+        @keyframes boardPulse {
+            0%, 100% { box-shadow: 3px 3px 0 #b8860b; }
+            50% { box-shadow: 0 0 18px 6px rgba(255,215,0,0.7), 3px 3px 0 #b8860b; }
+        }
+        .board-icon { font-size: 20px; }
+        .board-num {
+            font-size: 9px;
+            font-weight: 700;
+            color: #5a2d0c;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+        .board-label {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            color: #3d2b1f;
+            white-space: nowrap;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 1px 8px;
+            border-radius: 8px;
+        }
+
+        /* ===== 角色选择 ===== */
+        #character-select {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+        }
+        #character-select.hidden {
+            display: none;
+        }
+        #character-select h2 {
+            color: #FFD700;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 0 #8B4513;
+        }
+        .char-options {
+            display: flex;
+            gap: 50px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .char-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 3px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 30px 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            min-width: 160px;
+        }
+        .char-card:hover {
+            transform: scale(1.08);
+            border-color: #FFD700;
+            background: rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
+        }
+        .char-card img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            object-position: top center;
+            display: block;
+            margin: 0 auto 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .char-card .char-name {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .char-card .char-sub {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        #char-hint {
+            margin-top: 24px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+        }
+
+        /* ===== 弹窗 (Papan) ===== */
+        #modal-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            border-radius: 16px;
+        }
+        #modal-overlay.show { display: flex; }
+
+        /* ===== 像素风格弹窗 ===== */
+        #modal-box {
+            background: #fcf8e8;
+            border-radius: 12px;
+            padding: 16px 20px;
+            max-width: 540px;
+            width: 92%;
+            border: 4px solid #4a2c0a;
+            box-shadow:
+                inset 0 0 0 2px #f5deb3,
+                0 0 0 4px #8B6914,
+                0 0 0 6px #4a2c0a,
+                0 8px 32px rgba(0,0,0,0.5);
+            image-rendering: pixelated;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        #modal-box h2 {
+            font-size: 18px;
+            color: #4a2c0a;
+            margin-bottom: 2px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        #modal-box .modal-sub {
+            font-size: 10px;
+            color: #8B6914;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        #modal-box p {
+            font-size: 12px;
+            color: #3d2b1f;
+            line-height: 1.5;
+            margin-bottom: 6px;
+        }
+        #modal-box .modal-rules {
+            background: rgba(212, 160, 23, 0.08);
+            border: 2px solid #4a2c0a;
+            border-radius: 4px;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            box-shadow: inset 0 0 0 1px #8B6914;
+            list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        #modal-box .modal-rules li {
+            font-size: 12px;
+            color: #3d2b1f;
+            line-height: 1.7;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        /* ===== 像素表格 ===== */
+        .pixel-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 3px;
+            font-size: 12px;
+            background: #fcf8e8;
+            border: 3px solid #4a2c0a;
+            box-shadow: 0 0 0 2px #8B6914;
+            image-rendering: pixelated;
+            margin: 4px 0;
+        }
+        .pixel-table th {
+            background: #8B6914;
+            color: #fff;
+            padding: 6px 8px;
+            border: 2px solid #4a2c0a;
+            font-size: 10px;
+            text-align: center;
+            image-rendering: pixelated;
+            letter-spacing: 0.5px;
+        }
+        .pixel-table td {
+            padding: 5px 8px;
+            border: 2px solid #4a2c0a;
+            color: #2d1a0e;
+            font-size: 11px;
+            text-align: center;
+            image-rendering: pixelated;
+        }
+        .pixel-table tr:nth-child(even) td {
+            background: #f2ebd5;
+        }
+        .pixel-table tr:nth-child(odd) td {
+            background: #fcf8e8;
+        }
+        .pixel-table tr:hover td {
+            background: #e8dcc0;
+        }
+
+        /* ===== 弹窗按钮 ===== */
+        .modal-btn {
+            padding: 6px 18px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 3px solid #4a2c0a;
+            transition: all 0.15s;
+            image-rendering: pixelated;
+            box-shadow: 0 0 0 2px #8B6914;
+        }
+        .modal-btn:hover { transform: scale(1.03); }
+        .btn-primary {
+            background: #8B6914;
+            color: white;
+            box-shadow: 0 0 0 2px #8B6914;
+            margin-right: 6px;
+        }
+        .btn-primary:hover {
+            background: #a87d1a;
+        }
+        .btn-secondary {
+            background: #eee;
+            color: #4a2c0a;
+            border-color: #4a2c0a;
+        }
+        .btn-secondary:hover {
+            background: #ddd;
+        }
+
+        /* ===== 事件弹窗 ===== */
+        #event-popup {
+            display: none;
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(255, 248, 220, 0.95);
+            border: 3px solid #D4A017;
+            border-radius: 8px;
+            padding: 12px 22px;
+            z-index: 150;
+            text-align: center;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s, opacity 0.3s;
+            opacity: 0;
+            min-width: 200px;
+        }
+        #event-popup.show {
+            display: block;
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        #event-popup .ep-icon { font-size: 28px; }
+        #event-popup .ep-title { font-size: 16px; font-weight: 800; color: #4a2c0a; }
+        #event-popup .ep-desc { font-size: 12px; color: #6b4f2e; }
+
+        /* ===== 宝箱问题 ===== */
+        #q-box {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 250;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            border-radius: 16px;
+        }
+        #q-box.show { display: flex; }
+        #q-inner {
+            background: #fcf8e8;
+            border: 4px solid #4a2c0a;
+            border-radius: 12px;
+            padding: 24px 28px;
+            max-width: 380px;
+            width: 90%;
+            box-shadow:
+                inset 0 0 0 2px #f5deb3,
+                0 0 0 4px #8B6914,
+                0 8px 32px rgba(0,0,0,0.5);
+            animation: modalIn 0.3s cubic-bezier(.34, 1.56, .64, 1);
+        }
+        #q-inner h3 {
+            font-size: 12px;
+            color: #8B6914;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .q-text {
+            font-size: 17px;
+            color: #4a2c0a;
+            font-weight: 700;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+        .q-choices { display: flex; flex-direction: column; gap: 8px; }
+        .q-choice {
+            padding: 10px 14px;
+            background: rgba(212, 160, 23, 0.08);
+            border: 2px solid rgba(212, 160, 23, 0.2);
+            border-radius: 4px;
+            color: #4a2c0a;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+            text-align: left;
+        }
+        .q-choice:hover {
+            background: rgba(212, 160, 23, 0.18);
+            border-color: #D4A017;
+        }
+        .q-choice.correct {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: #2ECC71;
+        }
+        .q-choice.wrong {
+            background: rgba(231, 76, 60, 0.12);
+            border-color: #E74C3C;
+        }
+
+        /* ===== iframe 游戏容器 ===== */
+        #game-slot {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: #000;
+            z-index: 350;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        #game-slot.show { display: block; }
+        #game-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        /* 加载中遮罩 */
+        #game-loading {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 10, 20, 0.92);
+            z-index: 360;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 14px;
+            border-radius: 16px;
+        }
+        #game-loading.show { display: flex; }
+        #game-loading p {
+            color: #FFD700;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,215,0,0.2);
+            border-top-color: #FFD700;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== 胜利/失败 ===== */
+        #win-screen, #over-screen {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 400;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+        }
+        #win-screen.show, #over-screen.show { display: flex; }
+        #win-screen h1 { font-size: 38px; color: #FFD700; font-weight: 900; text-shadow: 0 0 40px rgba(255, 215, 0, 0.2); }
+        #win-screen p, #over-screen p { font-size: 16px; color: #ddd; margin-bottom: 18px; }
+        #over-screen h1 { font-size: 34px; color: #E74C3C; font-weight: 900; }
+
+        /* ===== 控制提示 ===== */
+        #ctrl-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: #FFD700;
+            padding: 4px 18px;
+            border-radius: 20px;
+            font-size: 11px;
+            z-index: 30;
+            backdrop-filter: blur(4px);
+            white-space: nowrap;
+        }
+        #ctrl-hint kbd {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 1px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #fff;
+            margin: 0 3px;
+        }
+
+        #life-flash {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.1s;
+            border-radius: 16px;
+        }
+        #life-flash.red { background: rgba(220, 38, 38, 0.2); }
+        #life-flash.green { background: rgba(46, 204, 113, 0.15); }
+
+        /* ===== 滚动条像素风格 ===== */
+        #modal-box::-webkit-scrollbar,
+        .modal-rules::-webkit-scrollbar {
+            width: 6px;
+        }
+        #modal-box::-webkit-scrollbar-track,
+        .modal-rules::-webkit-scrollbar-track {
+            background: #f2ebd5;
+            border: 2px solid #4a2c0a;
+        }
+        #modal-box::-webkit-scrollbar-thumb,
+        .modal-rules::-webkit-scrollbar-thumb {
+            background: #8B6914;
+            border: 2px solid #4a2c0a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+    <div class="game-container" id="gameContainer">
+
+        <!-- ===== 游戏内部草坪背景 (PNG) ===== -->
+        <img id="bgImage" src="https://i.ibb.co/gZ1ppHVQ/grass-background.png" alt="Background">
+
+        <!-- ===== HUD ===== -->
+        <div id="hud">
+            <div class="title">🗺️ TataKembara</div>
+            <div id="lives-display">
+                <span class="heart" id="h1">❤️</span>
+                <span class="heart" id="h2">❤️</span>
+                <span class="heart" id="h3">❤️</span>
+                <span class="heart lost" id="h4">❤️</span>
+                <span class="heart lost" id="h5">❤️</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div id="progress-label">🏁 Lobi</div>
+                <button id="musicBtn" onclick="toggleMusic()" title="BGM On/Off">🔊</button>
+            </div>
+        </div>
+
+        <div id="life-flash"></div>
+
+        <!-- ===== Canvas 路径 ===== -->
+        <canvas id="pathCanvas"></canvas>
+
+        <!-- ===== 世界元素 ===== -->
+        <div id="world"></div>
+
+        <!-- ===== 玩家 ===== -->
+        <div id="player">
+            <img id="playerImg" src="https://i.ibb.co/4gTMh7RP/watak1.png" alt="Player">
+        </div>
+
+        <!-- ===== 角色选择 ===== -->
+        <div id="character-select">
+            <h2>🗺️ TataKembara — Pilih Watak</h2>
+            <div class="char-options">
+                <div class="char-card" onclick="selectCharacter('male')">
+                    <img src="https://i.ibb.co/4gTMh7RP/watak1.png" alt="Lelaki">
+                    <div class="char-name">👦 Lelaki</div>
+                    <div class="char-sub">Watak 1</div>
+                </div>
+                <div class="char-card" onclick="selectCharacter('female')">
+                    <img src="https://i.ibb.co/60W1FKz2/watak2.png" alt="Perempuan">
+                    <div class="char-name">👧 Perempuan</div>
+                    <div class="char-sub">Watak 2</div>
+                </div>
+            </div>
+            <div id="char-hint">Klik watak untuk mula bermain</div>
+        </div>
+
+        <!-- ===== 弹窗 (Papan) ===== -->
+        <div id="modal-overlay">
+            <div id="modal-box">
+                <div class="modal-sub" id="modal-sub">Papan Ilmu</div>
+                <h2 id="modal-title">Game 1</h2>
+                <p id="modal-body"></p>
+                <ul class="modal-rules" id="modal-rules-list"></ul>
+                <button class="modal-btn btn-primary" onclick="startGame()">🎮 Main</button>
+                <button class="modal-btn btn-secondary" onclick="closeModal()">Tutup</button>
+            </div>
+        </div>
+
+        <!-- ===== 宝箱问题 ===== -->
+        <div id="q-box">
+            <div id="q-inner">
+                <h3>📦 Kotak Soalan</h3>
+                <div class="q-text" id="q-text"></div>
+                <div class="q-choices" id="q-choices"></div>
+            </div>
+        </div>
+
+        <!-- ===== 事件弹窗 ===== -->
+        <div id="event-popup">
+            <div class="ep-icon" id="ep-icon"></div>
+            <div class="ep-title" id="ep-title"></div>
+            <div class="ep-desc" id="ep-desc"></div>
+        </div>
+
+        <!-- ===== iframe 游戏容器 ===== -->
+        <div id="game-slot">
+            <iframe id="game-iframe" src="" title="Mini Game" allowfullscreen></iframe>
+        </div>
+        <!-- 加载遮罩 -->
+        <div id="game-loading">
+            <div class="loading-spinner"></div>
+            <p>Memuatkan permainan...</p>
+        </div>
+
+        <!-- ===== 胜利/失败 ===== -->
+        <div id="win-screen">
+            <h1>🏆 Tahniah!</h1>
+            <p>Anda telah menyelesaikan semua cabaran!</p>
+            <button class="modal-btn btn-primary" onclick="location.reload()">🔄 Main Semula</button>
+        </div>
+        <div id="over-screen">
+            <h1>😵 Nyawa Habis</h1>
+            <p>Jangan putus asa! Cuba lagi.</p>
+            <button class="modal-btn btn-primary" onclick="location.reload()">🔄 Cuba Lagi</button>
+        </div>
+
+        <!-- ===== 控制提示 ===== -->
+        <div id="ctrl-hint"><kbd>←↑↓→</kbd> / <kbd>WASD</kbd> bergerak</div>
+
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  背景音乐 —— 使用本地 bgm.mp3 文件
+    // ============================================================
+    const BGM_URL = 'bgm.mp3';
+    let bgm = null;
+    let isMusicOn = true;
+
+    function initBGM() {
+        try {
+            bgm = new Audio(BGM_URL);
+            bgm.loop = true;
+            bgm.volume = 0.3;
+            bgm.load();
+            console.log('BGM 已加载 (本地文件)');
+        } catch (e) {
+            console.log('BGM 初始化失败:', e);
+        }
+    }
+
+    function playBGM() {
+        if (bgm && isMusicOn) {
+            bgm.play().then(() => {
+                console.log('BGM 开始播放');
+            }).catch((e) => {
+                console.log('BGM 播放被拦截，等待用户交互:', e);
+                document.addEventListener('click', function playOnce() {
+                    if (bgm && isMusicOn) {
+                        bgm.play().catch(() => {});
+                    }
+                    document.removeEventListener('click', playOnce);
+                }, { once: true });
+            });
+        }
+    }
+
+    function toggleMusic() {
+        const btn = document.getElementById('musicBtn');
+        if (!bgm) return;
+        if (isMusicOn) {
+            bgm.pause();
+            isMusicOn = false;
+            btn.textContent = '🔇';
+            btn.classList.add('muted');
+        } else {
+            bgm.play().catch(() => {});
+            isMusicOn = true;
+            btn.textContent = '🔊';
+            btn.classList.remove('muted');
+        }
+    }
+
+    // ============================================================
+    //  图片直链 (ImgBB)
+    // ============================================================
+    const IMAGES = {
+        playerMale: 'https://i.ibb.co/4gTMh7RP/watak1.png',
+        playerFemale: 'https://i.ibb.co/60W1FKz2/watak2.png',
+        bg: 'https://i.ibb.co/gZ1ppHVQ/grass-background.png',
+        mushroom: 'https://i.ibb.co/cc6NKZKj/mushroom.png',
+        treasure: 'https://i.ibb.co/gbz7wfRv/treasure.png',
+        dinosaur: 'https://i.ibb.co/BKCkDGm4/dinosaur.png',
+    };
+
+    // ============================================================
+    //  物品类型映射
+    // ============================================================
+    const EVENT_TYPES = {
+        mushroom: { img: IMAGES.mushroom, name: 'Cendawan' },
+        chest: { img: IMAGES.treasure, name: 'Peti Harta' },
+        dino: { img: IMAGES.dinosaur, name: 'Dinosaur' },
+    };
+
+    // ============================================================
+    //  随机选择两个不同物品
+    // ============================================================
+    function getRandomEvents() {
+        const all = ['mushroom', 'chest', 'dino'];
+        const shuffled = [...all];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled.slice(0, 2);
+    }
+
+    // ============================================================
+    //  STATE
+    // ============================================================
+    const S = {
+        lives: 3,
+        game1Done: false,
+        game2Done: false,
+        game3Done: false,
+        eventsUnlocked: false,
+        px: 0,
+        py: 0,
+        facingRight: true,
+        locked: true,
+        selectedChar: 'male',
+        currentEvents: [],
+    };
+
+    // ============================================================
+    //  NODE POSITIONS
+    // ============================================================
+    const N = {
+        start: { x: 70, y: 310 },
+        game1: { x: 200, y: 460 },
+        game2: { x: 520, y: 200 },
+        game3: { x: 780, y: 340 },
+        end: { x: 880, y: 530 },
+        ev1: { x: 370, y: 280 },
+        ev2: { x: 650, y: 260 },
+    };
+
+    // ============================================================
+    //  PATH
+    // ============================================================
+    function getPathPoints() {
+        const n = N;
+        return [
+            { x: n.start.x, y: n.start.y },
+            { x: n.start.x, y: n.start.y + 60 },
+            { x: n.start.x, y: n.start.y + 120 },
+            { x: n.game1.x, y: n.game1.y },
+            { x: n.game1.x + 50, y: n.game1.y - 30 },
+            { x: n.game1.x + 120, y: n.game1.y - 80 },
+            { x: n.game2.x, y: n.game2.y },
+            { x: n.game2.x + 50, y: n.game2.y + 30 },
+            { x: n.game2.x + 120, y: n.game2.y + 80 },
+            { x: n.game3.x, y: n.game3.y },
+            { x: n.game3.x, y: n.game3.y + 60 },
+            { x: n.game3.x, y: n.game3.y + 120 },
+            { x: n.end.x, y: n.end.y },
+        ];
+    }
+
+    // ============================================================
+    //  DRAW PATH
+    // ============================================================
+    const canvas = document.getElementById('pathCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        const rect = document.getElementById('gameContainer');
+        canvas.width = rect.clientWidth;
+        canvas.height = rect.clientHeight;
+        drawPath();
+    }
+
+    function drawPath() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const pts = getPathPoints();
+        if (pts.length < 2) return;
+
+        ctx.shadowColor = 'rgba(139,69,19,0.25)';
+        ctx.shadowBlur = 15;
+        ctx.strokeStyle = '#8B6B4A';
+        ctx.lineWidth = 28;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = 'rgba(210,180,140,0.2)';
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+        ctx.stroke();
+    }
+
+    // ============================================================
+    //  SNAP TO PATH
+    // ============================================================
+    function snapToPath(px, py, dx, dy) {
+        const tx = px + dx, ty = py + dy;
+        const pts = getPathPoints();
+        let best = Infinity, bestX = px, bestY = py;
+        const totalLen = pts.length - 1;
+        for (let i = 0; i <= 200; i++) {
+            const t = i / 200;
+            const idx = t * totalLen;
+            const i0 = Math.floor(idx);
+            const i1 = Math.min(i0 + 1, totalLen);
+            const frac = idx - i0;
+            const p0 = pts[i0];
+            const p1 = pts[i1];
+            const sx = p0.x + (p1.x - p0.x) * frac;
+            const sy = p0.y + (p1.y - p0.y) * frac;
+            const d = Math.hypot(tx - sx, ty - sy);
+            if (d < best) { best = d; bestX = sx; bestY = sy; }
+        }
+        if (best < 35) return { x: tx, y: ty };
+        return { x: bestX, y: bestY };
+    }
+
+    // ============================================================
+    //  CHARACTER SELECTION
+    // ============================================================
+    function selectCharacter(charId) {
+        S.selectedChar = charId;
+        document.getElementById('character-select').classList.add('hidden');
+        S.locked = false;
+        const imgSrc = charId === 'male' ? IMAGES.playerMale : IMAGES.playerFemale;
+        document.getElementById('playerImg').src = imgSrc;
+        S.px = N.start.x;
+        S.py = N.start.y;
+        updatePlayerPosition();
+
+        S.currentEvents = getRandomEvents();
+        updateEventObjects();
+
+        playBGM();
+        entryAnimation();
+    }
+
+    // ============================================================
+    //  更新事件物品显示
+    // ============================================================
+    function updateEventObjects() {
+        if (evObjects.length < 2) return;
+
+        const type1 = S.currentEvents[0];
+        const data1 = EVENT_TYPES[type1];
+        if (data1) {
+            evObjects[0].el.innerHTML = `<img src="${data1.img}" alt="${data1.name}">`;
+            evObjects[0].type = type1;
+            evObjects[0].el.dataset.type = type1;
+            // Do NOT add 'visible' here — objects only appear after Game 1
+        }
+
+        const type2 = S.currentEvents[1];
+        const data2 = EVENT_TYPES[type2];
+        if (data2) {
+            evObjects[1].el.innerHTML = `<img src="${data2.img}" alt="${data2.name}">`;
+            evObjects[1].type = type2;
+            evObjects[1].el.dataset.type = type2;
+            // Do NOT add 'visible' here — objects only appear after Game 1
+        }
+    }
+
+    // ============================================================
+    //  PLAYER
+    // ============================================================
+    const SPEED = 4.5;
+    const playerEl = document.getElementById('player');
+
+    function updatePlayerPosition() {
+        const x = S.px - 40;
+        const y = S.py - 40;
+        playerEl.style.left = x + 'px';
+        playerEl.style.top = y + 'px';
+        playerEl.style.transform = S.facingRight ? 'scaleX(1)' : 'scaleX(-1)';
+    }
+
+    let keys = {};
+    let moveInterval = null;
+
+    document.addEventListener('keydown', (e) => {
+        if (S.locked) return;
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'd', 'w', 's'].includes(e.key)) {
+            e.preventDefault();
+            keys[e.key] = true;
+            if (!moveInterval) moveInterval = setInterval(tickMove, 16);
+        }
+    });
+    document.addEventListener('keyup', (e) => {
+        keys[e.key] = false;
+        if (!Object.values(keys).some(Boolean)) { clearInterval(moveInterval); moveInterval = null; }
+    });
+
+    function tickMove() {
+        if (S.locked) return;
+        let dx = 0, dy = 0;
+        if (keys['ArrowLeft'] || keys['a']) { dx = -SPEED; S.facingRight = false; }
+        if (keys['ArrowRight'] || keys['d']) { dx = SPEED; S.facingRight = true; }
+        if (keys['ArrowUp'] || keys['w']) dy = -SPEED;
+        if (keys['ArrowDown'] || keys['s']) dy = SPEED;
+        if (dx === 0 && dy === 0) return;
+
+        const snapped = snapToPath(S.px, S.py, dx, dy);
+        S.px = snapped.x;
+        S.py = snapped.y;
+        updatePlayerPosition();
+        checkProximity();
+    }
+
+    // ============================================================
+    //  WORLD ELEMENTS
+    // ============================================================
+    const world = document.getElementById('world');
+    let evObjects = [];
+
+    function buildWorld() {
+        world.innerHTML = '';
+        const n = N;
+
+        createGate('gate-start', n.start.x - 28, n.start.y - 86, 'MULA', '🌟');
+        createGate('gate-end', n.end.x - 28, n.end.y - 86, 'SELESAI', '🏆');
+
+        createBoard(1, n.game1.x - 34, n.game1.y - 64, 'Kata Nama');
+        createBoard(2, n.game2.x - 34, n.game2.y - 64, 'Ayat Aktif→Pasif');
+        createBoard(3, n.game3.x - 34, n.game3.y - 64, 'Ayat Pasif→Aktif');
+
+        const eventPositions = [
+            { pos: n.ev1, id: 'ev1' },
+            { pos: n.ev2, id: 'ev2' },
+        ];
+
+        evObjects = eventPositions.map((data) => {
+            const el = document.createElement('div');
+            el.className = 'event-obj';
+            el.innerHTML = '';
+            el.style.left = (data.pos.x - 30) + 'px';
+            el.style.top = (data.pos.y - 30) + 'px';
+            el.style.animationDelay = '0s';
+            el.dataset.type = '';
+            el.onclick = () => {
+                const type = el.dataset.type;
+                if (type) collectItem(type, el);
+            };
+            world.appendChild(el);
+            return { el, x: data.pos.x, y: data.pos.y, type: '', consumed: false };
+        });
+
+        evObjects.forEach(ev => ev.el.classList.remove('visible'));
+
+        S.px = n.start.x;
+        S.py = n.start.y;
+        updatePlayerPosition();
+        setTimeout(drawPath, 50);
+    }
+
+    function createGate(id, x, y, label, icon) {
+        const g = document.createElement('div');
+        g.className = 'gate';
+        g.id = id;
+        g.style.cssText = `left:${x}px;top:${y}px;`;
+        g.innerHTML = `<div class="gate-arch"><span class="gate-stars">${icon}</span></div><div class="gate-label">${label}</div>`;
+        world.appendChild(g);
+    }
+
+    function createBoard(num, x, y, label) {
+        const b = document.createElement('div');
+        b.className = 'board';
+        b.id = 'board' + num;
+        b.style.cssText = `left:${x}px;top:${y}px;`;
+        b.innerHTML = `<div class="board-icon">📋</div><div class="board-num">GAME ${num}</div><div class="board-label">${label}</div>`;
+        // No onclick — board only opens via proximity check
+        world.appendChild(b);
+    }
+
+    // ============================================================
+    //  PROXIMITY
+    // ============================================================
+    const BOARD_NEAR_RADIUS = 70;   // radius to highlight board
+    const BOARD_OPEN_RADIUS = 52;   // radius to auto-open board
+
+    function checkProximity() {
+        const n = N;
+
+        // Board 1
+        const d1 = Math.hypot(S.px - n.game1.x, S.py - n.game1.y);
+        const b1 = document.getElementById('board1');
+        if (b1) b1.classList.toggle('near', d1 < BOARD_NEAR_RADIUS && !S.game1Done);
+        if (!S.game1Done && d1 < BOARD_OPEN_RADIUS) touchBoard(1);
+
+        // Board 2
+        const d2 = Math.hypot(S.px - n.game2.x, S.py - n.game2.y);
+        const b2 = document.getElementById('board2');
+        if (b2) b2.classList.toggle('near', d2 < BOARD_NEAR_RADIUS && S.game1Done && !S.game2Done);
+        if (S.game1Done && !S.game2Done && d2 < BOARD_OPEN_RADIUS) touchBoard(2);
+
+        // Board 3
+        const d3 = Math.hypot(S.px - n.game3.x, S.py - n.game3.y);
+        const b3 = document.getElementById('board3');
+        if (b3) b3.classList.toggle('near', d3 < BOARD_NEAR_RADIUS && S.game1Done && S.game2Done && !S.game3Done);
+        if (S.game1Done && S.game2Done && !S.game3Done && d3 < BOARD_OPEN_RADIUS) touchBoard(3);
+
+        // End gate
+        if (S.game3Done && Math.hypot(S.px - n.end.x, S.py - n.end.y) < 55) triggerWin();
+
+        if (!S.eventsUnlocked) return;
+        evObjects.forEach(ev => {
+            if (ev.consumed) return;
+            if (ev.type && Math.hypot(S.px - ev.x, S.py - ev.y) < 35) {
+                collectItem(ev.type, ev.el);
+                ev.consumed = true;
+            }
+        });
+    }
+
+    // ============================================================
+    //  COLLECT ITEM
+    // ============================================================
+    let itemConsumed = {};
+
+    function collectItem(type, el) {
+        const key = type + '_' + Date.now();
+        if (itemConsumed[key]) return;
+        itemConsumed[key] = true;
+
+        if (el) {
+            el.style.transition = 'transform 0.3s, opacity 0.3s';
+            el.style.transform = 'scale(0)';
+            el.style.opacity = '0';
+        }
+
+        S.locked = true;
+
+        if (type === 'chest') {
+            openChest();
+        } else if (type === 'mushroom') {
+            const isGreen = Math.random() < 0.5;
+            if (isGreen) { gainLife(); showPopup('🍄', 'Cendawan Hijau!', '+1 nyawa!'); }
+            else { loseLife(); showPopup('🍄', 'Cendawan Merah!', '-1 nyawa!'); }
+            setTimeout(() => { S.locked = false; }, 800);
+        } else if (type === 'dino') {
+            showPopup('🦖', 'Dinosaur!', '-1 nyawa!');
+            loseLife();
+            setTimeout(() => { S.locked = false; }, 1000);
+        }
+    }
+
+    // ============================================================
+    //  LIVES
+    // ============================================================
+    function gainLife() {
+        if (S.lives < 5) S.lives++;
+        updateHUD();
+        flashScreen('green');
+    }
+
+    function loseLife() {
+        S.lives--;
+        updateHUD();
+        flashScreen('red');
+        if (S.lives <= 0) setTimeout(triggerGameOver, 500);
+    }
+
+    function updateHUD() {
+        for (let i = 1; i <= 5; i++) {
+            document.getElementById('h' + i).classList.toggle('lost', i > S.lives);
+        }
+    }
+
+    function flashScreen(c) {
+        const f = document.getElementById('life-flash');
+        f.className = c;
+        f.style.opacity = '1';
+        setTimeout(() => f.style.opacity = '0', 200);
+    }
+
+    // ============================================================
+    //  BOARDS (PAPAN) —— Game 1, 2, 3 完整内容
+    // ============================================================
+    const BOARD_DATA = {
+        1: {
+            title: '📖 Golongan Kata Nama',
+            sub: 'Papan Ilmu · Game 1',
+            body: '',
+            rules: [`
+                <div style="max-height:340px; overflow-y:auto; padding-right:6px; font-size:13px; color:#2d1a0e;">
+
+                    <p style="font-weight:bold; font-size:15px; color:#4a2c0a; margin:0 0 6px 0;">📌 1. Kata Nama Am</p>
+                    <p style="margin:0 0 4px 0; line-height:1.6;"><strong>Kata nama am</strong> merujuk benda, tempat, atau orang secara umum. Ditulis dengan huruf kecil.</p>
+                    <p style="margin:0 0 4px 0; line-height:1.6;">Kata nama am terbahagi kepada dua jenis:</p>
+                    <p style="margin:0 0 2px 0; line-height:1.6; padding-left:10px;">• <strong>Konkrit</strong> — boleh dilihat atau disentuh: <em>buku, meja, pokok, kereta, air</em></p>
+                    <p style="margin:0 0 10px 0; line-height:1.6; padding-left:10px;">• <strong>Abstrak</strong> — tidak boleh dilihat atau disentuh: <em>kasih sayang, keberanian, kejujuran</em></p>
+
+                    <p style="font-weight:bold; font-size:15px; color:#4a2c0a; margin:0 0 6px 0;">📌 2. Kata Nama Khas</p>
+                    <p style="margin:0 0 10px 0; line-height:1.6;"><strong>Kata nama khas</strong> merujuk nama khusus bagi seseorang, tempat, atau benda tertentu. <strong>Ejaan bermula dengan huruf besar.</strong></p>
+
+                    <table class="pixel-table">
+                        <tr><th style="width:50%; padding:10px 14px; text-align:center;">Kata Nama Am</th><th style="width:50%; padding:10px 14px; text-align:center;">Kata Nama Khas</th></tr>
+                        <tr><td style="padding:6px 14px; text-align:center; font-size:11px; color:#8B6914; font-weight:bold;" colspan="2">Orang</td></tr>
+                        <tr><td style="padding:6px 14px; text-align:center;">pelajar</td><td style="padding:6px 14px; text-align:center;">Ahmad</td></tr>
+                        <tr><td style="padding:6px 14px; text-align:center;">guru</td><td style="padding:6px 14px; text-align:center;">Cikgu Aminah</td></tr>
+                        <tr><td style="padding:6px 14px; text-align:center; font-size:11px; color:#8B6914; font-weight:bold;" colspan="2">Tempat</td></tr>
+                        <tr><td style="padding:6px 14px; text-align:center;">bandar</td><td style="padding:6px 14px; text-align:center;">Kuala Lumpur</td></tr>
+                        <tr><td style="padding:6px 14px; text-align:center;">gunung</td><td style="padding:6px 14px; text-align:center;">Gunung Kinabalu</td></tr>
+                        <tr><td style="padding:6px 14px; text-align:center;">sungai</td><td style="padding:6px 14px; text-align:center;">Sungai Klang</td></tr>
+                        <tr><td style="padding:6px 14px; text-align:center; font-size:11px; color:#8B6914; font-weight:bold;" colspan="2">Benda / Haiwan</td></tr>
+                        <tr><td style="padding:6px 14px; text-align:center;">kucing</td><td style="padding:6px 14px; text-align:center;">Tompok</td></tr>
+                        <tr><td style="padding:6px 14px; text-align:center;">buku</td><td style="padding:6px 14px; text-align:center;">Kamus Dewan</td></tr>
+                    </table>
+
+                    <div style="height:16px;"></div>
+
+                    <p style="font-weight:bold; font-size:15px; color:#4a2c0a; margin:0 0 6px 0;">📌 3. Kata Ganti Nama Diri</p>
+                    <p style="margin:0 0 10px 0; line-height:1.6;"><strong>Kata ganti nama diri</strong> menggantikan kata nama bagi orang. Terbahagi kepada tiga diri:</p>
+
+                    <table class="pixel-table">
+                        <tr>
+                            <th style="width:33%; padding:8px 10px; text-align:center;">Diri Pertama<br><span style="font-size:10px; font-weight:normal;">(orang yang bercakap)</span></th>
+                            <th style="width:33%; padding:8px 10px; text-align:center;">Diri Kedua<br><span style="font-size:10px; font-weight:normal;">(orang yang diajak bercakap)</span></th>
+                            <th style="width:34%; padding:8px 10px; text-align:center;">Diri Ketiga<br><span style="font-size:10px; font-weight:normal;">(orang yang dibicarakan)</span></th>
+                        </tr>
+                        <tr><td style="padding:6px 10px; text-align:center;">saya, aku</td><td style="padding:6px 10px; text-align:center;">awak, kamu</td><td style="padding:6px 10px; text-align:center;">dia, ia</td></tr>
+                        <tr><td style="padding:6px 10px; text-align:center;">kami, kita</td><td style="padding:6px 10px; text-align:center;">anda, engkau</td><td style="padding:6px 10px; text-align:center;">beliau, mereka</td></tr>
+                        <tr><td style="padding:6px 10px; text-align:center;">hamba, patik, beta</td><td style="padding:6px 10px; text-align:center;">kalian, tuanku,<br>tuan hamba</td><td style="padding:6px 10px; text-align:center;">baginda, -nya</td></tr>
+                    </table>
+
+                    <div style="height:10px;"></div>
+                    <p style="margin:0; font-size:11px; color:#6b4f2e; line-height:1.5; background:rgba(212,160,23,0.08); border:1px solid #D4A017; border-radius:4px; padding:6px 10px;">💡 <strong>Ingat:</strong> Kata ganti nama diri <em>bukan</em> kata nama khas — ia tidak ditulis dengan huruf besar melainkan di awal ayat.</p>
+                </div>
+            `]
+        },
+        2: {
+            title: 'Ayat Aktif → Ayat Pasif',
+            sub: 'Papan Ilmu · Game 2',
+            body: 'Panduan menukar ayat aktif kepada ayat pasif.',
+            rules: [`
+                <div style="max-height:360px; overflow-y:auto; padding-right:6px; font-size:13px; color:#2d1a0e;">
+
+                    <p style="font-weight:bold; font-size:15px; color:#4a2c0a; margin:0 0 6px 0;">📌 1. Unsur-Unsur Ayat Aktif</p>
+                    <p style="margin:0 0 6px 0; font-size:12px; color:#5a3d1a;">Sebelum menukar, kenal pasti setiap unsur dalam ayat aktif:</p>
+
+                    <table class="pixel-table">
+                        <tr><th style="padding:7px 8px; text-align:center;">Unsur</th><th style="padding:7px 8px; text-align:center;">Maksud</th><th style="padding:7px 8px; text-align:center;">Contoh</th></tr>
+                        <tr><td style="padding:6px 8px; text-align:center; font-weight:bold;">Subjek</td><td style="padding:6px 8px;">Pelaku — yang melakukan perbuatan</td><td style="padding:6px 8px; text-align:center; font-style:italic;">Ahmad</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center; font-weight:bold;">Kata Kerja Transitif</td><td style="padding:6px 8px;">Perbuatan yang memerlukan objek</td><td style="padding:6px 8px; text-align:center; font-style:italic;">menendang</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center; font-weight:bold;">Objek</td><td style="padding:6px 8px;">Benda yang dikenakan perbuatan</td><td style="padding:6px 8px; text-align:center; font-style:italic;">bola</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center; font-weight:bold;">Pelaku</td><td style="padding:6px 8px;">Subjek asal — menjadi pelaku dalam ayat pasif</td><td style="padding:6px 8px; text-align:center; font-style:italic;">oleh Ahmad</td></tr>
+                    </table>
+
+                    <p style="margin:8px 0 4px 0; font-size:12px; color:#5a3d1a;">Contoh ayat lengkap: <strong>Subjek + Kata Kerja + Objek</strong></p>
+                    <table class="pixel-table">
+                        <tr><th style="width:25%; padding:7px 8px; text-align:center;">Subjek</th><th style="width:30%; padding:7px 8px; text-align:center;">Kata Kerja Transitif</th><th style="width:22%; padding:7px 8px; text-align:center;">Objek</th><th style="width:23%; padding:7px 8px; text-align:center;">Ayat Penuh</th></tr>
+                        <tr><td style="padding:5px 8px; text-align:center;">Saya</td><td style="padding:5px 8px; text-align:center;">menanak</td><td style="padding:5px 8px; text-align:center;">nasi</td><td style="padding:5px 8px; text-align:center; font-style:italic;">Saya menanak nasi.</td></tr>
+                        <tr><td style="padding:5px 8px; text-align:center;">Kamu</td><td style="padding:5px 8px; text-align:center;">membaca</td><td style="padding:5px 8px; text-align:center;">buku</td><td style="padding:5px 8px; text-align:center; font-style:italic;">Kamu membaca buku.</td></tr>
+                        <tr><td style="padding:5px 8px; text-align:center;">Ahmad</td><td style="padding:5px 8px; text-align:center;">menendang</td><td style="padding:5px 8px; text-align:center;">bola</td><td style="padding:5px 8px; text-align:center; font-style:italic;">Ahmad menendang bola.</td></tr>
+                    </table>
+
+                    <div style="height:14px;"></div>
+
+                    <p style="font-weight:bold; font-size:15px; color:#4a2c0a; margin:0 0 6px 0;">📌 2. Tiga Jenis Ayat Pasif Mengikut Pelaku</p>
+                    <p style="margin:0 0 8px 0; font-size:12px; color:#5a3d1a;">Jenis ayat pasif bergantung kepada <strong>siapa pelakunya</strong> (subjek dalam ayat aktif):</p>
+
+                    <table class="pixel-table">
+                        <tr>
+                            <th style="width:28%; padding:7px 8px; text-align:center;">Jenis Pasif</th>
+                            <th style="width:30%; padding:7px 8px; text-align:center;">Pelaku</th>
+                            <th style="width:42%; padding:7px 8px; text-align:center;">Kata Kerja Pasif</th>
+                        </tr>
+                        <tr>
+                            <td style="padding:6px 8px; text-align:center; font-weight:bold; background:#e8f5e9;">Pasif Diri Pertama</td>
+                            <td style="padding:6px 8px; text-align:center; background:#e8f5e9;">saya, aku, kami, kita</td>
+                            <td style="padding:6px 8px; text-align:center; background:#e8f5e9;">Gugurkan <strong>meN-</strong> → kata kerja biasa<br><span style="font-size:11px;">menanak → tanak</span></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:6px 8px; text-align:center; font-weight:bold; background:#e3f2fd;">Pasif Diri Kedua</td>
+                            <td style="padding:6px 8px; text-align:center; background:#e3f2fd;">awak, kamu, anda, engkau</td>
+                            <td style="padding:6px 8px; text-align:center; background:#e3f2fd;">Gugurkan <strong>meN-</strong> → kata kerja biasa<br><span style="font-size:11px;">membaca → baca</span></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:6px 8px; text-align:center; font-weight:bold; background:#fff3e0;">Pasif Diri Ketiga</td>
+                            <td style="padding:6px 8px; text-align:center; background:#fff3e0;">dia, beliau, mereka,<br>nama khas (Ahmad, dll)</td>
+                            <td style="padding:6px 8px; text-align:center; background:#fff3e0;">Tukar <strong>meN-</strong> kepada <strong>di-</strong><br><span style="font-size:11px;">menendang → ditendang</span></td>
+                        </tr>
+                    </table>
+
+                    <div style="height:14px;"></div>
+
+                    <p style="font-weight:bold; font-size:15px; color:#4a2c0a; margin:0 0 6px 0;">📌 3. Struktur dan Contoh Setiap Jenis</p>
+
+                    <p style="margin:4px 0 4px 0; font-size:12px; color:#2c6e2e; font-weight:bold;">🟢 Pasif Diri Pertama — Objek + Subjek + Kata Kerja (O + S + K)</p>
+                    <table class="pixel-table">
+                        <tr><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Aktif</th><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Pasif Diri Pertama</th></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Saya menanak nasi.</td><td style="padding:6px 8px; text-align:center;">Nasi <u>saya</u> tanak.</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Aku membaca buku itu.</td><td style="padding:6px 8px; text-align:center;">Buku itu <u>aku</u> baca.</td></tr>
+                    </table>
+
+                    <p style="margin:8px 0 4px 0; font-size:12px; color:#1a5276; font-weight:bold;">🔵 Pasif Diri Kedua — Objek + Subjek + Kata Kerja (O + S + K)</p>
+                    <table class="pixel-table">
+                        <tr><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Aktif</th><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Pasif Diri Kedua</th></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Kamu membaca buku.</td><td style="padding:6px 8px; text-align:center;">Buku <u>kamu</u> baca.</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Awak menulis surat itu.</td><td style="padding:6px 8px; text-align:center;">Surat itu <u>awak</u> tulis.</td></tr>
+                    </table>
+
+                    <p style="margin:8px 0 4px 0; font-size:12px; color:#7d4e00; font-weight:bold;">🟠 Pasif Diri Ketiga — Objek + Kata Kerja (di-) + oleh + Pelaku (O + K + P)</p>
+                    <table class="pixel-table">
+                        <tr><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Aktif</th><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Pasif Diri Ketiga</th></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Ahmad menendang bola.</td><td style="padding:6px 8px; text-align:center;">Bola <u>ditendang</u> oleh Ahmad.</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Dia menanak nasi di dapur.</td><td style="padding:6px 8px; text-align:center;">Nasi <u>ditanak</u> olehnya di dapur.</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Emak membasuh baju.</td><td style="padding:6px 8px; text-align:center;">Baju <u>dibasuh</u> oleh emak.</td></tr>
+                    </table>
+
+                    <div style="height:10px;"></div>
+                    <p style="margin:0; font-size:11px; color:#6b4f2e; line-height:1.5; background:rgba(212,160,23,0.08); border:1px solid #D4A017; border-radius:4px; padding:6px 10px;">💡 <strong>Ringkasan:</strong> Diri pertama &amp; kedua → gugur <em>meN-</em>, susun O+S+K. Diri ketiga &amp; nama khas → tukar <em>meN-</em> jadi <em>di-</em>, tambah <em>oleh</em>, susun O+K+oleh+Pelaku.</p>
+
+                </div>
+            `]
+        },
+        3: {
+            title: 'Ayat Pasif → Ayat Aktif',
+            sub: 'Papan Ilmu · Game 3',
+            body: 'Panduan menukar ayat pasif kepada ayat aktif.',
+            rules: [`
+                <div style="max-height:360px; overflow-y:auto; padding-right:6px; font-size:13px; color:#2d1a0e;">
+
+                    <p style="font-weight:bold; font-size:15px; color:#4a2c0a; margin:0 0 6px 0;">📌 1. Unsur-Unsur Ayat Pasif</p>
+                    <p style="margin:0 0 8px 0; font-size:12px; color:#5a3d1a;">Dalam ayat pasif, <strong>objek</strong> menjadi unsur pertama. Subjek asal (pelaku) bergerak ke belakang.</p>
+
+                    <table class="pixel-table">
+                        <tr><th style="padding:7px 8px; text-align:center;">Unsur</th><th style="padding:7px 8px; text-align:center;">Peranan dalam Ayat Pasif</th><th style="padding:7px 8px; text-align:center;">Contoh</th></tr>
+                        <tr><td style="padding:6px 8px; text-align:center; font-weight:bold;">Objek</td><td style="padding:6px 8px;">Menjadi unsur pertama (subjek tatabahasa)</td><td style="padding:6px 8px; text-align:center; font-style:italic;">Bola</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center; font-weight:bold;">Kata Kerja Pasif</td><td style="padding:6px 8px;">Berubah bentuk mengikut jenis pasif</td><td style="padding:6px 8px; text-align:center; font-style:italic;">ditendang / tendang</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center; font-weight:bold;">Pelaku</td><td style="padding:6px 8px;">Subjek asal — berada di belakang</td><td style="padding:6px 8px; text-align:center; font-style:italic;">oleh Ahmad / saya</td></tr>
+                    </table>
+
+                    <div style="height:14px;"></div>
+
+                    <p style="font-weight:bold; font-size:15px; color:#4a2c0a; margin:0 0 6px 0;">📌 2. Kenal Pasti Jenis Ayat Pasif</p>
+                    <table class="pixel-table">
+                        <tr>
+                            <th style="width:32%; padding:7px 8px; text-align:center;">Jenis Pasif</th>
+                            <th style="width:36%; padding:7px 8px; text-align:center;">Ciri Pengenal</th>
+                            <th style="width:32%; padding:7px 8px; text-align:center;">Contoh</th>
+                        </tr>
+                        <tr style="background:#e8f5e9;">
+                            <td style="padding:6px 8px; text-align:center; font-weight:bold;">Pasif Diri Pertama</td>
+                            <td style="padding:6px 8px;">Pelaku: <em>saya, aku, kami, kita</em><br>Tiada "oleh". Kata kerja tanpa di-.</td>
+                            <td style="padding:6px 8px; text-align:center; font-style:italic;">Nasi <u>saya</u> tanak.</td>
+                        </tr>
+                        <tr style="background:#e3f2fd;">
+                            <td style="padding:6px 8px; text-align:center; font-weight:bold;">Pasif Diri Kedua</td>
+                            <td style="padding:6px 8px;">Pelaku: <em>awak, kamu, anda</em><br>Tiada "oleh". Kata kerja tanpa di-.</td>
+                            <td style="padding:6px 8px; text-align:center; font-style:italic;">Buku <u>kamu</u> baca.</td>
+                        </tr>
+                        <tr style="background:#fff3e0;">
+                            <td style="padding:6px 8px; text-align:center; font-weight:bold;">Pasif Diri Ketiga</td>
+                            <td style="padding:6px 8px;">Pelaku: <em>dia, mereka, nama khas</em><br>Ada kata "oleh". Kata kerja berimbuhan di-.</td>
+                            <td style="padding:6px 8px; text-align:center; font-style:italic;">Bola <u>ditendang</u> oleh Ahmad.</td>
+                        </tr>
+                    </table>
+
+                    <div style="height:14px;"></div>
+
+                    <p style="font-weight:bold; font-size:15px; color:#4a2c0a; margin:0 0 6px 0;">📌 3. Langkah Pertukaran kepada Ayat Aktif</p>
+
+                    <p style="margin:4px 0 4px 0; font-size:12px; color:#2c6e2e; font-weight:bold;">🟢 Dari Pasif Diri Pertama</p>
+                    <p style="margin:0 0 4px 0; font-size:12px; color:#5a3d1a;">Langkah: Ambil pelaku sebagai subjek → tambah imbuhan <strong>meN-</strong> pada kata kerja → letakkan objek di belakang.</p>
+                    <table class="pixel-table">
+                        <tr><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Pasif Diri Pertama</th><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Aktif</th></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Nasi <u>saya</u> tanak.</td><td style="padding:6px 8px; text-align:center;"><u>Saya</u> menanak nasi.</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Buku itu <u>aku</u> baca.</td><td style="padding:6px 8px; text-align:center;"><u>Aku</u> membaca buku itu.</td></tr>
+                    </table>
+
+                    <p style="margin:8px 0 4px 0; font-size:12px; color:#1a5276; font-weight:bold;">🔵 Dari Pasif Diri Kedua</p>
+                    <p style="margin:0 0 4px 0; font-size:12px; color:#5a3d1a;">Langkah: Sama seperti diri pertama — pelaku jadi subjek, tambah <strong>meN-</strong> pada kata kerja.</p>
+                    <table class="pixel-table">
+                        <tr><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Pasif Diri Kedua</th><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Aktif</th></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Buku <u>kamu</u> baca.</td><td style="padding:6px 8px; text-align:center;"><u>Kamu</u> membaca buku.</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Surat itu <u>awak</u> tulis.</td><td style="padding:6px 8px; text-align:center;"><u>Awak</u> menulis surat itu.</td></tr>
+                    </table>
+
+                    <p style="margin:8px 0 4px 0; font-size:12px; color:#7d4e00; font-weight:bold;">🟠 Dari Pasif Diri Ketiga</p>
+                    <p style="margin:0 0 4px 0; font-size:12px; color:#5a3d1a;">Langkah: Buang "oleh" → pelaku jadi subjek → tukar imbuhan <strong>di-</strong> kepada <strong>meN-</strong> → objek di belakang.</p>
+                    <table class="pixel-table">
+                        <tr><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Pasif Diri Ketiga</th><th style="width:50%; padding:7px 8px; text-align:center;">Ayat Aktif</th></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Bola ditendang oleh <u>Ahmad</u>.</td><td style="padding:6px 8px; text-align:center;"><u>Ahmad</u> menendang bola.</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Nasi ditanak <u>olehnya</u> di dapur.</td><td style="padding:6px 8px; text-align:center;"><u>Dia</u> menanak nasi di dapur.</td></tr>
+                        <tr><td style="padding:6px 8px; text-align:center;">Baju dibasuh oleh <u>emak</u>.</td><td style="padding:6px 8px; text-align:center;"><u>Emak</u> membasuh baju.</td></tr>
+                    </table>
+
+                    <div style="height:10px;"></div>
+                    <p style="margin:0; font-size:11px; color:#6b4f2e; line-height:1.5; background:rgba(212,160,23,0.08); border:1px solid #D4A017; border-radius:4px; padding:6px 10px;">💡 <strong>Kunci:</strong> Dalam semua jenis, pelaku dalam ayat pasif menjadi <em>subjek</em> dalam ayat aktif. Imbuhan kata kerja berubah balik kepada <em>meN-</em>.</p>
+
+                </div>
+            `]
+        },
+    };
+
+    let curBoard = 0;
+
+    function touchBoard(num) {
+        if (S.locked) return;
+        if (num === 1 && S.game1Done) return;
+        if (num === 2 && S.game2Done) return;
+        if (num === 3 && S.game3Done) return;
+        if (num === 2 && !S.game1Done) return;
+        if (num === 3 && !S.game2Done) return;
+
+        curBoard = num;
+        S.locked = true;
+        const d = BOARD_DATA[num];
+        document.getElementById('modal-sub').textContent = d.sub;
+        document.getElementById('modal-title').textContent = d.title;
+        document.getElementById('modal-body').textContent = d.body;
+
+        if (num === 1 || num === 2 || num === 3) {
+            document.getElementById('modal-rules-list').innerHTML = d.rules[0];
+            document.getElementById('modal-rules-list').style.listStyle = 'none';
+            document.getElementById('modal-rules-list').style.padding = '0';
+        } else {
+            document.getElementById('modal-rules-list').innerHTML = d.rules.map(r => `<li>${r}</li>`).join('');
+            document.getElementById('modal-rules-list').style.listStyle = '';
+            document.getElementById('modal-rules-list').style.padding = '';
+        }
+
+        document.getElementById('modal-overlay').classList.add('show');
+    }
+
+    function closeModal() {
+        document.getElementById('modal-overlay').classList.remove('show');
+        S.locked = false;
+    }
+
+    // ============================================================
+    //  GAME FILE MAP — tambah game3.html bila siap
+    // ============================================================
+    const GAME_FILES = {
+        1: 'katanama.html',
+        2: 'game2.html',
+        3: null,   // belum siap — akan guna fallback
+    };
+
+    function startGame() {
+        closeModal();
+        S.locked = true;
+
+        const file = GAME_FILES[curBoard];
+
+        if (!file) {
+            // Game 3 belum siap — tunjuk mesej placeholder
+            _showPlaceholder(curBoard);
+            return;
+        }
+
+        // Tunjuk loading, kemudian load iframe
+        const loading = document.getElementById('game-loading');
+        const slot = document.getElementById('game-slot');
+        const iframe = document.getElementById('game-iframe');
+
+        loading.classList.add('show');
+        slot.classList.add('show');
+        iframe.src = '';
+
+        iframe.onload = function () {
+            // Suntik fungsi kembaliKeLobi ke dalam iframe
+            try {
+                const win = iframe.contentWindow;
+                win.kembaliKeLobi = function () {
+                    finishGame();
+                };
+            } catch (e) {
+                // Cross-origin fallback (tidak sepatutnya berlaku dalam folder sama)
+                console.warn('Tidak dapat suntik kembaliKeLobi:', e);
+            }
+            loading.classList.remove('show');
+        };
+
+        // Set src selepas onload dipasang
+        iframe.src = file;
+    }
+
+    function _showPlaceholder(num) {
+        // Fallback untuk game yang belum siap
+        const slot = document.getElementById('game-slot');
+        slot.classList.add('show');
+        const iframe = document.getElementById('game-iframe');
+        iframe.srcdoc = `
+            <html><body style="margin:0;background:#1a1a2e;display:flex;align-items:center;
+            justify-content:center;height:100vh;flex-direction:column;font-family:sans-serif;">
+            <div style="color:#FFD700;font-size:28px;margin-bottom:16px;">🚧</div>
+            <div style="color:#FFD700;font-size:18px;font-weight:700;margin-bottom:8px;">Game ${num} — Akan Datang</div>
+            <div style="color:#aaa;font-size:13px;margin-bottom:24px;">Permainan ini sedang dalam pembinaan.</div>
+            <button onclick="window.parent.finishGame()"
+                style="padding:10px 24px;background:#8B6914;color:#fff;border:3px solid #4a2c0a;
+                border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;">
+                ✅ Kembali ke Lobi
+            </button></body></html>`;
+        document.getElementById('game-loading').classList.remove('show');
+    }
+
+    function finishGame() {
+        // Kosongkan iframe dan sembunyi
+        const iframe = document.getElementById('game-iframe');
+        iframe.onload = null;
+        iframe.src = '';
+        iframe.srcdoc = '';
+
+        document.getElementById('game-slot').classList.remove('show');
+        document.getElementById('game-loading').classList.remove('show');
+        S.locked = false;
+
+        if (curBoard === 1) {
+            S.game1Done = true;
+            S.eventsUnlocked = true;
+            // Tandakan board sebagai selesai
+            const b1 = document.getElementById('board1');
+            if (b1) { b1.classList.remove('near'); b1.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 1</div><div class="board-label">Kata Nama</div>'; }
+            document.getElementById('progress-label').textContent = '✅ Game 1';
+            showPopup('🎉', 'Game 1 Selesai!', 'Objek rawak muncul!');
+            evObjects.forEach(ev => {
+                if (ev.type) ev.el.classList.add('visible');
+            });
+        } else if (curBoard === 2) {
+            S.game2Done = true;
+            const b2 = document.getElementById('board2');
+            if (b2) { b2.classList.remove('near'); b2.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 2</div><div class="board-label">Ayat Aktif→Pasif</div>'; }
+            document.getElementById('progress-label').textContent = '✅ Game 2';
+            showPopup('🎉', 'Game 2 Selesai!', 'Teruskan ke Game 3!');
+        } else if (curBoard === 3) {
+            S.game3Done = true;
+            const b3 = document.getElementById('board3');
+            if (b3) { b3.classList.remove('near'); b3.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 3</div><div class="board-label">Ayat Pasif→Aktif</div>'; }
+            document.getElementById('progress-label').textContent = '✅ Semua Selesai!';
+            showPopup('🏆', 'Semua Selesai!', 'Pergi ke SELESAI!');
+        }
+    }
+
+    // Dedahkan finishGame ke luar (untuk iframe placeholder pakai window.parent.finishGame)
+    window.finishGame = finishGame;
+
+    // ============================================================
+    //  CHEST — Bank soalan (28 soalan — disemak untuk ketepatan)
+    // ============================================================
+    const QUESTIONS = [
+        // === Kata Ganti Nama Diri ===
+        {
+            q: 'Pilih kata ganti nama diri PERTAMA.',
+            choices: ['Mereka', 'Saya', 'Beliau', 'Awak'],
+            ans: 1
+        },
+        {
+            q: 'Pilih kata ganti nama diri KEDUA.',
+            choices: ['Dia', 'Kami', 'Kamu', 'Mereka'],
+            ans: 2
+        },
+        {
+            q: 'Pilih kata ganti nama diri KETIGA.',
+            choices: ['Saya', 'Kamu', 'Kami', 'Beliau'],
+            ans: 3
+        },
+        {
+            q: '"Kami" ialah kata ganti nama diri yang mana?',
+            choices: ['Kedua', 'Ketiga', 'Pertama', 'Khas'],
+            ans: 2
+        },
+        {
+            q: '"Engkau" ialah kata ganti nama diri yang mana?',
+            choices: ['Pertama', 'Ketiga', 'Khas', 'Kedua'],
+            ans: 3
+        },
+        {
+            q: 'Yang manakah BUKAN kata ganti nama diri?',
+            choices: ['Saya', 'Beliau', 'Buku', 'Mereka'],
+            ans: 2
+        },
+
+        // === Kata Nama Am vs Khas ===
+        {
+            q: 'Yang manakah kata nama KHAS?',
+            choices: ['kereta', 'sekolah', 'Kuala Lumpur', 'hujan'],
+            ans: 2
+        },
+        {
+            q: 'Yang manakah kata nama AM?',
+            choices: ['Gunung Kinabalu', 'Sungai Klang', 'bandar', 'Ahmad'],
+            ans: 2
+        },
+        {
+            q: '"Gunung Kinabalu" ialah contoh...?',
+            choices: ['Kata nama am konkrit', 'Kata ganti nama', 'Kata kerja', 'Kata nama khas'],
+            ans: 3
+        },
+        {
+            q: 'Kata nama khas ditulis dengan...?',
+            choices: ['Huruf kecil sahaja', 'Angka', 'Huruf besar di awal', 'Tanda sempang'],
+            ans: 2
+        },
+        {
+            q: '"Kasih sayang" ialah kata nama am jenis...?',
+            choices: ['Konkrit', 'Khas', 'Abstrak', 'Ganti'],
+            ans: 2
+        },
+        {
+            q: 'Yang manakah kata nama am KONKRIT?',
+            choices: ['Keberanian', 'Kejujuran', 'Meja', 'Kasih sayang'],
+            ans: 2
+        },
+
+        // === Ayat Aktif → Pasif Diri Pertama ===
+        {
+            q: '"Saya menanak nasi." → Ayat pasif diri pertama yang betul?',
+            choices: ['Nasi ditanak oleh saya.', 'Nasi saya tanak.', 'Saya ditanak nasi.', 'Ditanak nasi saya.'],
+            ans: 1
+        },
+        {
+            q: '"Aku membaca buku itu." → Ayat pasif diri pertama yang betul?',
+            choices: ['Buku itu dibaca oleh aku.', 'Buku itu aku baca.', 'Aku dibaca buku itu.', 'Dibaca buku itu aku.'],
+            ans: 1
+        },
+        {
+            q: 'Apakah ciri utama ayat pasif diri pertama?',
+            choices: [
+                'Ada perkataan "oleh" dan imbuhan di-',
+                'Objek + Pelaku diri pertama + Kata kerja tanpa meN-',
+                'Kata kerja mesti berimbuhan di-',
+                'Pelaku diletakkan di awal ayat'
+            ],
+            ans: 1
+        },
+
+        // === Ayat Aktif → Pasif Diri Kedua ===
+        {
+            q: '"Kamu membaca buku." → Ayat pasif diri kedua yang betul?',
+            choices: ['Buku dibaca oleh kamu.', 'Buku kamu baca.', 'Kamu dibaca buku.', 'Dibaca buku kamu.'],
+            ans: 1
+        },
+        {
+            q: '"Awak menulis surat itu." → Ayat pasif diri kedua yang betul?',
+            choices: ['Surat itu ditulis oleh awak.', 'Surat itu awak tulis.', 'Awak ditulis surat itu.', 'Ditulis surat itu awak.'],
+            ans: 1
+        },
+
+        // === Ayat Aktif → Pasif Diri Ketiga ===
+        {
+            q: '"Ahmad menendang bola." → Ayat pasif diri ketiga yang betul?',
+            choices: ['Bola Ahmad tendang.', 'Bola ditendang Ahmad.', 'Bola ditendang oleh Ahmad.', 'Ahmad ditendang bola.'],
+            ans: 2
+        },
+        {
+            q: '"Emak membasuh baju." → Ayat pasif diri ketiga yang betul?',
+            choices: ['Baju dibasuh oleh emak.', 'Baju emak basuh.', 'Emak dibasuh baju.', 'Basuh baju emak.'],
+            ans: 0
+        },
+        {
+            q: 'Ayat pasif diri ketiga MESTI mempunyai...?',
+            choices: [
+                'Pelaku diri pertama dan kata kerja tanpa di-',
+                'Kata kerja berimbuhan di- dan perkataan "oleh" sebelum pelaku',
+                'Pelaku di awal ayat',
+                'Tiada pelaku langsung'
+            ],
+            ans: 1
+        },
+
+        // === Ayat Pasif → Aktif ===
+        {
+            q: '"Bola ditendang oleh Ahmad." → Ayat aktif yang betul?',
+            choices: ['Ahmad tendang bola.', 'Ahmad menendang bola.', 'Bola Ahmad tendang.', 'Ditendang bola Ahmad.'],
+            ans: 1
+        },
+        {
+            q: '"Nasi saya tanak." → Ayat aktif yang betul?',
+            choices: ['Tanak nasi saya.', 'Saya ditanak nasi.', 'Saya menanak nasi.', 'Nasi ditanak saya.'],
+            ans: 2
+        },
+        {
+            q: '"Buku kamu baca." → Ayat aktif yang betul?',
+            choices: ['Baca buku kamu.', 'Kamu dibaca buku.', 'Kamu membaca buku.', 'Buku dibaca kamu.'],
+            ans: 2
+        },
+        {
+            q: '"Baju dibasuh oleh emak." → Ayat aktif yang betul?',
+            choices: ['Emak basuh baju.', 'Emak membasuh baju.', 'Baju emak basuh.', 'Dibasuh baju emak.'],
+            ans: 1
+        },
+        {
+            q: 'Untuk menukar ayat pasif diri ketiga kepada aktif, apakah yang perlu dilakukan pada kata kerja?',
+            choices: [
+                'Kekalkan imbuhan di-',
+                'Tambah imbuhan ber-',
+                'Tukar imbuhan di- kepada meN-',
+                'Buang semua imbuhan'
+            ],
+            ans: 2
+        },
+
+        // === Unsur Ayat ===
+        {
+            q: 'Dalam ayat "Ahmad menendang bola", apakah OBJEK?',
+            choices: ['Ahmad', 'menendang', 'bola', 'di padang'],
+            ans: 2
+        },
+        {
+            q: 'Dalam ayat "Saya membeli buku di kedai", apakah SUBJEK?',
+            choices: ['membeli', 'buku', 'di kedai', 'Saya'],
+            ans: 3
+        },
+        {
+            q: 'Dalam ayat pasif "Bola ditendang oleh Ahmad", apakah PELAKU?',
+            choices: ['Bola', 'ditendang', 'Ahmad', 'oleh'],
+            ans: 2
+        },
+    ];
+
+    function openChest() {
+        const q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+        document.getElementById('q-box').classList.add('show');
+        document.getElementById('q-text').textContent = q.q;
+        const cDiv = document.getElementById('q-choices');
+        cDiv.innerHTML = '';
+
+        // Shuffle choices while tracking correct answer
+        const correctText = q.choices[q.ans];
+        const shuffled = [...q.choices].sort(() => Math.random() - 0.5);
+        const newCorrectIndex = shuffled.indexOf(correctText);
+
+        shuffled.forEach((c, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'q-choice';
+            btn.textContent = `${['A','B','C','D'][i]}. ${c}`;
+            btn.onclick = () => answerChest(i, newCorrectIndex, btn, cDiv);
+            cDiv.appendChild(btn);
+        });
+    }
+
+    function answerChest(chosen, correct, btn, container) {
+        [...container.children].forEach(b => b.onclick = null);
+        if (chosen === correct) {
+            btn.classList.add('correct');
+            setTimeout(() => { document.getElementById('q-box').classList.remove('show'); gainLife(); S.locked = false; showPopup('🎉', 'Jawapan Betul!', '+1 nyawa!'); }, 600);
+        } else {
+            btn.classList.add('wrong');
+            container.children[correct].classList.add('correct');
+            setTimeout(() => { document.getElementById('q-box').classList.remove('show'); loseLife(); S.locked = false; showPopup('😢', 'Jawapan Salah!', '-1 nyawa!'); }, 800);
+        }
+    }
+
+    // ============================================================
+    //  UI HELPERS
+    // ============================================================
+    let popupTimer = null;
+
+    function showPopup(icon, title, desc) {
+        const ep = document.getElementById('event-popup');
+        document.getElementById('ep-icon').textContent = icon;
+        document.getElementById('ep-title').textContent = title;
+        document.getElementById('ep-desc').textContent = desc;
+        ep.classList.add('show');
+        clearTimeout(popupTimer);
+        popupTimer = setTimeout(() => ep.classList.remove('show'), 1800);
+    }
+
+    function triggerWin() {
+        if (document.getElementById('win-screen').classList.contains('show')) return;
+        S.locked = true;
+        clearInterval(moveInterval);
+        document.getElementById('win-screen').classList.add('show');
+    }
+
+    function triggerGameOver() {
+        S.locked = true;
+        clearInterval(moveInterval);
+        document.getElementById('over-screen').classList.add('show');
+    }
+
+    // ============================================================
+    //  ENTRY
+    // ============================================================
+    function entryAnimation() {
+        S.locked = true;
+        S.px = N.start.x - 50;
+        S.py = N.start.y;
+        updatePlayerPosition();
+        setTimeout(() => {
+            S.px = N.start.x + 10;
+            updatePlayerPosition();
+            setTimeout(() => {
+                S.locked = false;
+                showPopup('🌟', 'Selamat Datang!', 'Gunakan anak panah!');
+            }, 700);
+        }, 300);
+    }
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+    window.addEventListener('load', () => {
+        buildWorld();
+        updateHUD();
+        document.getElementById('character-select').classList.remove('hidden');
+        S.locked = true;
+        setTimeout(() => resizeCanvas(), 100);
+        initBGM();
+    });
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // 暴露给 HTML onclick
+    window.startGame = startGame;
+    window.finishGame = finishGame;
+    window.closeModal = closeModal;
+    window.selectCharacter = selectCharacter;
+    window.toggleMusic = toggleMusic;
+</script>
+
+</body>
+</html>
