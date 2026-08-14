@@ -3449,8 +3449,8 @@
       try { st = JSON.parse(sessionStorage.getItem('tk_state') || '{}'); } catch(e) {}
 
       if (gameDone) st.game2Done = true;
-      st.returnBoard = gameDone ? 2 : 0;
-      st.game2Passed = gameDone;
+      st.returnBoard = 2;
+      st.gamePassed = gameDone;
       sessionStorage.setItem('tk_state', JSON.stringify(st));
 
       // Cuba postMessage dulu (kalau dalam iframe), kalau gagal redirect

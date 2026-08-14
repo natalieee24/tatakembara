@@ -1588,7 +1588,7 @@
         iframe.onload = function () {
             loading.classList.remove('show');
             try {
-                iframe.contentWindow.kembaliKeLobi = function (passed) { finishGame(passed); };
+                iframe.contentWindow.kembaliKeLobi = function (isWin) { finishGame(isWin === false ? 'failed' : true); };
             } catch (e) {}
         };
 
@@ -1949,13 +1949,14 @@
             sessionStorage.removeItem('tk_state');
             try {
                 const st = JSON.parse(saved);
-                S.lives        = st.lives        ?? S.lives;
-                S.game1Done    = st.game1Done    ?? false;
-                S.game2Done    = st.game2Done    ?? false;
-                S.game3Done    = st.game3Done    ?? false;
+                S.lives          = st.lives          ?? S.lives;
+                S.game1Done      = st.game1Done      ?? false;
+                S.game2Done      = st.game2Done      ?? false;
+                S.game3Done      = st.game3Done      ?? false;
                 S.eventsUnlocked = st.eventsUnlocked ?? false;
-                S.selectedChar = st.selectedChar ?? 'male';
-                curBoard       = st.returnBoard  ?? 0;
+                S.selectedChar   = st.selectedChar   ?? 'male';
+                curBoard         = st.returnBoard    ?? 0;
+                const passed     = st.gamePassed !== false;
 
                 // Tetapkan watak
                 const imgSrc = S.selectedChar === 'male' ? IMAGES.playerMale : IMAGES.playerFemale;
@@ -1963,12 +1964,11 @@
 
                 // Langkau skrin pilih watak, terus ke lobi
                 document.getElementById('character-select').classList.add('hidden');
-                S.locked = false;
                 updateHUD();
                 S.currentEvents = getRandomEvents();
                 updateEventObjects();
 
-                // Tanda board yang sudah selesai
+                // Tanda board yang sudah selesai pada papan
                 if (S.game1Done) {
                     const b1 = document.getElementById('board1');
                     if (b1) b1.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 1</div><div class="board-label">Kata Nama</div>';
@@ -1978,16 +1978,69 @@
                     if (b2) b2.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 2</div><div class="board-label">Ayat Aktif→Pasif</div>';
                 }
 
-                // Jalankan finishGame untuk board yang baru selesai
+                // [fix path] Lukis semula canvas selepas redirect
+                setTimeout(() => resizeCanvas(), 80);
+
+                // [fix position] Letak pemain di hadapan board berkaitan, bukan di start
+                const boardPos = {
+                    1: { x: N.game1.x, y: N.game1.y + 30 },
+                    2: { x: N.game2.x, y: N.game2.y + 30 },
+                    3: { x: N.game3.x, y: N.game3.y + 30 },
+                };
+                if (curBoard > 0 && boardPos[curBoard]) {
+                    S.px = boardPos[curBoard].x;
+                    S.py = boardPos[curBoard].y;
+                } else {
+                    S.px = N.start.x;
+                    S.py = N.start.y;
+                }
+                updatePlayerPosition();
+
+                // BGM
+                initBGM();
+                setTimeout(() => playBGM(), 300);
+
+                // Focus fix
+                setTimeout(() => {
+                    window.focus();
+                    const gc = document.getElementById('gameContainer');
+                    gc.setAttribute('tabindex', '-1');
+                    gc.focus({ preventScroll: true });
+                }, 200);
+
+                // [fix game lock] Proses keputusan game
                 if (curBoard > 0) {
-                    // Resume BGM dan fix focus selepas redirect
-                    initBGM();
-                    setTimeout(() => playBGM(), 300);
-                    finishGame(st.game2Passed === false ? 'failed' : true);
+                    S.locked = false;
+                    if (passed) {
+                        // Menang — mark done dan buka unlock
+                        if (curBoard === 1) {
+                            S.game1Done = true;
+                            S.eventsUnlocked = true;
+                            const b1 = document.getElementById('board1');
+                            if (b1) { b1.classList.remove('near'); b1.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 1</div><div class="board-label">Kata Nama</div>'; }
+                            document.getElementById('progress-label').textContent = '✅ Game 1';
+                            showPopup('🎉', 'Game 1 Selesai!', 'Objek rawak muncul!');
+                            evObjects.forEach(ev => { if (ev.type) ev.el.classList.add('visible'); });
+                        } else if (curBoard === 2) {
+                            S.game2Done = true;
+                            const b2 = document.getElementById('board2');
+                            if (b2) { b2.classList.remove('near'); b2.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 2</div><div class="board-label">Ayat Aktif→Pasif</div>'; }
+                            document.getElementById('progress-label').textContent = '✅ Game 2';
+                            showPopup('🎉', 'Game 2 Selesai!', 'Teruskan ke Game 3!');
+                        } else if (curBoard === 3) {
+                            S.game3Done = true;
+                            const b3 = document.getElementById('board3');
+                            if (b3) { b3.classList.remove('near'); b3.innerHTML = '<div class="board-icon">✅</div><div class="board-num">GAME 3</div><div class="board-label">Ayat Pasif→Aktif</div>'; }
+                            document.getElementById('progress-label').textContent = '✅ Semua Selesai!';
+                            showPopup('🏆', 'Semua Selesai!', 'Pergi ke SELESAI!');
+                        }
+                    } else {
+                        // Kalah — jangan mark done, tunjuk mesej, player kekal di hadapan board
+                        showPopup('💪', 'Cuba Lagi!', 'Main semula untuk teruskan!');
+                    }
                 } else {
                     S.locked = false;
-                    playBGM();
-                    entryAnimation();
+                    showPopup('🌟', 'Selamat Datang!', 'Gunakan anak panah!');
                 }
                 return;
             } catch(e) {

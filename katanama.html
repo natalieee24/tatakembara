@@ -674,7 +674,7 @@
         <div class="modal-btn-group">
             <button class="modal-btn-primary" onclick="closeModalAndReset();">🔄 Permainan baharu</button>
             <button class="modal-btn-secondary" onclick="window.kembaliKeMenu();">📋 Laman utama</button>
-            <button class="modal-btn-secondary" onclick="window.kembaliKeLobi && window.kembaliKeLobi();">🏠 Kembali ke lobi</button>
+            <button class="modal-btn-secondary" onclick="window.kembaliKeLobi && window.kembaliKeLobi(_lastIsWin);">🏠 Kembali ke lobi</button>
         </div>
     </div>
 </div>
@@ -1315,7 +1315,9 @@ function updatePetuaBtn() {
 // ==============================================================
 //  RESULT MODAL
 // ==============================================================
+let _lastIsWin = false;
 function showModal(isWin) {
+    _lastIsWin = isWin;
     pauseFlags.result=true;
     document.getElementById('modalIcon').textContent=isWin?'🏆':'😔';
     document.getElementById('modalTitle').textContent=isWin?'Tahniah!':'Maaf, anda gagal';
