@@ -1554,35 +1554,37 @@
         const file = GAME_FILES[curBoard];
 
         if (!file) {
-            // Game 3 belum siap — tunjuk mesej placeholder
             _showPlaceholder(curBoard);
             return;
         }
 
-        // Tunjuk loading, kemudian load iframe
         const loading = document.getElementById('game-loading');
         const slot = document.getElementById('game-slot');
         const iframe = document.getElementById('game-iframe');
 
-        loading.classList.add('show');
-        slot.classList.add('show');
+        // Reset dulu — buang onload lama, kosongkan src
+        iframe.onload = null;
         iframe.src = '';
 
+        loading.classList.add('show');
+        slot.classList.add('show');
+
+        // Pasang onload BARU selepas reset, supaya hanya tembak sekali untuk file sebenar
         iframe.onload = function () {
-            // Suntik fungsi kembaliKeLobi ke dalam iframe
+            // Langkau jika src masih kosong (onload dari '' di atas)
+            if (!iframe.src || iframe.src === window.location.href) return;
+
             try {
-                const win = iframe.contentWindow;
-                win.kembaliKeLobi = function () {
+                iframe.contentWindow.kembaliKeLobi = function () {
                     finishGame();
                 };
             } catch (e) {
-                // Cross-origin fallback (tidak sepatutnya berlaku dalam folder sama)
                 console.warn('Tidak dapat suntik kembaliKeLobi:', e);
             }
             loading.classList.remove('show');
         };
 
-        // Set src selepas onload dipasang
+        // Set src — ini akan trigger onload yang sebenar
         iframe.src = file;
     }
 
