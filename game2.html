@@ -3440,27 +3440,30 @@
     });
 
     // ============================================================
-    //  ANTARA MUKA LOBI — dipanggil oleh TataKembara.html
+    //  ANTARA MUKA LOBI — postMessage kepada TataKembara
     // ============================================================
-    // Butang Kembali ke Lobi (Menang)
-    document.getElementById('btn-lobi-vic').addEventListener('click', () => {
+    function balikKeLobi() {
       sound.stopBGM();
-      window.kembaliKeLobi();
-    });
+      // Cuba inject dulu, kalau gagal guna postMessage
+      try {
+        if (window.kembaliKeLobi && typeof window.kembaliKeLobi === 'function') {
+          window.kembaliKeLobi();
+          return;
+        }
+      } catch(e) {}
+      // Fallback: hantar mesej kepada parent (TataKembara)
+      try {
+        window.parent.postMessage({ type: 'GAME_DONE', game: 2 }, '*');
+      } catch(e) {}
+    }
 
-    // Butang Kembali ke Lobi (Kalah)
-    document.getElementById('btn-lobi-go').addEventListener('click', () => {
-      sound.stopBGM();
-      window.kembaliKeLobi();
-    });
+    document.getElementById('btn-lobi-vic').addEventListener('click', balikKeLobi);
+    document.getElementById('btn-lobi-go').addEventListener('click', balikKeLobi);
 
-    // Fungsi ini akan disuntik oleh TataKembara.html selepas iframe dimuatkan.
-    // Secara lalai ia tidak membuat apa-apa — selamat jika game2 dibuka secara langsung.
     window.kembaliKeLobi = function () {
       // Diisi oleh induk (TataKembara) — jangan buang baris ini
     };
 
-    // Skor boleh dibaca oleh induk selepas permainan selesai
     window.getGameScore = function () {
       return state.score;
     };

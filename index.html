@@ -1562,37 +1562,35 @@
         const slot = document.getElementById('game-slot');
         const iframe = document.getElementById('game-iframe');
 
-        // Buang onload lama, kosongkan iframe
         iframe.onload = null;
         iframe.removeAttribute('src');
 
         loading.classList.add('show');
         slot.classList.add('show');
 
-        // Timeout — kalau onload tak tembak dalam 10 saat, tutup loading je
-        const loadingTimeout = setTimeout(function () {
+        // Tutup loading sebaik iframe selesai load
+        // Cuba inject kembaliKeLobi (untuk katanama.html yang menyokongnya)
+        // game2.html akan guna postMessage sebagai alternatif
+        iframe.onload = function () {
             loading.classList.remove('show');
             try {
-                iframe.contentWindow.kembaliKeLobi = function () { finishGame(); };
-            } catch(e) {}
-        }, 10000);
+                iframe.contentWindow.kembaliKeLobi = function () {
+                    finishGame();
+                };
+            } catch (e) {
+                // game2 akan guna postMessage — tidak perlu buat apa-apa di sini
+            }
+        };
 
-        // Tunggu satu frame supaya reset selesai, baru set src baru
-        setTimeout(function () {
-            iframe.onload = function () {
-                clearTimeout(loadingTimeout);
-                try {
-                    iframe.contentWindow.kembaliKeLobi = function () {
-                        finishGame();
-                    };
-                } catch (e) {
-                    console.warn('kembaliKeLobi inject failed:', e);
-                }
-                loading.classList.remove('show');
-            };
-            iframe.src = file;
-        }, 50);
+        setTimeout(function () { iframe.src = file; }, 50);
     }
+
+    // Dengar postMessage dari game2 (atau mana-mana game lain)
+    window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'GAME_DONE') {
+            finishGame();
+        }
+    });
 
     function _showPlaceholder(num) {
         // Fallback untuk game yang belum siap
