@@ -2914,16 +2914,26 @@
         const badgeChar = String.fromCharCode(65 + lane); 
         ctx.fillText(badgeChar, cX - finalW/2.4, cardY);
 
-        // Draw option text banner letters
-        // (Guarantees minimum readable 11.5px font size from the horizon!)
+        // Draw option text — wrap into two lines if too long
         ctx.fillStyle = '#fef3c7';
-        ctx.font = `600 ${Math.max(11.5, 15 * archScale)}px Outfit`;
+        const txtFontSize = Math.max(11.5, 15 * archScale);
+        ctx.font = `600 ${txtFontSize}px Outfit`;
         ctx.textAlign = 'center';
-        
-        let txt = option.text;
-        if (txt.length > 25) txt = txt.substring(0, 23) + '...';
-        
-        ctx.fillText(txt, cX + 12 * archScale, cardY);
+
+        const fullTxt = option.text;
+        const maxChars = 22;
+        if (fullTxt.length <= maxChars) {
+            ctx.fillText(fullTxt, cX + 12 * archScale, cardY);
+        } else {
+            // Split at last space before maxChars
+            let splitIdx = fullTxt.lastIndexOf(' ', maxChars);
+            if (splitIdx < 6) splitIdx = maxChars;
+            const line1 = fullTxt.substring(0, splitIdx).trim();
+            const line2 = fullTxt.substring(splitIdx).trim();
+            const lineH = txtFontSize * 1.25;
+            ctx.fillText(line1, cX + 12 * archScale, cardY - lineH * 0.5);
+            ctx.fillText(line2, cX + 12 * archScale, cardY + lineH * 0.5);
+        }
 
         ctx.restore();
       }
@@ -3451,6 +3461,7 @@
       if (gameDone) st.game2Done = true;
       st.returnBoard = 2;
       st.gamePassed = gameDone;
+      try { st.game2Score = state.score || 0; } catch(e) { st.game2Score = 0; }
       sessionStorage.setItem('tk_state', JSON.stringify(st));
 
       // Cuba postMessage dulu (kalau dalam iframe), kalau gagal redirect

@@ -526,6 +526,63 @@
         #event-popup .ep-title { font-size: 16px; font-weight: 800; color: #4a2c0a; }
         #event-popup .ep-desc { font-size: 12px; color: #6b4f2e; }
 
+        /* ===== 解释面板 ===== */
+        #exp-panel {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.78);
+            z-index: 260;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+        }
+        #exp-panel.show { display: flex; }
+        #exp-inner {
+            background: #fcf8e8;
+            border: 4px solid #4a2c0a;
+            border-radius: 12px;
+            padding: 22px 26px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 0 0 2px #f5deb3, 0 0 0 5px #8B6914, 0 8px 32px rgba(0,0,0,0.5);
+        }
+        #exp-verdict {
+            font-size: 18px;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+        #exp-verdict.correct { color: #27ae60; }
+        #exp-verdict.wrong   { color: #e74c3c; }
+        #exp-ans {
+            font-size: 12px;
+            font-weight: 700;
+            color: #2c5f2e;
+            background: rgba(46,204,113,0.12);
+            border: 1px solid #2ECC71;
+            border-radius: 6px;
+            padding: 7px 12px;
+            margin-bottom: 10px;
+        }
+        #exp-text {
+            font-size: 13px;
+            color: #3d2b1f;
+            line-height: 1.65;
+            margin-bottom: 14px;
+        }
+        #exp-ok {
+            width: 100%;
+            padding: 9px;
+            background: #8B6914;
+            color: #fff;
+            border: 3px solid #4a2c0a;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        #exp-ok:hover { background: #a87d1a; }
+
         /* ===== 宝箱问题 ===== */
         #q-box {
             display: none;
@@ -711,11 +768,115 @@
             background: #8B6914;
             border: 2px solid #4a2c0a;
         }
+        /* ===== INTRO ===== */
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0a0a0f; display:flex; align-items:center; justify-content:center; min-height:100vh; font-family:'Segoe UI',sans-serif; }
+#intro-stage { position:relative; width:800px; height:500px; overflow:hidden; background:#0a0a0f; border:3px solid #2a2a3a; border-radius:12px; box-shadow:0 0 60px rgba(0,0,0,0.8); }
+#intro-inner canvas { position:absolute; top:0; left:0; }
+#ui { position:absolute; inset:0; pointer-events:none; }
+
+#dialog {
+    position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+    width:88%; background:rgba(10,10,20,0.92);
+    border:2px solid #D4A017; border-radius:8px;
+    padding:14px 18px 12px; display:none;
+    box-shadow:0 0 0 1px #8B6914, 0 8px 32px rgba(0,0,0,0.6);
+    pointer-events:auto;
+}
+#dialog-name { font-size:11px; font-weight:700; color:#FFD700; text-transform:uppercase; letter-spacing:2px; margin-bottom:6px; }
+#dialog-text { font-size:14px; color:#f5ecd4; line-height:1.6; min-height:40px; }
+#dialog-next { position:absolute; bottom:10px; right:14px; font-size:11px; color:#D4A017; animation:blink 1s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+#skip-btn {
+    position:absolute; top:14px; right:14px;
+    background:rgba(0,0,0,0.5); border:1px solid rgba(255,215,0,0.3);
+    color:rgba(255,215,0,0.7); font-size:11px; font-weight:600;
+    padding:5px 14px; border-radius:20px; cursor:pointer;
+    pointer-events:auto; letter-spacing:1px; transition:all 0.2s;
+}
+#skip-btn:hover { background:rgba(255,215,0,0.15); color:#FFD700; }
+
+#replay-btn {
+    display:none; position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+    background:#8B6914; border:3px solid #4a2c0a; color:#fff;
+    font-size:14px; font-weight:700; padding:10px 32px;
+    border-radius:6px; cursor:pointer; pointer-events:auto;
+}
+#replay-btn:hover { background:#a87d1a; }
+
+#end-text {
+    display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    text-align:center;
+}
+#end-text .line1 { font-size:22px; font-weight:700; color:#FFD700; text-shadow:0 0 20px rgba(255,215,0,0.4); margin-bottom:10px; }
+#end-text .line2 { font-size:14px; color:#f5ecd4; letter-spacing:1px; }
+
+        @keyframes mulaPulse {
+            0%,100% { box-shadow:0 0 20px rgba(255,215,0,0.1); transform:scale(1); }
+            50%      { box-shadow:0 0 40px rgba(255,215,0,0.35); transform:scale(1.04); }
+        }
+        /* ===== END INTRO ===== */
+
+        /* ===== CLOSING ANIMATION ===== */
+        #closing-stage {
+            display: none; position: fixed; top:0; left:0;
+            width:100vw; height:100vh; background:#0a0a0f;
+            z-index: 99998; align-items:center; justify-content:center;
+        }
+        #closing-stage.show { display: flex; }
+        #cl-dialog {
+            position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+            width:88%; background:rgba(10,10,20,0.92);
+            border:2px solid #D4A017; border-radius:8px;
+            padding:14px 18px 12px; display:none;
+            box-shadow:0 0 0 1px #8B6914, 0 8px 32px rgba(0,0,0,0.6);
+            pointer-events:auto;
+        }
+        #cl-dialog-name { font-size:11px; font-weight:700; color:#FFD700; text-transform:uppercase; letter-spacing:2px; margin-bottom:6px; }
+        #cl-dialog-text { font-size:14px; color:#f5ecd4; line-height:1.6; min-height:40px; }
+        #cl-dialog-next { position:absolute; bottom:10px; right:14px; font-size:11px; color:#D4A017; animation:blink 1s ease-in-out infinite; }
+        #cl-end-card {
+            display:none; position:absolute; inset:0;
+            align-items:center; justify-content:center; flex-direction:column;
+            background:rgba(0,0,0,0.9);
+        }
+        #cl-end-card.show { display:flex; }
+        #cl-end-title { font-size:28px; font-weight:900; color:#FFD700; text-shadow:0 0 30px rgba(255,215,0,0.5); margin-bottom:12px; letter-spacing:2px; }
+        #cl-end-sub { font-size:15px; color:#f5ecd4; letter-spacing:1px; opacity:0.85; margin-bottom:28px; }
+        #cl-replay-btn { display:none; background:#8B6914; border:3px solid #4a2c0a; color:#fff; font-size:13px; font-weight:700; padding:9px 28px; border-radius:6px; cursor:pointer; pointer-events:auto; }
+        #cl-replay-btn:hover { background:#a87d1a; }
+        /* ===== END CLOSING CSS ===== */
     </style>
 </head>
 <body>
 
-<div class="game-wrapper">
+<!-- ===== INTRO ===== -->
+<div id="intro-stage" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a0f;z-index:99999;display:flex;align-items:center;justify-content:center;">
+  <div id="intro-inner" style="position:relative;width:800px;height:500px;">
+    <!-- Mula screen -->
+    <div id="mula-screen" style="position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0a0f;">
+      <div style="font-size:12px;color:#4a8a5a;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;">✦ TataKembara ✦</div>
+      <h1 style="font-size:28px;font-weight:900;color:#FFD700;text-shadow:0 0 30px rgba(255,215,0,0.4);margin-bottom:8px;text-align:center;line-height:1.3;">Permainan Pengembaraan<br>Digital</h1>
+      <p style="font-size:12px;color:#888;margin-bottom:44px;letter-spacing:1px;">untuk Pembelajaran Ayat Aktif dan Ayat Pasif</p>
+      <button id="mula-btn" style="background:#8B6914;color:#fff;border:3px solid #4a2c0a;border-radius:8px;font-size:17px;font-weight:700;padding:13px 46px;cursor:pointer;animation:mulaPulse 1.5s ease-in-out infinite;letter-spacing:1px;">▶ Mula</button>
+      <p style="font-size:10px;color:#444;margin-top:18px;letter-spacing:1px;">Klik untuk mula</p>
+    </div>
+    <canvas id="c" width="800" height="500" style="display:none;"></canvas>
+    <div id="ui" style="display:none; position:absolute; inset:0; pointer-events:none;">
+      <button id="skip-btn" style="position:absolute;top:14px;right:14px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,215,0,0.3);color:rgba(255,215,0,0.7);font-size:11px;font-weight:600;padding:5px 14px;border-radius:20px;cursor:pointer;pointer-events:auto;letter-spacing:1px;">SKIP ▶▶</button>
+      <div id="dialog" style="display:none;position:absolute;bottom:24px;left:50%;transform:translateX(-50%);width:88%;background:rgba(10,10,20,0.92);border:2px solid #D4A017;border-radius:8px;padding:14px 18px 12px;box-shadow:0 0 0 1px #8B6914,0 8px 32px rgba(0,0,0,0.6);pointer-events:auto;">
+        <div id="dialog-name" style="font-size:11px;font-weight:700;color:#FFD700;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;"></div>
+        <div id="dialog-text" style="font-size:14px;color:#f5ecd4;line-height:1.6;min-height:40px;"></div>
+        <div style="position:absolute;bottom:10px;right:14px;font-size:11px;color:#D4A017;animation:blink 1s ease-in-out infinite;">▼ klik untuk teruskan</div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== END INTRO ===== -->
+
+<div class="game-wrapper" style="display:none;">
     <div class="game-container" id="gameContainer">
 
         <!-- ===== 游戏内部草坪背景 (PNG) ===== -->
@@ -789,6 +950,16 @@
             </div>
         </div>
 
+        <!-- ===== 解释面板 ===== -->
+        <div id="exp-panel">
+            <div id="exp-inner">
+                <div id="exp-verdict"></div>
+                <div id="exp-ans"></div>
+                <div id="exp-text"></div>
+                <button id="exp-ok">✅ Faham, teruskan!</button>
+            </div>
+        </div>
+
         <!-- ===== 事件弹窗 ===== -->
         <div id="event-popup">
             <div class="ep-icon" id="ep-icon"></div>
@@ -833,46 +1004,38 @@
     let isMusicOn = true;
 
     function initBGM() {
+        // Create Audio object only — don't play yet
+        // Play happens in selectCharacter() within a user gesture
         try {
-            bgm = new Audio(BGM_URL);
-            bgm.loop = true;
-            bgm.volume = 0.3;
-            bgm.load();
-            console.log('BGM 已加载 (本地文件)');
-        } catch (e) {
-            console.log('BGM 初始化失败:', e);
-        }
+            if (!bgm) {
+                bgm = new Audio(BGM_URL);
+                bgm.loop = true;
+                bgm.volume = 0.3;
+            }
+        } catch (e) {}
     }
 
     function playBGM() {
-        if (bgm && isMusicOn) {
-            bgm.play().then(() => {
-                console.log('BGM 开始播放');
-            }).catch((e) => {
-                console.log('BGM 播放被拦截，等待用户交互:', e);
-                document.addEventListener('click', function playOnce() {
-                    if (bgm && isMusicOn) {
-                        bgm.play().catch(() => {});
-                    }
-                    document.removeEventListener('click', playOnce);
-                }, { once: true });
-            });
+        if (!isMusicOn) return;
+        // Create fresh if needed
+        if (!bgm) {
+            try { bgm = new Audio(BGM_URL); bgm.loop = true; bgm.volume = 0.3; } catch(e) { return; }
         }
+        bgm.play().catch(() => {});
     }
 
     function toggleMusic() {
         const btn = document.getElementById('musicBtn');
-        if (!bgm) return;
         if (isMusicOn) {
-            bgm.pause();
+            if (bgm) bgm.pause();
             isMusicOn = false;
             btn.textContent = '🔇';
             btn.classList.add('muted');
         } else {
-            bgm.play().catch(() => {});
             isMusicOn = true;
             btn.textContent = '🔊';
             btn.classList.remove('muted');
+            playBGM();
         }
     }
 
@@ -1042,7 +1205,11 @@
         S.currentEvents = getRandomEvents();
         updateEventObjects();
 
-        playBGM();
+        // Play BGM directly within user gesture (click) — avoids autoplay block
+        if (!bgm) {
+            try { bgm = new Audio(BGM_URL); bgm.loop = true; bgm.volume = 0.3; } catch(e) {}
+        }
+        if (bgm && isMusicOn) bgm.play().catch(() => {});
         entryAnimation();
     }
 
@@ -1546,7 +1713,7 @@
     const GAME_FILES = {
         1: { file: 'katanama.html', method: 'redirect' },
         2: { file: 'game2.html',    method: 'redirect' },
-        3: { file: null,            method: 'placeholder' },
+        3: { file: 'game3.html',    method: 'redirect' },
     };
 
     function startGame() {
@@ -1572,6 +1739,9 @@
                 eventsUnlocked: S.eventsUnlocked,
                 selectedChar: S.selectedChar,
                 returnBoard: curBoard,
+                currentEvents: S.currentEvents,
+                ev0consumed: evObjects[0] ? evObjects[0].consumed : false,
+                ev1consumed: evObjects[1] ? evObjects[1].consumed : false,
             }));
             window.location.href = game.file;
             return;
@@ -1650,6 +1820,7 @@
                 showPopup('🎉', 'Game 1 Selesai!', 'Objek rawak muncul!');
                 evObjects.forEach(ev => { if (ev.type) ev.el.classList.add('visible'); });
             } else {
+                loseLife();
                 showPopup('💪', 'Cuba Lagi!', 'Jalan ke GAME 1 semula!');
             }
         } else if (curBoard === 2) {
@@ -1660,6 +1831,7 @@
                 document.getElementById('progress-label').textContent = '✅ Game 2';
                 showPopup('🎉', 'Game 2 Selesai!', 'Teruskan ke Game 3!');
             } else {
+                loseLife();
                 showPopup('💪', 'Cuba Lagi!', 'Jalan ke GAME 2 semula!');
             }
         } else if (curBoard === 3) {
@@ -1670,6 +1842,7 @@
                 document.getElementById('progress-label').textContent = '✅ Semua Selesai!';
                 showPopup('🏆', 'Semua Selesai!', 'Pergi ke SELESAI!');
             } else {
+                loseLife();
                 showPopup('💪', 'Cuba Lagi!', 'Jalan ke GAME 3 semula!');
             }
         }
@@ -1683,173 +1856,123 @@
     // ============================================================
     const QUESTIONS = [
         // === Kata Ganti Nama Diri ===
-        {
-            q: 'Pilih kata ganti nama diri PERTAMA.',
-            choices: ['Mereka', 'Saya', 'Beliau', 'Awak'],
-            ans: 1
-        },
-        {
-            q: 'Pilih kata ganti nama diri KEDUA.',
-            choices: ['Dia', 'Kami', 'Kamu', 'Mereka'],
-            ans: 2
-        },
-        {
-            q: 'Pilih kata ganti nama diri KETIGA.',
-            choices: ['Saya', 'Kamu', 'Kami', 'Beliau'],
-            ans: 3
-        },
-        {
-            q: '"Kami" ialah kata ganti nama diri yang mana?',
-            choices: ['Kedua', 'Ketiga', 'Pertama', 'Khas'],
-            ans: 2
-        },
-        {
-            q: '"Engkau" ialah kata ganti nama diri yang mana?',
-            choices: ['Pertama', 'Ketiga', 'Khas', 'Kedua'],
-            ans: 3
-        },
-        {
-            q: 'Yang manakah BUKAN kata ganti nama diri?',
-            choices: ['Saya', 'Beliau', 'Buku', 'Mereka'],
-            ans: 2
-        },
+        { q: 'Pilih kata ganti nama diri PERTAMA.',
+          choices: ['Mereka', 'Saya', 'Beliau', 'Awak'], ans: 1,
+          exp: '"Saya" ialah kata ganti nama diri pertama — merujuk orang yang sedang bercakap. "Mereka" dan "Beliau" = diri ketiga. "Awak" = diri kedua.' },
+
+        { q: 'Pilih kata ganti nama diri KEDUA.',
+          choices: ['Dia', 'Kami', 'Kamu', 'Mereka'], ans: 2,
+          exp: '"Kamu" ialah kata ganti nama diri kedua — merujuk orang yang diajak bercakap. "Dia" dan "Mereka" = diri ketiga. "Kami" = diri pertama.' },
+
+        { q: 'Pilih kata ganti nama diri KETIGA.',
+          choices: ['Saya', 'Kamu', 'Kami', 'Beliau'], ans: 3,
+          exp: '"Beliau" ialah kata ganti nama diri ketiga — merujuk orang yang dibicarakan secara hormat. "Saya" dan "Kami" = diri pertama. "Kamu" = diri kedua.' },
+
+        { q: '"Kami" ialah kata ganti nama diri yang mana?',
+          choices: ['Kedua', 'Ketiga', 'Pertama', 'Khas'], ans: 2,
+          exp: '"Kami" = diri pertama jamak, TIDAK termasuk pendengar. Bandingkan dengan "kita" yang juga diri pertama tetapi termasuk pendengar dalam perbualan.' },
+
+        { q: '"Engkau" ialah kata ganti nama diri yang mana?',
+          choices: ['Pertama', 'Ketiga', 'Khas', 'Kedua'], ans: 3,
+          exp: '"Engkau" = diri kedua, sama seperti "kamu" dan "awak". Ia digunakan untuk orang yang diajak bercakap secara langsung, biasanya dalam konteks tidak formal.' },
+
+        { q: 'Yang manakah BUKAN kata ganti nama diri?',
+          choices: ['Saya', 'Beliau', 'Buku', 'Mereka'], ans: 2,
+          exp: '"Buku" ialah kata nama am — merujuk benda, bukan orang. Kata ganti nama diri seperti "saya", "beliau", dan "mereka" digunakan untuk menggantikan nama manusia.' },
 
         // === Kata Nama Am vs Khas ===
-        {
-            q: 'Yang manakah kata nama KHAS?',
-            choices: ['kereta', 'sekolah', 'Kuala Lumpur', 'hujan'],
-            ans: 2
-        },
-        {
-            q: 'Yang manakah kata nama AM?',
-            choices: ['Gunung Kinabalu', 'Sungai Klang', 'bandar', 'Ahmad'],
-            ans: 2
-        },
-        {
-            q: '"Gunung Kinabalu" ialah contoh...?',
-            choices: ['Kata nama am konkrit', 'Kata ganti nama', 'Kata kerja', 'Kata nama khas'],
-            ans: 3
-        },
-        {
-            q: 'Kata nama khas ditulis dengan...?',
-            choices: ['Huruf kecil sahaja', 'Angka', 'Huruf besar di awal', 'Tanda sempang'],
-            ans: 2
-        },
-        {
-            q: '"Kasih sayang" ialah kata nama am jenis...?',
-            choices: ['Konkrit', 'Khas', 'Abstrak', 'Ganti'],
-            ans: 2
-        },
-        {
-            q: 'Yang manakah kata nama am KONKRIT?',
-            choices: ['Keberanian', 'Kejujuran', 'Meja', 'Kasih sayang'],
-            ans: 2
-        },
+        { q: 'Yang manakah kata nama KHAS?',
+          choices: ['kereta', 'sekolah', 'Kuala Lumpur', 'hujan'], ans: 2,
+          exp: '"Kuala Lumpur" ialah nama khas sebuah bandar — ejaan bermula huruf besar. "kereta", "sekolah", dan "hujan" = kata nama am kerana merujuk benda atau perkara secara umum.' },
+
+        { q: 'Yang manakah kata nama AM?',
+          choices: ['Gunung Kinabalu', 'Sungai Klang', 'bandar', 'Ahmad'], ans: 2,
+          exp: '"bandar" ialah kata nama am — merujuk tempat secara umum. "Gunung Kinabalu", "Sungai Klang", dan "Ahmad" = kata nama khas kerana merujuk tempat atau orang yang spesifik.' },
+
+        { q: '"Gunung Kinabalu" ialah contoh...?',
+          choices: ['Kata nama am konkrit', 'Kata ganti nama', 'Kata kerja', 'Kata nama khas'], ans: 3,
+          exp: '"Gunung Kinabalu" ialah kata nama khas — nama khusus sebuah gunung di Sabah. Ia bermula huruf besar dan merujuk satu tempat yang tertentu sahaja, bukan gunung secara umum.' },
+
+        { q: 'Kata nama khas ditulis dengan...?',
+          choices: ['Huruf kecil sahaja', 'Angka', 'Huruf besar di awal', 'Tanda sempang'], ans: 2,
+          exp: 'Kata nama khas MESTI dimulakan dengan huruf besar. Contoh: Ahmad, Kuala Lumpur, Kamus Dewan. Ini membezakannya daripada kata nama am seperti "pelajar", "bandar", dan "buku".' },
+
+        { q: '"Kasih sayang" ialah kata nama am jenis...?',
+          choices: ['Konkrit', 'Khas', 'Abstrak', 'Ganti'], ans: 2,
+          exp: '"Kasih sayang" tidak boleh dilihat, disentuh, atau diukur — ia ialah kata nama am abstrak. Kata nama konkrit pula boleh dilihat dan disentuh: meja, buku, kereta, air.' },
+
+        { q: 'Yang manakah kata nama am KONKRIT?',
+          choices: ['Keberanian', 'Kejujuran', 'Meja', 'Kasih sayang'], ans: 2,
+          exp: '"Meja" ialah kata nama am konkrit — ia wujud secara fizikal dan boleh dilihat serta disentuh. "Keberanian", "Kejujuran", dan "Kasih sayang" = abstrak kerana tidak dapat dilihat atau disentuh.' },
 
         // === Ayat Aktif → Pasif Diri Pertama ===
-        {
-            q: '"Saya menanak nasi." → Ayat pasif diri pertama yang betul?',
-            choices: ['Nasi ditanak oleh saya.', 'Nasi saya tanak.', 'Saya ditanak nasi.', 'Ditanak nasi saya.'],
-            ans: 1
-        },
-        {
-            q: '"Aku membaca buku itu." → Ayat pasif diri pertama yang betul?',
-            choices: ['Buku itu dibaca oleh aku.', 'Buku itu aku baca.', 'Aku dibaca buku itu.', 'Dibaca buku itu aku.'],
-            ans: 1
-        },
-        {
-            q: 'Apakah ciri utama ayat pasif diri pertama?',
-            choices: [
-                'Ada perkataan "oleh" dan imbuhan di-',
-                'Objek + Pelaku diri pertama + Kata kerja tanpa meN-',
-                'Kata kerja mesti berimbuhan di-',
-                'Pelaku diletakkan di awal ayat'
-            ],
-            ans: 1
-        },
+        { q: '"Saya menanak nasi." → Ayat pasif diri pertama yang betul?',
+          choices: ['Nasi ditanak oleh saya.', 'Nasi saya tanak.', 'Saya ditanak nasi.', 'Ditanak nasi saya.'], ans: 1,
+          exp: 'Pasif diri pertama: Objek + Pelaku (saya/aku) + Kata kerja tanpa meN-. Susunan: "Nasi + saya + tanak". Imbuhan "meN-" pada "menanak" digugurkan. "ditanak oleh saya" adalah pasif diri ketiga, bukan pertama.' },
+
+        { q: '"Aku membaca buku itu." → Ayat pasif diri pertama yang betul?',
+          choices: ['Buku itu dibaca oleh aku.', 'Buku itu aku baca.', 'Aku dibaca buku itu.', 'Dibaca buku itu aku.'], ans: 1,
+          exp: 'Pasif diri pertama: Objek + Pelaku + KK tanpa meN-. "Buku itu aku baca" — objek "buku itu" di depan, pelaku "aku" di tengah, kata kerja "membaca" → "baca" (gugur meN-). Tiada "di-" atau "oleh".' },
+
+        { q: 'Apakah ciri utama ayat pasif diri pertama?',
+          choices: ['Ada perkataan "oleh" dan imbuhan di-', 'Objek + Pelaku diri pertama + Kata kerja tanpa meN-', 'Kata kerja mesti berimbuhan di-', 'Pelaku diletakkan di awal ayat'], ans: 1,
+          exp: 'Pasif diri pertama: O + S(diri 1 atau 2) + KK(tanpa meN-). Tiada "oleh" dan tiada "di-". Imbuhan "di-" hanya untuk pasif diri ketiga. Pelaku (saya/aku/kamu) berada di tengah ayat.' },
 
         // === Ayat Aktif → Pasif Diri Kedua ===
-        {
-            q: '"Kamu membaca buku." → Ayat pasif diri kedua yang betul?',
-            choices: ['Buku dibaca oleh kamu.', 'Buku kamu baca.', 'Kamu dibaca buku.', 'Dibaca buku kamu.'],
-            ans: 1
-        },
-        {
-            q: '"Awak menulis surat itu." → Ayat pasif diri kedua yang betul?',
-            choices: ['Surat itu ditulis oleh awak.', 'Surat itu awak tulis.', 'Awak ditulis surat itu.', 'Ditulis surat itu awak.'],
-            ans: 1
-        },
+        { q: '"Kamu membaca buku." → Ayat pasif diri kedua yang betul?',
+          choices: ['Buku dibaca oleh kamu.', 'Buku kamu baca.', 'Kamu dibaca buku.', 'Dibaca buku kamu.'], ans: 1,
+          exp: 'Pasif diri kedua sama strukturnya dengan diri pertama: O + Pelaku + KK tanpa meN-. "Buku kamu baca" — "membaca" → "baca". Tiada "oleh" dan tiada "di-". Pelaku diri kedua (kamu/awak) di tengah.' },
+
+        { q: '"Awak menulis surat itu." → Ayat pasif diri kedua yang betul?',
+          choices: ['Surat itu ditulis oleh awak.', 'Surat itu awak tulis.', 'Awak ditulis surat itu.', 'Ditulis surat itu awak.'], ans: 1,
+          exp: '"Surat itu awak tulis" — objek "surat itu" didahulukan, pelaku "awak" (diri kedua) di tengah, kata kerja "menulis" → "tulis" (gugur meN-). Tiada "di-" atau "oleh" kerana pelaku adalah diri kedua.' },
 
         // === Ayat Aktif → Pasif Diri Ketiga ===
-        {
-            q: '"Ahmad menendang bola." → Ayat pasif diri ketiga yang betul?',
-            choices: ['Bola Ahmad tendang.', 'Bola ditendang Ahmad.', 'Bola ditendang oleh Ahmad.', 'Ahmad ditendang bola.'],
-            ans: 2
-        },
-        {
-            q: '"Emak membasuh baju." → Ayat pasif diri ketiga yang betul?',
-            choices: ['Baju dibasuh oleh emak.', 'Baju emak basuh.', 'Emak dibasuh baju.', 'Basuh baju emak.'],
-            ans: 0
-        },
-        {
-            q: 'Ayat pasif diri ketiga MESTI mempunyai...?',
-            choices: [
-                'Pelaku diri pertama dan kata kerja tanpa di-',
-                'Kata kerja berimbuhan di- dan perkataan "oleh" sebelum pelaku',
-                'Pelaku di awal ayat',
-                'Tiada pelaku langsung'
-            ],
-            ans: 1
-        },
+        { q: '"Ahmad menendang bola." → Ayat pasif diri ketiga yang betul?',
+          choices: ['Bola Ahmad tendang.', 'Bola ditendang Ahmad.', 'Bola ditendang oleh Ahmad.', 'Ahmad ditendang bola.'], ans: 2,
+          exp: 'Pasif diri ketiga: O + KK(di-) + oleh + Pelaku. "Ahmad" = nama khas (diri ketiga). Mesti ada imbuhan "di-" DAN kata "oleh". "Bola ditendang Ahmad" salah kerana tiada "oleh" — wajib ada untuk diri ketiga dan nama khas.' },
+
+        { q: '"Emak membasuh baju." → Ayat pasif diri ketiga yang betul?',
+          choices: ['Baju dibasuh oleh emak.', 'Baju emak basuh.', 'Emak dibasuh baju.', 'Basuh baju emak.'], ans: 0,
+          exp: '"Emak" = diri ketiga (kata nama am merujuk orang lain). Pasif diri ketiga: "Baju + dibasuh + oleh + emak". "Baju emak basuh" adalah struktur pasif diri kedua — tidak sesuai untuk pelaku diri ketiga.' },
+
+        { q: 'Ayat pasif diri ketiga MESTI mempunyai...?',
+          choices: ['Pelaku diri pertama dan kata kerja tanpa di-', 'Kata kerja berimbuhan di- dan perkataan "oleh" sebelum pelaku', 'Pelaku di awal ayat', 'Tiada pelaku langsung'], ans: 1,
+          exp: 'Pasif diri ketiga mempunyai DUA syarat wajib: (1) imbuhan "di-" pada kata kerja, dan (2) kata "oleh" sebelum pelaku. Pelaku adalah diri ketiga (dia, mereka, beliau) atau nama khas (Ahmad, emak).' },
 
         // === Ayat Pasif → Aktif ===
-        {
-            q: '"Bola ditendang oleh Ahmad." → Ayat aktif yang betul?',
-            choices: ['Ahmad tendang bola.', 'Ahmad menendang bola.', 'Bola Ahmad tendang.', 'Ditendang bola Ahmad.'],
-            ans: 1
-        },
-        {
-            q: '"Nasi saya tanak." → Ayat aktif yang betul?',
-            choices: ['Tanak nasi saya.', 'Saya ditanak nasi.', 'Saya menanak nasi.', 'Nasi ditanak saya.'],
-            ans: 2
-        },
-        {
-            q: '"Buku kamu baca." → Ayat aktif yang betul?',
-            choices: ['Baca buku kamu.', 'Kamu dibaca buku.', 'Kamu membaca buku.', 'Buku dibaca kamu.'],
-            ans: 2
-        },
-        {
-            q: '"Baju dibasuh oleh emak." → Ayat aktif yang betul?',
-            choices: ['Emak basuh baju.', 'Emak membasuh baju.', 'Baju emak basuh.', 'Dibasuh baju emak.'],
-            ans: 1
-        },
-        {
-            q: 'Untuk menukar ayat pasif diri ketiga kepada aktif, apakah yang perlu dilakukan pada kata kerja?',
-            choices: [
-                'Kekalkan imbuhan di-',
-                'Tambah imbuhan ber-',
-                'Tukar imbuhan di- kepada meN-',
-                'Buang semua imbuhan'
-            ],
-            ans: 2
-        },
+        { q: '"Bola ditendang oleh Ahmad." → Ayat aktif yang betul?',
+          choices: ['Ahmad tendang bola.', 'Ahmad menendang bola.', 'Bola Ahmad tendang.', 'Ditendang bola Ahmad.'], ans: 1,
+          exp: 'Untuk menukar pasif diri ketiga → aktif: (1) buang "oleh", (2) jadikan pelaku sebagai subjek, (3) tukar "di-" kepada "meN-". "ditendang" → "menendang". Susunan akhir: Ahmad + menendang + bola.' },
+
+        { q: '"Nasi saya tanak." → Ayat aktif yang betul?',
+          choices: ['Tanak nasi saya.', 'Saya ditanak nasi.', 'Saya menanak nasi.', 'Nasi ditanak saya.'], ans: 2,
+          exp: 'Pasif diri pertama → aktif: pelaku (saya) jadi subjek, tambah semula imbuhan "meN-" pada kata kerja. "tanak" → "menanak". Susunan akhir: Saya + menanak + nasi.' },
+
+        { q: '"Buku kamu baca." → Ayat aktif yang betul?',
+          choices: ['Baca buku kamu.', 'Kamu dibaca buku.', 'Kamu membaca buku.', 'Buku dibaca kamu.'], ans: 2,
+          exp: 'Pasif diri kedua → aktif: pelaku (kamu) jadi subjek, tambah "meN-" pada kata kerja. "baca" → "membaca". Susunan akhir: Kamu + membaca + buku. Perhatikan imbuhan meN- + b = mem-.' },
+
+        { q: '"Baju dibasuh oleh emak." → Ayat aktif yang betul?',
+          choices: ['Emak basuh baju.', 'Emak membasuh baju.', 'Baju emak basuh.', 'Dibasuh baju emak.'], ans: 1,
+          exp: 'Pasif diri ketiga → aktif: (1) buang "oleh", (2) pelaku "emak" jadi subjek, (3) tukar "di-" → "meN-". "dibasuh" → "membasuh". Susunan akhir: Emak + membasuh + baju.' },
+
+        { q: 'Untuk menukar pasif diri ketiga kepada aktif, apakah yang perlu dilakukan pada kata kerja?',
+          choices: ['Kekalkan imbuhan di-', 'Tambah imbuhan ber-', 'Tukar imbuhan di- kepada meN-', 'Buang semua imbuhan'], ans: 2,
+          exp: 'Dalam ayat aktif, kata kerja transitif menggunakan imbuhan "meN-". Oleh itu "di-" dalam pasif diri ketiga MESTI ditukar kepada "meN-". Contoh: ditanak → menanak, dibasuh → membasuh, ditendang → menendang.' },
 
         // === Unsur Ayat ===
-        {
-            q: 'Dalam ayat "Ahmad menendang bola", apakah OBJEK?',
-            choices: ['Ahmad', 'menendang', 'bola', 'di padang'],
-            ans: 2
-        },
-        {
-            q: 'Dalam ayat "Saya membeli buku di kedai", apakah SUBJEK?',
-            choices: ['membeli', 'buku', 'di kedai', 'Saya'],
-            ans: 3
-        },
-        {
-            q: 'Dalam ayat pasif "Bola ditendang oleh Ahmad", apakah PELAKU?',
-            choices: ['Bola', 'ditendang', 'Ahmad', 'oleh'],
-            ans: 2
-        },
+        { q: 'Dalam ayat "Ahmad menendang bola", apakah OBJEK?',
+          choices: ['Ahmad', 'menendang', 'bola', 'di padang'], ans: 2,
+          exp: 'Objek ialah benda yang dikenakan perbuatan. "Ahmad" = subjek (pelaku yang menendang). "menendang" = kata kerja transitif. "bola" = objek (benda yang ditendang). "di padang" = keterangan tempat.' },
+
+        { q: 'Dalam ayat "Saya membeli buku di kedai", apakah SUBJEK?',
+          choices: ['membeli', 'buku', 'di kedai', 'Saya'], ans: 3,
+          exp: 'Subjek ialah pelaku — yang melakukan perbuatan. "Saya" = subjek (yang membeli). "membeli" = kata kerja. "buku" = objek (yang dibeli). "di kedai" = keterangan tempat.' },
+
+        { q: 'Dalam ayat pasif "Bola ditendang oleh Ahmad", apakah PELAKU?',
+          choices: ['Bola', 'ditendang', 'Ahmad', 'oleh'], ans: 2,
+          exp: '"Ahmad" ialah pelaku — orang yang melakukan perbuatan menendang. Dalam ayat pasif diri ketiga, pelaku diletakkan selepas "oleh". "Bola" = objek yang menjadi subjek tatabahasa dalam ayat pasif.' },
     ];
 
     function openChest() {
@@ -1864,25 +1987,46 @@
         const shuffled = [...q.choices].sort(() => Math.random() - 0.5);
         const newCorrectIndex = shuffled.indexOf(correctText);
 
+        const qData = { q: q.q, choices: shuffled, ans: newCorrectIndex, exp: q.exp || '' };
+
         shuffled.forEach((c, i) => {
             const btn = document.createElement('button');
             btn.className = 'q-choice';
             btn.textContent = `${['A','B','C','D'][i]}. ${c}`;
-            btn.onclick = () => answerChest(i, newCorrectIndex, btn, cDiv);
+            btn.onclick = () => answerChest(i, newCorrectIndex, btn, cDiv, qData);
             cDiv.appendChild(btn);
         });
     }
 
-    function answerChest(chosen, correct, btn, container) {
+    function answerChest(chosen, correct, btn, container, qData) {
         [...container.children].forEach(b => b.onclick = null);
-        if (chosen === correct) {
+        const isCorrect = chosen === correct;
+        if (isCorrect) {
             btn.classList.add('correct');
-            setTimeout(() => { document.getElementById('q-box').classList.remove('show'); gainLife(); S.locked = false; showPopup('🎉', 'Jawapan Betul!', '+1 nyawa!'); }, 600);
         } else {
             btn.classList.add('wrong');
             container.children[correct].classList.add('correct');
-            setTimeout(() => { document.getElementById('q-box').classList.remove('show'); loseLife(); S.locked = false; showPopup('😢', 'Jawapan Salah!', '-1 nyawa!'); }, 800);
         }
+        setTimeout(() => {
+            document.getElementById('q-box').classList.remove('show');
+            showExplanation(isCorrect, qData);
+        }, isCorrect ? 500 : 800);
+    }
+
+    function showExplanation(isCorrect, qData) {
+        const correctText = qData.choices[qData.ans];
+        const verdict = document.getElementById('exp-verdict');
+        verdict.textContent = isCorrect ? '✅ Jawapan Betul!' : '❌ Jawapan Salah';
+        verdict.className = isCorrect ? 'correct' : 'wrong';
+        document.getElementById('exp-ans').textContent = '💡 Jawapan betul: ' + correctText;
+        document.getElementById('exp-text').textContent = qData.exp || '';
+        document.getElementById('exp-panel').classList.add('show');
+        document.getElementById('exp-ok').onclick = () => {
+            document.getElementById('exp-panel').classList.remove('show');
+            if (isCorrect) { gainLife(); showPopup('🎉', 'Jawapan Betul!', '+1 nyawa!'); }
+            else           { loseLife(); showPopup('😢', 'Jawapan Salah!', '-1 nyawa!'); }
+            S.locked = false;
+        };
     }
 
     // ============================================================
@@ -1901,10 +2045,14 @@
     }
 
     function triggerWin() {
-        if (document.getElementById('win-screen').classList.contains('show')) return;
+        if (document.getElementById('closing-stage').classList.contains('show')) return;
         S.locked = true;
         clearInterval(moveInterval);
-        document.getElementById('win-screen').classList.add('show');
+        if (typeof triggerClosing === 'function') {
+            triggerClosing();
+        } else {
+            document.getElementById('win-screen').classList.add('show');
+        }
     }
 
     function triggerGameOver() {
@@ -1967,8 +2115,25 @@
                 // Langkau skrin pilih watak, terus ke lobi
                 document.getElementById('character-select').classList.add('hidden');
                 updateHUD();
-                S.currentEvents = getRandomEvents();
+                // Restore event types (don't regenerate — keeps same icons)
+                if (st.currentEvents && st.currentEvents.length === 2) {
+                    S.currentEvents = st.currentEvents;
+                } else {
+                    S.currentEvents = getRandomEvents();
+                }
                 updateEventObjects();
+                // Restore consumed + visibility
+                if (S.eventsUnlocked) {
+                    evObjects.forEach((ev, i) => {
+                        const consumed = i === 0 ? st.ev0consumed : st.ev1consumed;
+                        if (consumed) {
+                            ev.consumed = true;
+                            ev.el.style.display = 'none';
+                        } else if (ev.type) {
+                            ev.el.classList.add('visible');
+                        }
+                    });
+                }
 
                 // Tanda board yang sudah selesai pada papan
                 if (S.game1Done) {
@@ -1998,9 +2163,11 @@
                 }
                 updatePlayerPosition();
 
-                // BGM
-                initBGM();
-                setTimeout(() => playBGM(), 300);
+                // BGM — resume after redirect (already had user gesture earlier)
+                if (!bgm) {
+                    try { bgm = new Audio(BGM_URL); bgm.loop = true; bgm.volume = 0.3; } catch(e) {}
+                }
+                if (bgm && isMusicOn) bgm.play().catch(() => {});
 
                 // Focus fix
                 setTimeout(() => {
@@ -2041,7 +2208,8 @@
                             showPopup('🏆', 'Semua Selesai!', 'Pergi ke SELESAI!');
                         }
                     } else {
-                        // Kalah — jangan mark done, tunjuk mesej, player kekal di hadapan board
+                        // Kalah — tolak nyawa dan tunjuk mesej
+                        loseLife();
                         showPopup('💪', 'Cuba Lagi!', 'Main semula untuk teruskan!');
                     }
                 } else {
@@ -2054,7 +2222,7 @@
             }
         }
 
-        document.getElementById('character-select').classList.remove('hidden');
+        // Intro handles showing character-select
         S.locked = true;
         setTimeout(() => resizeCanvas(), 100);
         initBGM();
@@ -2068,7 +2236,1265 @@
     window.closeModal = closeModal;
     window.selectCharacter = selectCharacter;
     window.toggleMusic = toggleMusic;
+
+    // ===== INTRO JS =====
+// ═══════════════════════════════════════════════
+//  AUDIO ENGINE
+// ═══════════════════════════════════════════════
+let AC = null;
+let activeAudioNodes = [];
+let introDead = false;
+
+function getAC() {
+    if (introDead) return null;
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === 'suspended') AC.resume();
+    return AC;
+}
+
+function stopAllAudio() {
+    activeAudioNodes.forEach(n => { try { n.stop(0); } catch(e){} });
+    activeAudioNodes = [];
+}
+
+// ── Night ambience (loop-able, fade in/out controllable) ──────
+let nightGainNode = null;
+let nightStarted  = false;
+
+function startNightAmbience() {
+    if (nightStarted) return;
+    nightStarted = true;
+    const ac = getAC();
+    if (!ac) return;
+    const now = ac.currentTime;
+
+    const master = ac.createGain();
+    master.gain.setValueAtTime(0, now);
+    master.gain.linearRampToValueAtTime(0.28, now + 2.0); // max 0.28 ≈ comfortable
+    master.connect(ac.destination);
+    nightGainNode = master;
+    activeAudioNodes.push(master);
+
+    const totalDur = 20; // long enough for whole intro
+
+    // Low hum
+    const humOsc = ac.createOscillator();
+    const humG   = ac.createGain();
+    humOsc.type = 'sine'; humOsc.frequency.value = 52;
+    humG.gain.value = 0.06;
+    humOsc.connect(humG); humG.connect(master);
+    humOsc.start(now); humOsc.stop(now + totalDur);
+    activeAudioNodes.push(humOsc);
+
+    // Wind noise
+    const wBuf = ac.createBuffer(1, ac.sampleRate * totalDur, ac.sampleRate);
+    const wd   = wBuf.getChannelData(0);
+    for (let i = 0; i < wd.length; i++) wd[i] = Math.random() * 2 - 1;
+    const wSrc = ac.createBufferSource();
+    wSrc.buffer = wBuf;
+    const wLpf = ac.createBiquadFilter(); wLpf.type = 'lowpass';  wLpf.frequency.value = 300;
+    const wHpf = ac.createBiquadFilter(); wHpf.type = 'highpass'; wHpf.frequency.value = 60;
+    const wG   = ac.createGain();
+    wG.gain.setValueAtTime(0.05, now);
+    wG.gain.linearRampToValueAtTime(0.14, now + 3);
+    wG.gain.linearRampToValueAtTime(0.07, now + 7);
+    wG.gain.linearRampToValueAtTime(0.16, now + 12);
+    wG.gain.linearRampToValueAtTime(0.06, now + totalDur);
+    wSrc.connect(wLpf); wLpf.connect(wHpf); wHpf.connect(wG); wG.connect(master);
+    wSrc.start(now); wSrc.stop(now + totalDur);
+    activeAudioNodes.push(wSrc);
+
+    // Crickets
+    const chirpPattern = [0, 0.08, 0.28, 0.36, 0.56, 0.64, 0.84, 0.92];
+    const cycleLen = 1.1;
+    const numCycles = Math.floor(totalDur / cycleLen);
+    for (let c = 0; c < numCycles; c++) {
+        chirpPattern.forEach(offset => {
+            const t = now + c * cycleLen + offset;
+            if (t > now + totalDur - 0.5) return;
+            [[4200, 0.045], [3800, 0.03]].forEach(([freq, vol], fi) => {
+                const o = ac.createOscillator();
+                const g = ac.createGain();
+                o.type = 'square';
+                o.frequency.value = freq + Math.random() * 300;
+                const fm = ac.createOscillator(); const fmG = ac.createGain();
+                fm.frequency.value = 180; fmG.gain.value = 50;
+                fm.connect(fmG); fmG.connect(o.frequency);
+                const t2 = t + fi * 0.015;
+                g.gain.setValueAtTime(0, t2);
+                g.gain.linearRampToValueAtTime(vol, t2 + 0.01);
+                g.gain.linearRampToValueAtTime(0, t2 + 0.055);
+                o.connect(g); g.connect(master);
+                o.start(t2); o.stop(t2 + 0.07);
+                fm.start(t2); fm.stop(t2 + 0.07);
+                activeAudioNodes.push(o, fm);
+            });
+        });
+    }
+
+    // Occasional frog
+    [2.0, 5.5, 9.2, 13.4].forEach(ft => {
+        const fo = ac.createOscillator(); const fg = ac.createGain();
+        fo.type = 'sine';
+        fo.frequency.setValueAtTime(260, now + ft);
+        fo.frequency.exponentialRampToValueAtTime(180, now + ft + 0.18);
+        fg.gain.setValueAtTime(0.04, now + ft);
+        fg.gain.exponentialRampToValueAtTime(0.001, now + ft + 0.25);
+        fo.connect(fg); fg.connect(master);
+        fo.start(now + ft); fo.stop(now + ft + 0.3);
+        activeAudioNodes.push(fo);
+    });
+}
+
+function fadeOutNight(dur) {
+    if (!nightGainNode) return;
+    const ac = getAC();
+    if (!ac) return;
+    nightGainNode.gain.linearRampToValueAtTime(0, ac.currentTime + dur);
+}
+
+// ── NPC voice — one character at a time, called by dialog system ──
+const BASE_PITCHES = [523, 587, 659, 698, 784, 880, 988];
+
+function playNPCChar(ch) {
+    if (ch === ' ' || ch === '!' || ch === '.' || ch === ',') return;
+    const ac = getAC();
+    if (!ac) return;
+    const now = ac.currentTime;
+
+    const master = ac.createGain();
+    master.gain.value = 0.32; // well below 0.5
+    master.connect(ac.destination);
+
+    const code  = ch.toLowerCase().charCodeAt(0);
+    const freq  = BASE_PITCHES[code % BASE_PITCHES.length] * (1 + (code % 3) * 0.05);
+    const dur   = 0.062;
+
+    const o = ac.createOscillator(); const g = ac.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(freq, now);
+    o.frequency.exponentialRampToValueAtTime(freq * 0.93, now + dur);
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(0.55, now + 0.006);
+    g.gain.setValueAtTime(0.5, now + dur - 0.012);
+    g.gain.linearRampToValueAtTime(0, now + dur);
+    o.connect(g); g.connect(master);
+    o.start(now); o.stop(now + dur + 0.01);
+
+    const o2 = ac.createOscillator(); const g2 = ac.createGain();
+    o2.type = 'triangle'; o2.frequency.value = freq * 2;
+    g2.gain.setValueAtTime(0, now);
+    g2.gain.linearRampToValueAtTime(0.1, now + 0.006);
+    g2.gain.linearRampToValueAtTime(0, now + dur);
+    o2.connect(g2); g2.connect(master);
+    o2.start(now); o2.stop(now + dur + 0.01);
+}
+
+// ── Whoosh — sucked into screen ───────────────────────────────
+function playWhoosh() {
+    const ac = getAC();
+    if (!ac) return;
+    const now = ac.currentTime;
+    const dur = 3.2;
+
+    const master = ac.createGain();
+    master.gain.value = 0.45; // just under 0.5
+    master.connect(ac.destination);
+    activeAudioNodes.push(master);
+
+    // Rising hiss
+    const hBuf = ac.createBuffer(1, Math.ceil(ac.sampleRate * dur), ac.sampleRate);
+    const hd   = hBuf.getChannelData(0);
+    for (let i = 0; i < hd.length; i++) hd[i] = Math.random() * 2 - 1;
+    const hSrc = ac.createBufferSource(); hSrc.buffer = hBuf;
+    const hHpf = ac.createBiquadFilter(); hHpf.type = 'highpass';
+    hHpf.frequency.setValueAtTime(600,  now);
+    hHpf.frequency.exponentialRampToValueAtTime(7000, now + 2.6);
+    const hG = ac.createGain();
+    hG.gain.setValueAtTime(0,    now);
+    hG.gain.linearRampToValueAtTime(0.25, now + 0.5);
+    hG.gain.linearRampToValueAtTime(0.7,  now + 2.2);
+    hG.gain.linearRampToValueAtTime(0,    now + 2.9);
+    hSrc.connect(hHpf); hHpf.connect(hG); hG.connect(master);
+    hSrc.start(now); hSrc.stop(now + dur);
+    activeAudioNodes.push(hSrc);
+
+    // Portal tone sweep
+    const pOsc = ac.createOscillator(); const pG = ac.createGain();
+    pOsc.type = 'sawtooth';
+    pOsc.frequency.setValueAtTime(70,   now + 0.2);
+    pOsc.frequency.exponentialRampToValueAtTime(3400, now + 2.7);
+    const pBpf = ac.createBiquadFilter(); pBpf.type = 'bandpass';
+    pBpf.frequency.setValueAtTime(180,  now + 0.2);
+    pBpf.frequency.exponentialRampToValueAtTime(4200, now + 2.7);
+    pBpf.Q.value = 3;
+    pG.gain.setValueAtTime(0,   now + 0.2);
+    pG.gain.linearRampToValueAtTime(0.45, now + 0.9);
+    pG.gain.linearRampToValueAtTime(0.7,  now + 2.4);
+    pG.gain.linearRampToValueAtTime(0,    now + 2.9);
+    pOsc.connect(pBpf); pBpf.connect(pG); pG.connect(master);
+    pOsc.start(now + 0.2); pOsc.stop(now + 3.0);
+    activeAudioNodes.push(pOsc);
+
+    // Sub wobble with vibrato
+    const wOsc = ac.createOscillator(); const wG = ac.createGain();
+    wOsc.type = 'sine';
+    wOsc.frequency.setValueAtTime(55, now);
+    wOsc.frequency.linearRampToValueAtTime(200, now + 2.7);
+    const vOsc = ac.createOscillator(); const vG = ac.createGain();
+    vOsc.frequency.value = 8;
+    vG.gain.setValueAtTime(2, now); vG.gain.linearRampToValueAtTime(45, now + 2.4);
+    vOsc.connect(vG); vG.connect(wOsc.frequency);
+    wG.gain.setValueAtTime(0,    now);
+    wG.gain.linearRampToValueAtTime(0.35, now + 0.4);
+    wG.gain.linearRampToValueAtTime(0.5,  now + 2.2);
+    wG.gain.linearRampToValueAtTime(0,    now + 2.8);
+    wOsc.connect(wG); wG.connect(master);
+    wOsc.start(now); wOsc.stop(now + 2.9);
+    vOsc.start(now); vOsc.stop(now + 2.9);
+    activeAudioNodes.push(wOsc, vOsc);
+
+    // Final TING
+    [1047, 1319, 2093].forEach((f, i) => {
+        const o = ac.createOscillator(); const g = ac.createGain();
+        o.type = 'sine'; o.frequency.value = f;
+        const t = now + 2.85 + i * 0.035;
+        g.gain.setValueAtTime(0.45, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+        o.connect(g); g.connect(master);
+        o.start(t); o.stop(t + 0.6);
+        activeAudioNodes.push(o);
+    });
+
+    // Impact thud
+    const iBuf = ac.createBuffer(1, Math.ceil(ac.sampleRate * 0.1), ac.sampleRate);
+    const id_  = iBuf.getChannelData(0);
+    for (let i = 0; i < id_.length; i++) id_[i] = (Math.random() * 2 - 1) * Math.exp(-i / id_.length * 15);
+    const iSrc = ac.createBufferSource(); iSrc.buffer = iBuf;
+    const iLpf = ac.createBiquadFilter(); iLpf.type = 'lowpass'; iLpf.frequency.value = 180;
+    const iG   = ac.createGain(); iG.gain.value = 0.4;
+    iSrc.connect(iLpf); iLpf.connect(iG); iG.connect(master);
+    iSrc.start(now + 2.85); iSrc.stop(now + 3.0);
+    activeAudioNodes.push(iSrc);
+}
+
+// ═══════════════════════════════════════════════
+//  CANVAS + ANIMATION
+// ═══════════════════════════════════════════════
+const iCanvas = document.getElementById('c');
+const iCtx   = iCanvas.getContext('2d');
+
+function px(x,y,w,h,col){ iCtx.fillStyle=col; iCtx.fillRect(x,y,w,h); }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function easeOut(t){ return 1-(1-t)*(1-t); }
+function easeIn(t){ return t*t; }
+
+let scene     = 0;
+let sceneT    = 0;
+let globalT   = 0;
+let lastTime  = null;
+let animId    = null;
+let done      = false;
+
+// Dialog state
+let dialogIdx     = 0;
+let dialogCharIdx = 0;
+let dialogTimer   = 0;
+let waitingClick  = false;
+let dialogPhase   = 0;
+
+const DIALOGS = [
+    { name:'???',                      text:'Psst... hei, kamu!' },
+    { name:'Wira — Penjaga TataKembara', text:'Nama aku Wira. Aku datang dari dunia TataKembara.' },
+    { name:'Wira — Penjaga TataKembara', text:'Dunia kami dalam bahaya! Ayat-ayat Bahasa Melayu bersepah-sepah dan tiada siapa yang boleh menyusunnya semula.' },
+    { name:'Wira — Penjaga TataKembara', text:'Kami perlukan seorang pengembara untuk menyelamatkan TataKembara!' },
+    { name:'Wira — Penjaga TataKembara', text:'Adakah kamu bersedia untuk menerima cabaran ini?' },
+];
+
+// Scene durations (seconds)
+const SCENE_DUR = [2.2, 3.0, 2.0, 14.0, 2.5, 3.2];
+// Scene 3 duration is generous — dialog drives the advance
+
+// ── Colours ──────────────────────────────────
+const C = {
+    wall:'#12101e', floor:'#2d1f3d', desk:'#5a3e1b', deskTop:'#7a5528',
+    monitor:'#1a1a2e', gold:'#FFD700', gold2:'#D4A017',
+    skin:'#f4c87a', shirt:'#3a5f8a', hair:'#2d1a0e',
+    chair:'#3d2b1f', star:'#ffe066', green:'#2ECC71',
+};
+
+const STARS = Array.from({length:55}, () => ({
+    x: Math.random()*800, y: Math.random()*200,
+    r: Math.random()*1.5+0.4, tw: Math.random()*3+1
+}));
+
+// ── Draw helpers ──────────────────────────────
+function drawStars(a=1){
+    STARS.forEach(s=>{
+        const b = 0.5+0.5*Math.sin(globalT*s.tw+s.x);
+        iCtx.globalAlpha = a*(0.3+0.7*b);
+        iCtx.fillStyle = C.star;
+        iCtx.beginPath(); iCtx.arc(s.x,s.y,s.r,0,Math.PI*2); iCtx.fill();
+    });
+    iCtx.globalAlpha=1;
+}
+function drawRoom(a=1){
+    iCtx.globalAlpha=a;
+    px(0,0,800,500,C.wall);
+    px(0,340,800,160,C.floor);
+    px(0,340,800,3,'#3d2b4d');
+    iCtx.globalAlpha=a*0.25;
+    px(55,55,130,88,'#1e1a2e'); px(58,58,124,82,'#2a2040');
+    iCtx.globalAlpha=a;
+}
+function drawDesk(a=1){
+    iCtx.globalAlpha=a;
+    px(158,318,20,124,C.desk); px(578,318,20,124,C.desk);
+    px(138,292,484,30,C.deskTop); px(138,290,484,5,'#8B7340');
+    px(558,258,18,36,'#c0392b'); px(546,263,14,31,'#2980b9'); px(532,268,14,26,'#27ae60');
+    iCtx.globalAlpha=1;
+}
+function drawChair(offX=0){
+    px(280+offX,338,160,22,C.chair);
+    px(290+offX,278,140,66,C.chair); px(292+offX,280,136,62,'#4a3526');
+    px(283+offX,360,14,52,'#2d1f1a'); px(423+offX,360,14,52,'#2d1f1a');
+}
+function drawMonitor(screenFn, scA=1, glow=0){
+    px(353,288,44,12,'#1a1a2e'); px(328,296,94,6,'#1a1a2e');
+    px(208,128,334,168,'#0d0d1a'); px(213,133,324,158,C.monitor);
+    px(223,141,304,138,'#050508');
+    if(glow>0){
+        iCtx.save(); iCtx.globalAlpha=glow*0.35;
+        const g=iCtx.createRadialGradient(375,210,10,375,210,165);
+        g.addColorStop(0,'#7ec850'); g.addColorStop(1,'transparent');
+        iCtx.fillStyle=g; iCtx.fillRect(145,75,460,260);
+        iCtx.restore();
+    }
+    iCtx.globalAlpha=scA; screenFn(); iCtx.globalAlpha=1;
+    iCtx.strokeStyle='#2a2a4a'; iCtx.lineWidth=2;
+    iCtx.strokeRect(213,133,324,158);
+}
+function screenIdle(){
+    px(223,141,304,138,'#0a1a0a');
+    iCtx.strokeStyle='rgba(0,200,0,0.12)'; iCtx.lineWidth=1;
+    for(let r=0;r<7;r++){ iCtx.beginPath(); iCtx.moveTo(223,141+r*23); iCtx.lineTo(527,141+r*23); iCtx.stroke(); }
+    for(let c=0;c<8;c++){ iCtx.beginPath(); iCtx.moveTo(223+c*38,141); iCtx.lineTo(223+c*38,279); iCtx.stroke(); }
+    if(Math.floor(globalT*2)%2===0) px(232,148,8,14,'rgba(0,200,0,0.55)');
+    px(223,264,304,15,'#0d2a0d');
+    iCtx.fillStyle='rgba(0,200,0,0.35)'; iCtx.font='8px monospace'; iCtx.textAlign='left';
+    iCtx.fillText('LATIHAN_BM_T5.xlsx  |  Siap', 228,274);
+}
+function screenNPC(t){
+    const g=iCtx.createLinearGradient(223,141,223,279);
+    g.addColorStop(0,'#0a2010'); g.addColorStop(1,'#051008');
+    iCtx.fillStyle=g; iCtx.fillRect(223,141,304,138);
+    iCtx.globalAlpha=0.1;
+    for(let y=141;y<279;y+=3) px(223,y,304,1,'#00ff88');
+    iCtx.globalAlpha=1;
+    const cx=375, cy=222, bob=Math.sin(globalT*3)*3, speak=Math.floor(globalT*6)%2===0;
+    iCtx.save(); iCtx.globalAlpha=0.22;
+    const ng=iCtx.createRadialGradient(cx,cy+bob,5,cx,cy+bob,52);
+    ng.addColorStop(0,'#2ECC71'); ng.addColorStop(1,'transparent');
+    iCtx.fillStyle=ng; iCtx.fillRect(cx-55,cy-55+bob,110,110);
+    iCtx.restore();
+    iCtx.save(); iCtx.globalAlpha=(0.45+0.3*Math.sin(globalT*8))*t;
+    px(cx-30,cy-10+bob,22,15,'#a8ffcc'); px(cx+8,cy-10+bob,22,15,'#a8ffcc');
+    iCtx.restore();
+    px(cx-12,cy-22+bob,24,32,C.green); px(cx-10,cy-20+bob,20,28,'#27ae60');
+    px(cx-10,cy-38+bob,20,22,C.green); px(cx-8,cy-36+bob,16,18,'#27ae60');
+    px(cx-6,cy-32+bob,4,5,'#fff'); px(cx+2,cy-32+bob,4,5,'#fff');
+    px(cx-5,cy-31+bob,2,3,'#0a2010'); px(cx+3,cy-31+bob,2,3,'#0a2010');
+    if(speak){ px(cx-3,cy-25+bob,6,3,'#0a2010'); } else { px(cx-3,cy-25+bob,6,1,'#0a2010'); }
+    const armA=Math.sin(globalT*4)*0.4;
+    iCtx.save(); iCtx.translate(cx-12,cy-12+bob); iCtx.rotate(-0.4+armA); px(-12,0,12,5,C.green); iCtx.restore();
+    iCtx.save(); iCtx.translate(cx+12,cy-12+bob); iCtx.rotate(0.4-armA);  px(0,0,12,5,C.green);  iCtx.restore();
+    [[-32,-32],[32,-26],[-36,8],[36,4],[-22,30],[22,27]].forEach(([dx,dy],i)=>{
+        iCtx.globalAlpha=(0.4+0.6*Math.sin(globalT*2+i))*t;
+        iCtx.fillStyle=C.star; iCtx.font=`${8+i%3*4}px sans-serif`; iCtx.textAlign='center';
+        iCtx.fillText('✦',cx+dx,cy+dy+bob);
+    });
+    iCtx.globalAlpha=1;
+}
+function drawPlayer(a=1, lean=0, standT=0){
+    iCtx.globalAlpha=a;
+    const bx=362, by=332, sOff=-standT*60;
+    px(bx-14,by-74+sOff,28,28,C.hair); px(bx-12,by-72+sOff,24,24,'#3d2510');
+    px(bx-5, by-46+sOff,10,8, C.skin);
+    px(bx-26,by-40+sOff,52,36,C.shirt); px(bx-24,by-38+sOff,48,32,'#2a4a6a');
+    if(standT<0.3){
+        px(bx-40,by-14+sOff+lean*8,20,10,C.shirt); px(bx+20,by-14+sOff+lean*8,20,10,C.shirt);
+        px(bx-44,by-12+sOff+lean*8,10,8,C.skin);   px(bx+34,by-12+sOff+lean*8,10,8,C.skin);
+    } else {
+        const aOut=(standT-0.3)/0.7;
+        px(bx-38-aOut*10,by-32+sOff,14,30,C.shirt);
+        px(bx+24+aOut*10,by-32+sOff,14,30,C.shirt);
+    }
+    if(standT<0.5){
+        px(bx-20,by-5,40,18,'#1a2a3a');
+        px(bx-28,by+11,20,12,'#1a2a3a'); px(bx+8,by+11,20,12,'#1a2a3a');
+    }
+    iCtx.globalAlpha=1;
+}
+
+// ── Scenes ────────────────────────────────────
+function drawS0(t){ // fade in
+    const a=easeOut(t);
+    drawRoom(a); drawStars(a*0.6); drawDesk(a);
+    iCtx.globalAlpha=a; drawChair(); iCtx.globalAlpha=1;
+    drawMonitor(screenIdle,a,0); drawPlayer(a,0,0);
+}
+function drawS1(t){ // bored
+    drawRoom(); drawStars(0.6); drawDesk();
+    drawChair();
+    const lean=Math.sin(t*Math.PI*1.5)*0.3+0.3*t;
+    drawMonitor(screenIdle,1,0); drawPlayer(1,lean,0);
+    if(t>0.5){
+        const zA=(t-0.5)*2;
+        ['z','z','Z'].forEach((z,i)=>{
+            const zt=((globalT*0.5+i*0.33)%1);
+            iCtx.globalAlpha=zA*Math.sin(zt*Math.PI);
+            iCtx.fillStyle='#aaa'; iCtx.font=`${10+i*4}px Segoe UI`; iCtx.textAlign='center';
+            iCtx.fillText(z,328+i*14,240-zt*50);
+        });
+        iCtx.globalAlpha=1;
+    }
+}
+function drawS2(t){ // screen flicker → NPC
+    drawRoom(); drawStars(0.6); drawDesk(); drawChair();
+    if(t<0.3){
+        const f=Math.floor(t*30)%2===0?1:0;
+        drawMonitor(screenIdle,f,0);
+    } else {
+        const nT=easeOut((t-0.3)/0.7);
+        drawMonitor(()=>screenNPC(nT),1,nT*0.8);
+    }
+    drawPlayer(1,0.3-t*0.3,0);
+}
+function drawS3(t){ // dialog
+    drawRoom(); drawStars(0.6); drawDesk(); drawChair();
+    drawMonitor(()=>screenNPC(1),1,0.8);
+    drawPlayer(1,Math.max(0,0.25-t*0.08),0);
+}
+function drawS4(t){ // player stands up
+    drawRoom(); drawStars(0.6); drawDesk();
+    iCtx.save(); iCtx.translate(t*32,0); drawChair(); iCtx.restore();
+    drawMonitor(()=>screenNPC(1),1,0.8+t*0.2);
+    drawPlayer(1,0,easeOut(t));
+    if(t>0.25){
+        const eT=easeOut((t-0.25)/0.75);
+        iCtx.globalAlpha=eT;
+        iCtx.fillStyle=C.gold; iCtx.font='bold 30px Segoe UI'; iCtx.textAlign='center';
+        iCtx.fillText('!',365,200-eT*18);
+        iCtx.globalAlpha=1;
+    }
+}
+function drawS5(t){ // sucked in
+    drawRoom(1-t*0.5); drawStars(0.6*(1-t)); drawDesk(1-t*0.3);
+    drawMonitor(()=>screenNPC(1),1,1);
+    const px2=lerp(362,375,easeIn(t));
+    const py2=lerp(332,210,easeIn(t));
+    const sc=lerp(1,0.05,easeIn(t));
+    const sp=t*Math.PI*5;
+    iCtx.save(); iCtx.translate(px2,py2); iCtx.rotate(sp); iCtx.scale(sc,sc);
+    drawPlayer(1-t*0.2,0,1); iCtx.restore();
+    iCtx.save(); iCtx.globalAlpha=t*0.85;
+    const vg=iCtx.createRadialGradient(375,210,2,375,210,180*t+40);
+    vg.addColorStop(0,'rgba(126,200,80,0.9)'); vg.addColorStop(0.45,'rgba(126,200,80,0.25)'); vg.addColorStop(1,'rgba(0,0,0,0)');
+    iCtx.fillStyle=vg; iCtx.fillRect(0,0,800,500); iCtx.restore();
+    for(let i=0;i<14;i++){
+        const ang=globalT*5.5+i*(Math.PI*2/14);
+        const r=lerp(160,15,easeIn(t));
+        const sx=375+Math.cos(ang)*r, sy=210+Math.sin(ang)*r*0.5;
+        iCtx.globalAlpha=t*(0.3+0.7*(i%2));
+        iCtx.fillStyle='#a8e878'; iCtx.beginPath(); iCtx.arc(sx,sy,lerp(4,1,t),0,Math.PI*2); iCtx.fill();
+    }
+    iCtx.globalAlpha=1;
+    // White flash at end
+    if(t>0.82){
+        const fa=easeIn((t-0.82)/0.18);
+        iCtx.globalAlpha=fa;
+        iCtx.fillStyle='#fff'; iCtx.fillRect(0,0,800,500);
+        iCtx.globalAlpha=1;
+    }
+}
+
+// ── Dialog UI ─────────────────────────────────
+const dlgEl   = document.getElementById('dialog');
+const dlgName = document.getElementById('dialog-name');
+const dlgText = document.getElementById('dialog-text');
+
+function showDialog(idx){
+    dialogIdx=idx; dialogCharIdx=0; waitingClick=false;
+    dlgName.textContent=DIALOGS[idx].name;
+    dlgText.textContent='';
+    dlgEl.style.display='block';
+}
+function hideDialog(){ dlgEl.style.display='none'; }
+
+function tickDialog(dt){
+    if(dialogCharIdx>=DIALOGS[dialogIdx].text.length){ waitingClick=true; return; }
+    dialogTimer+=dt;
+    const speed=0.03; // seconds per character
+    while(dialogTimer>=speed && dialogCharIdx<DIALOGS[dialogIdx].text.length){
+        const ch=DIALOGS[dialogIdx].text[dialogCharIdx];
+        dialogCharIdx++;
+        dialogTimer-=speed;
+        dlgText.textContent=DIALOGS[dialogIdx].text.substring(0,dialogCharIdx);
+        playNPCChar(ch); // 🔊 play sound per character
+    }
+    if(dialogCharIdx>=DIALOGS[dialogIdx].text.length) waitingClick=true;
+}
+
+function advanceDialog(){
+    if(!waitingClick){
+        // Skip typewriter — show full text immediately
+        dialogCharIdx=DIALOGS[dialogIdx].text.length;
+        dlgText.textContent=DIALOGS[dialogIdx].text;
+        waitingClick=true;
+        return;
+    }
+    dialogPhase++;
+    if(dialogPhase<DIALOGS.length){
+        showDialog(dialogPhase);
+    } else {
+        hideDialog();
+        goScene(4);
+    }
+}
+
+// ── Scene management ──────────────────────────
+function goScene(n){
+    scene=n; sceneT=0;
+    if(n===1) startNightAmbience();           // 🔊 night sounds start
+    if(n===2){
+        // NPC about to appear — night fades slightly
+        if(nightGainNode){
+            const ac=getAC();
+            nightGainNode.gain.linearRampToValueAtTime(0.14, ac.currentTime+1.5);
+        }
+    }
+    if(n===3){ showDialog(0); dialogPhase=0; }
+    if(n===4){ hideDialog(); }
+    if(n===5){
+        fadeOutNight(2.0);  // 🔊 night fades out
+        playWhoosh();        // 🔊 whoosh starts
+    }
+}
+
+function finishIntro(){
+    done=true;
+    introDead = true;
+    if (nightGainNode) { try { nightGainNode.gain.cancelScheduledValues(0); nightGainNode.gain.setValueAtTime(0,0); nightGainNode.disconnect(); } catch(e){} nightGainNode=null; }
+    activeAudioNodes.forEach(n=>{ try{n.stop(0);}catch(e){} try{n.disconnect();}catch(e){} });
+    activeAudioNodes=[];
+    if(AC){ try{AC.close();}catch(e){} AC=null; }
+    cancelAnimationFrame(animId);
+    hideDialog();
+    iCtx.fillStyle='#fff'; iCtx.fillRect(0,0,800,500);
+    setTimeout(()=>{
+        document.getElementById('intro-stage').style.display='none';
+        document.querySelector('.game-wrapper').style.display='block';
+        document.getElementById('character-select').classList.remove('hidden');
+        setTimeout(()=>{ if(typeof resizeCanvas==='function') resizeCanvas(); },60);
+        if(typeof initBGM==='function') initBGM();  // pre-create Audio object
+    },380);
+}
+
+// ── Main loop ─────────────────────────────────
+function loop(ts){
+    if(done) return;
+    if(!lastTime) lastTime=ts;
+    const dt=Math.min((ts-lastTime)/1000,0.05);
+    lastTime=ts; globalT+=dt; sceneT+=dt;
+
+    iCtx.clearRect(0,0,800,500);
+    const t=Math.min(sceneT/SCENE_DUR[scene],1);
+
+    switch(scene){
+        case 0: drawS0(t); break;
+        case 1: drawS1(t); break;
+        case 2: drawS2(t); break;
+        case 3: drawS3(t); tickDialog(dt); break;
+        case 4: drawS4(t); break;
+        case 5: drawS5(t); break;
+    }
+
+    // Auto-advance non-dialog scenes
+    if(scene!==3 && sceneT>=SCENE_DUR[scene]){
+        if(scene<5) goScene(scene+1);
+        else finishIntro();
+    }
+    animId=requestAnimationFrame(loop);
+}
+
+// ── Input ─────────────────────────────────────
+document.getElementById('intro-stage').addEventListener('click', e=>{
+    if(done||e.target.id==='skip-btn'||e.target.id==='replay-btn') return;
+    getAC(); // unlock audio on first click
+    if(scene===3){ advanceDialog(); return; }
+});
+
+document.getElementById('skip-btn').addEventListener('click', ()=>{
+    stopAllAudio(); finishIntro();
+});
+
+
+// ── Controlled intro start ───────────────────────────────
+    (function startIntro() {
+        if (sessionStorage.getItem('tk_state')) {
+            // Returning from mini-game redirect — skip intro
+            document.getElementById('intro-stage').style.display = 'none';
+            document.querySelector('.game-wrapper').style.display = 'block';
+        } else {
+            document.getElementById('character-select').classList.add('hidden');
+            document.querySelector('.game-wrapper').style.display = 'none';
+            document.getElementById('mula-btn').addEventListener('click', function() {
+                getAC(); // unlock AudioContext on user gesture
+                document.getElementById('mula-screen').style.display = 'none';
+                document.getElementById('c').style.display = 'block';
+                document.getElementById('ui').style.display = 'block';
+                goScene(0);
+                animId = requestAnimationFrame(loop);
+            });
+        }
+    })();
+    // ===== END INTRO JS =====
+
+
+
+    // ===== CLOSING JS =====
+// ═══════════════════════════════════════════════════════════
+//  AUDIO ENGINE
+// ═══════════════════════════════════════════════════════════
+let clAC = null;
+let clNodes = [];
+
+function clGetAC() {
+    if (!clAC) clAC = new (window.AudioContext || window.webkitAudioContext)();
+    if (clAC.state === 'suspended') clAC.resume();
+    return clAC;
+}
+let clAudioGen = 0;  // increments on each scene change to kill stale callbacks
+
+function clStopAllAudio() {
+    clAudioGen++;
+    clNodes.forEach(n => { try{n.stop(0);}catch(e){} try{n.disconnect();}catch(e){} });
+    clNodes = [];
+}
+
+// ── Noise buffer helper ─────────────────────────────────────
+function clNoiseBuf(ac, dur, shape) {
+    const len = Math.ceil(ac.sampleRate * dur);
+    const buf = ac.createBuffer(1, len, ac.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * (shape ? shape(i,len) : 1);
+    return buf;
+}
+
+// ── SCENE 0: Fireworks show ─────────────────────────────────
+function clFirework(ac, t, vol, dst) {
+    const launchDur = 0.45 + Math.random()*0.3;
+    // Thump
+    const tOsc=ac.createOscillator(),tG=ac.createGain();
+    tOsc.type='sine'; tOsc.frequency.setValueAtTime(55,t); tOsc.frequency.exponentialRampToValueAtTime(20,t+0.08);
+    tG.gain.setValueAtTime(vol*0.45,t); tG.gain.exponentialRampToValueAtTime(0.001,t+0.1);
+    tOsc.connect(tG); tG.connect(dst); tOsc.start(t); tOsc.stop(t+0.12); clNodes.push(tOsc);
+    const mS=ac.createBufferSource(); mS.buffer=clNoiseBuf(ac,0.06,(i,l)=>Math.exp(-i/l*18));
+    const mL=ac.createBiquadFilter(); mL.type='lowpass'; mL.frequency.value=200;
+    const mG=ac.createGain(); mG.gain.value=vol*0.3;
+    mS.connect(mL); mL.connect(mG); mG.connect(dst); mS.start(t); mS.stop(t+0.08); clNodes.push(mS);
+    // Pew whistle
+    const pOsc=ac.createOscillator(),pG=ac.createGain();
+    pOsc.type='sine';
+    pOsc.frequency.setValueAtTime(200+Math.random()*100,t+0.05);
+    pOsc.frequency.exponentialRampToValueAtTime(2400+Math.random()*1200,t+launchDur);
+    pG.gain.setValueAtTime(0,t+0.05); pG.gain.linearRampToValueAtTime(vol*0.22,t+0.12);
+    pG.gain.linearRampToValueAtTime(vol*0.18,t+launchDur-0.04); pG.gain.linearRampToValueAtTime(0,t+launchDur+0.02);
+    pOsc.connect(pG); pG.connect(dst); pOsc.start(t+0.05); pOsc.stop(t+launchDur+0.05); clNodes.push(pOsc);
+    // Whoosh
+    const wS=ac.createBufferSource(); wS.buffer=clNoiseBuf(ac,launchDur-0.05,(i,l)=>i/l);
+    const wB=ac.createBiquadFilter(); wB.type='bandpass'; wB.frequency.value=800; wB.Q.value=1.5;
+    const wG=ac.createGain(); wG.gain.setValueAtTime(0,t+0.05); wG.gain.linearRampToValueAtTime(vol*0.1,t+launchDur-0.05); wG.gain.linearRampToValueAtTime(0,t+launchDur+0.02);
+    wS.connect(wB); wB.connect(wG); wG.connect(dst); wS.start(t+0.05); wS.stop(t+launchDur+0.04); clNodes.push(wS);
+    // BOOM
+    const b=t+launchDur;
+    const sOsc=ac.createOscillator(),sG=ac.createGain();
+    sOsc.type='sine'; sOsc.frequency.setValueAtTime(55+Math.random()*20,b); sOsc.frequency.exponentialRampToValueAtTime(18,b+0.25);
+    sG.gain.setValueAtTime(vol*1.0,b); sG.gain.exponentialRampToValueAtTime(0.001,b+0.3);
+    sOsc.connect(sG); sG.connect(dst); sOsc.start(b); sOsc.stop(b+0.35); clNodes.push(sOsc);
+    const mOsc=ac.createOscillator(),miG=ac.createGain();
+    mOsc.type='sine'; mOsc.frequency.setValueAtTime(90+Math.random()*40,b); mOsc.frequency.exponentialRampToValueAtTime(30,b+0.18);
+    miG.gain.setValueAtTime(vol*0.65,b); miG.gain.exponentialRampToValueAtTime(0.001,b+0.22);
+    mOsc.connect(miG); miG.connect(dst); mOsc.start(b); mOsc.stop(b+0.25); clNodes.push(mOsc);
+    const eS=ac.createBufferSource(); eS.buffer=clNoiseBuf(ac,0.1,(i,l)=>Math.exp(-i/l*10));
+    const eL=ac.createBiquadFilter(); eL.type='lowpass'; eL.frequency.value=500;
+    const eG=ac.createGain(); eG.gain.value=vol*0.8;
+    eS.connect(eL); eL.connect(eG); eG.connect(dst); eS.start(b); eS.stop(b+0.12); clNodes.push(eS);
+    const snS=ac.createBufferSource(); snS.buffer=clNoiseBuf(ac,0.025,(i,l)=>Math.exp(-i/l*30));
+    const snH=ac.createBiquadFilter(); snH.type='highpass'; snH.frequency.value=1500;
+    const snG=ac.createGain(); snG.gain.value=vol*0.55;
+    snS.connect(snH); snH.connect(snG); snG.connect(dst); snS.start(b); snS.stop(b+0.03); clNodes.push(snS);
+    // Crackle
+    const crackleEnd=b+1.8+Math.random()*1.2;
+    for(let i=0;i<90+Math.floor(Math.random()*50);i++){
+        const ct=b+0.04+Math.pow(Math.random(),0.6)*(crackleEnd-b-0.04);
+        const dec=(crackleEnd-ct)/(crackleEnd-b);
+        const cDur=0.002+Math.random()*0.004;
+        const cS=ac.createBufferSource(); cS.buffer=clNoiseBuf(ac,cDur,(j,l)=>Math.exp(-j/l*25));
+        const cB=ac.createBiquadFilter(); cB.type='bandpass'; cB.frequency.value=1500+Math.random()*5500; cB.Q.value=1.2;
+        const cG=ac.createGain(); cG.gain.value=vol*dec*(0.08+Math.random()*0.18);
+        cS.connect(cB); cB.connect(cG); cG.connect(dst); cS.start(ct); cS.stop(ct+cDur+0.002); clNodes.push(cS);
+    }
+    // Sizzle
+    const szDur=crackleEnd-b+0.5;
+    const szS=ac.createBufferSource(); szS.buffer=clNoiseBuf(ac,szDur,()=>1);
+    const szH=ac.createBiquadFilter(); szH.type='highpass'; szH.frequency.value=4000;
+    const szL=ac.createBiquadFilter(); szL.type='lowpass'; szL.frequency.value=12000;
+    const szG=ac.createGain();
+    szG.gain.setValueAtTime(0,b); szG.gain.linearRampToValueAtTime(vol*0.06,b+0.05);
+    szG.gain.setValueAtTime(vol*0.05,b+szDur*0.3); szG.gain.exponentialRampToValueAtTime(0.001,b+szDur);
+    szS.connect(szH); szH.connect(szL); szL.connect(szG); szG.connect(dst);
+    szS.start(b); szS.stop(b+szDur+0.05); clNodes.push(szS);
+}
+
+function clStartFireworks() {
+    const ac = clGetAC();
+    const m = ac.createGain(); m.gain.value=0.62; m.connect(ac.destination); clNodes.push(m);
+    const myGen = clAudioGen;
+    [{t:0.3,v:0.9},{t:1.8,v:0.75},{t:3.1,v:1.0},{t:4.6,v:0.8},{t:5.8,v:0.85},
+     {t:7.0,v:1.0},{t:7.18,v:0.9},{t:7.35,v:1.0}]
+    .forEach(l=>{ if(clAudioGen===myGen) clFirework(ac, ac.currentTime+l.t, l.v, m); });
+}
+
+// ── SCENE 1: Reverse swoosh ──────────────────────────────────
+function clStartReverseSwoosh() {
+    const ac=clGetAC(), now=ac.currentTime;
+    const m=ac.createGain(); m.gain.value=0.45; m.connect(ac.destination); clNodes.push(m);
+    // Reverse pitch
+    const pOsc=ac.createOscillator(),pG=ac.createGain();
+    pOsc.type='sawtooth';
+    pOsc.frequency.setValueAtTime(3200,now); pOsc.frequency.exponentialRampToValueAtTime(55,now+2.6);
+    const pB=ac.createBiquadFilter(); pB.type='bandpass'; pB.frequency.setValueAtTime(4000,now); pB.frequency.exponentialRampToValueAtTime(120,now+2.6); pB.Q.value=3;
+    pG.gain.setValueAtTime(0.7,now); pG.gain.linearRampToValueAtTime(0.5,now+2.2); pG.gain.linearRampToValueAtTime(0,now+2.8);
+    pOsc.connect(pB); pB.connect(pG); pG.connect(m); pOsc.start(now); pOsc.stop(now+3.0); clNodes.push(pOsc);
+    // Hiss dropping
+    const hS=ac.createBufferSource(); hS.buffer=clNoiseBuf(ac,3,()=>1);
+    const hH=ac.createBiquadFilter(); hH.type='highpass'; hH.frequency.setValueAtTime(6000,now); hH.frequency.exponentialRampToValueAtTime(300,now+2.5);
+    const hG=ac.createGain(); hG.gain.setValueAtTime(0.7,now); hG.gain.linearRampToValueAtTime(0.2,now+2.2); hG.gain.linearRampToValueAtTime(0,now+2.8);
+    hS.connect(hH); hH.connect(hG); hG.connect(m); hS.start(now); hS.stop(now+3); clNodes.push(hS);
+    // Sub wobble
+    const wOsc=ac.createOscillator(),wG=ac.createGain();
+    wOsc.type='sine'; wOsc.frequency.setValueAtTime(200,now); wOsc.frequency.linearRampToValueAtTime(40,now+2.5);
+    const vOsc=ac.createOscillator(),vG=ac.createGain();
+    vOsc.frequency.value=8; vG.gain.setValueAtTime(40,now); vG.gain.linearRampToValueAtTime(2,now+2.4);
+    vOsc.connect(vG); vG.connect(wOsc.frequency);
+    wG.gain.setValueAtTime(0.5,now); wG.gain.linearRampToValueAtTime(0.35,now+2.2); wG.gain.linearRampToValueAtTime(0,now+2.8);
+    wOsc.connect(wG); wG.connect(m); wOsc.start(now); wOsc.stop(now+2.9); clNodes.push(wOsc);
+    vOsc.start(now); vOsc.stop(now+2.9); clNodes.push(vOsc);
+    // Landing thud
+    const lOsc=ac.createOscillator(),lG=ac.createGain();
+    lOsc.type='sine'; lOsc.frequency.setValueAtTime(90,now+2.85); lOsc.frequency.exponentialRampToValueAtTime(30,now+3.1);
+    lG.gain.setValueAtTime(0.6,now+2.85); lG.gain.exponentialRampToValueAtTime(0.001,now+3.2);
+    lOsc.connect(lG); lG.connect(m); lOsc.start(now+2.85); lOsc.stop(now+3.3); clNodes.push(lOsc);
+    const iS=ac.createBufferSource(); iS.buffer=clNoiseBuf(ac,0.1,(i,l)=>(Math.random()*2-1)*Math.exp(-i/l*20));
+    const iL=ac.createBiquadFilter(); iL.type='lowpass'; iL.frequency.value=300;
+    const iG=ac.createGain(); iG.gain.value=0.4;
+    iS.connect(iL); iL.connect(iG); iG.connect(m); iS.start(now+2.85); iS.stop(now+3.0); clNodes.push(iS);
+}
+
+// ── SCENE 2: Wira voice (Animal Crossing) ───────────────────
+const CL_BASE_PITCHES = [523,587,659,698,784,880,988];
+function clPlayNPCChar(ch) {
+    if(ch===' '||ch==='!'||ch==='.'||ch===','||ch==='—') return;
+    const ac=clGetAC(), now=ac.currentTime;
+    const m=ac.createGain(); m.gain.value=0.3; m.connect(ac.destination);
+    const code=ch.toLowerCase().charCodeAt(0);
+    const freq=CL_BASE_PITCHES[code%CL_BASE_PITCHES.length]*(1+(code%3)*0.05);
+    const dur=0.062;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(freq,now); o.frequency.exponentialRampToValueAtTime(freq*0.93,now+dur);
+    g.gain.setValueAtTime(0,now); g.gain.linearRampToValueAtTime(0.55,now+0.007);
+    g.gain.setValueAtTime(0.48,now+dur-0.012); g.gain.linearRampToValueAtTime(0,now+dur);
+    o.connect(g); g.connect(m); o.start(now); o.stop(now+dur+0.01); clNodes.push(o);
+    const o2=ac.createOscillator(),g2=ac.createGain();
+    o2.type='triangle'; o2.frequency.value=freq*2;
+    g2.gain.setValueAtTime(0,now); g2.gain.linearRampToValueAtTime(0.1,now+0.007); g2.gain.linearRampToValueAtTime(0,now+dur);
+    o2.connect(g2); g2.connect(m); o2.start(now); o2.stop(now+dur+0.01); clNodes.push(o2);
+}
+
+// ── SCENE 3: Wira fade (ding-ding-ding) ─────────────────────
+function clStartWiraFade() {
+    const ac=clGetAC(), now=ac.currentTime;
+    const m=ac.createGain(); m.gain.value=0.38; m.connect(ac.destination); clNodes.push(m);
+    const dTimes  =[0,0.32,0.60,0.94,1.34,1.80,2.32,2.92,3.58,4.30,5.10,5.90];
+    const dPitches=[1047,880,1175,988,1047,784,880,698,784,659,523,440];
+    const dGains  =[0.5,0.48,0.45,0.42,0.38,0.34,0.28,0.22,0.16,0.11,0.07,0.04];
+    dTimes.forEach((t,i)=>{
+        const at=now+t, fr=dPitches[i], gv=dGains[i];
+        const o=ac.createOscillator(),g=ac.createGain();
+        o.type='sine'; o.frequency.value=fr;
+        g.gain.setValueAtTime(gv,at); g.gain.exponentialRampToValueAtTime(0.001,at+2.0);
+        o.connect(g); g.connect(m); o.start(at); o.stop(at+2.2); clNodes.push(o);
+        const o2=ac.createOscillator(),g2=ac.createGain();
+        o2.type='sine'; o2.frequency.value=fr*2;
+        g2.gain.setValueAtTime(gv*0.35,at); g2.gain.exponentialRampToValueAtTime(0.001,at+1.2);
+        o2.connect(g2); g2.connect(m); o2.start(at); o2.stop(at+1.4); clNodes.push(o2);
+        if(i<8){
+            const o3=ac.createOscillator(),g3=ac.createGain();
+            o3.type='sine'; o3.frequency.value=fr*4;
+            g3.gain.setValueAtTime(gv*0.12,at); g3.gain.exponentialRampToValueAtTime(0.001,at+0.6);
+            o3.connect(g3); g3.connect(m); o3.start(at); o3.stop(at+0.7); clNodes.push(o3);
+        }
+    });
+    // shimmer
+    const shS=ac.createBufferSource(); shS.buffer=clNoiseBuf(ac,6.5,()=>1);
+    const shH=ac.createBiquadFilter(); shH.type='highpass'; shH.frequency.value=8000;
+    const shG=ac.createGain(); shG.gain.setValueAtTime(0.015,now); shG.gain.linearRampToValueAtTime(0,now+6.5);
+    shS.connect(shH); shH.connect(shG); shG.connect(m); shS.start(now); shS.stop(now+6.6); clNodes.push(shS);
+}
+
+// ── SCENE 4: TV off ──────────────────────────────────────────
+function clStartTVOff() {
+    const ac=clGetAC(), now=ac.currentTime;
+    const m=ac.createGain(); m.gain.value=0.45; m.connect(ac.destination); clNodes.push(m);
+    // CRT whine drop
+    const wOsc=ac.createOscillator(),wG=ac.createGain();
+    wOsc.type='sine';
+    wOsc.frequency.setValueAtTime(15600,now); wOsc.frequency.exponentialRampToValueAtTime(800,now+0.4); wOsc.frequency.exponentialRampToValueAtTime(60,now+0.7);
+    wG.gain.setValueAtTime(0.5,now); wG.gain.setValueAtTime(0.45,now+0.3); wG.gain.exponentialRampToValueAtTime(0.001,now+0.75);
+    wOsc.connect(wG); wG.connect(m); wOsc.start(now); wOsc.stop(now+0.8); clNodes.push(wOsc);
+    // Static pop
+    const pS=ac.createBufferSource(); pS.buffer=clNoiseBuf(ac,0.08,(i,l)=>Math.exp(-i/l*30));
+    const pB=ac.createBiquadFilter(); pB.type='bandpass'; pB.frequency.value=2000; pB.Q.value=0.5;
+    const pG=ac.createGain(); pG.gain.value=0.55;
+    pS.connect(pB); pB.connect(pG); pG.connect(m); pS.start(now+0.05); pS.stop(now+0.15); clNodes.push(pS);
+    // Hiss
+    const hS=ac.createBufferSource(); hS.buffer=clNoiseBuf(ac,0.3,()=>1);
+    const hH=ac.createBiquadFilter(); hH.type='highpass'; hH.frequency.value=5000;
+    const hG=ac.createGain(); hG.gain.setValueAtTime(0.3,now); hG.gain.exponentialRampToValueAtTime(0.001,now+0.3);
+    hS.connect(hH); hH.connect(hG); hG.connect(m); hS.start(now); hS.stop(now+0.32); clNodes.push(hS);
+    // Power hum cut
+    const huOsc=ac.createOscillator(),huG=ac.createGain();
+    huOsc.type='sine'; huOsc.frequency.value=120;
+    huG.gain.setValueAtTime(0.18,now); huG.gain.setValueAtTime(0.18,now+0.06); huG.gain.linearRampToValueAtTime(0,now+0.12);
+    huOsc.connect(huG); huG.connect(m); huOsc.start(now); huOsc.stop(now+0.15); clNodes.push(huOsc);
+    // Residual CRT hiss
+    const rS=ac.createBufferSource(); rS.buffer=clNoiseBuf(ac,1.5,()=>1);
+    const rH=ac.createBiquadFilter(); rH.type='highpass'; rH.frequency.value=9000;
+    const rG=ac.createGain(); rG.gain.setValueAtTime(0.04,now+0.1); rG.gain.exponentialRampToValueAtTime(0.001,now+1.5);
+    rS.connect(rH); rH.connect(rG); rG.connect(m); rS.start(now+0.1); rS.stop(now+1.6); clNodes.push(rS);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CANVAS + ANIMATION
+// ═══════════════════════════════════════════════════════════
+let clCanvas = null;
+let clCtx    = null;
+
+function clPx(x,y,w,h,col){ clCtx.fillStyle=col; clCtx.fillRect(x,y,w,h); }
+function clLerp(a,b,t){ return a+(b-a)*t; }
+function clEaseOut(t){ return 1-(1-t)*(1-t); }
+function clEaseIn(t){ return t*t; }
+
+let clScene=0, clSceneT=0, clGlobalT=0, clLastTime=null, clAnimId=null, clDone=false;
+let clDialogIdx=0, clDialogCharIdx=0, clDialogTimer=0, clWaitingClick=false, clDialogPhase=0;
+
+// Scene durations: [s0_celebration, s1_portal, s2_dialog, s3_farewell, s4_fadeout, s5_black]
+// s2 and s3 are dialog-driven, durations are safety caps
+const CL_SCENE_DUR = [8, 3.5, 30, 30, 4, 3];
+
+const CL_DIALOGS = [
+    // Scene 2 — main dialog (phases 0-4)
+    { text:'Kamu... berjaya!' },
+    { text:'Ayat-ayat Bahasa Melayu yang bersepah-sepah itu... semuanya telah tersusun semula.' },
+    { text:'Kamu berjaya menyelamatkan dunia TataKembara dengan keberanian dan kebijaksanaan kamu.' },
+    { text:'Tapi aku tahu — ini bukan sihir. Ini ilmu. Ilmu yang kamu bawa dari dunia kamu.' },
+    { text:'Sekarang, tiba masanya kamu kembali.' },
+    // Scene 3 — farewell (phases 5-7)
+    { text:'Hei... kamu ingat tak? Masa kamu duduk di sini, buku terbuka, tapi mata tertutup?' },
+    { text:'Kini buku itu masih sama. Tapi kamu... sudah berbeza.' },
+    { text:'Jumpa lagi, pengembara.' },
+];
+
+// Visual firework particles
+const clFxParticles = [];
+const CL_FX_WORDS = ['Tahniah!','Ayat Aktif!','Ayat Pasif!','Berjaya!','✦','★','TataKembara!'];
+
+function clSpawnFX() {
+    const x=80+Math.random()*640, y=40+Math.random()*220;
+    const word=CL_FX_WORDS[Math.floor(Math.random()*CL_FX_WORDS.length)];
+    const col=['#FFD700','#2ECC71','#e63946','#74b9ff','#fd79a8','#a8e6cf'][Math.floor(Math.random()*6)];
+    const parts=[];
+    for(let i=0;i<18;i++){ const a=(i/18)*Math.PI*2, s=1.5+Math.random()*2.5; parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1}); }
+    clFxParticles.push({x,y,word,col,life:1,parts});
+}
+function clUpdateFX(dt) {
+    for(let i=clFxParticles.length-1;i>=0;i--){
+        const f=clFxParticles[i]; f.life-=dt*0.55;
+        f.parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.06;p.life-=dt*0.85;});
+        if(f.life<=0) clFxParticles.splice(i,1);
+    }
+}
+function clDrawFX() {
+    clFxParticles.forEach(f=>{
+        clCtx.globalAlpha=Math.max(0,f.life);
+        clCtx.fillStyle=f.col; clCtx.font='bold 15px Segoe UI'; clCtx.textAlign='center';
+        clCtx.fillText(f.word,f.x,f.y);
+        f.parts.forEach(p=>{
+            clCtx.globalAlpha=Math.max(0,p.life*0.8);
+            clCtx.fillStyle=f.col; clCtx.beginPath(); clCtx.arc(p.x,p.y,2.5,0,Math.PI*2); clCtx.fill();
+        });
+    });
+    clCtx.globalAlpha=1;
+}
+
+const CL_C={wall:'#12101e',floor:'#2d1f3d',desk:'#5a3e1b',deskTop:'#7a5528',monitor:'#1a1a2e',gold:'#FFD700',skin:'#f4c87a',shirt:'#3a5f8a',hair:'#2d1a0e',chair:'#3d2b1f',star:'#ffe066',green:'#2ECC71'};
+const CL_STARS=Array.from({length:55},()=>({x:Math.random()*800,y:Math.random()*200,r:Math.random()*1.5+0.4,tw:Math.random()*3+1}));
+
+function clDrawStars(a=1){ CL_STARS.forEach(s=>{ const b=0.5+0.5*Math.sin(clGlobalT*s.tw+s.x); clCtx.globalAlpha=a*(0.3+0.7*b); clCtx.fillStyle=CL_C.star; clCtx.beginPath(); clCtx.arc(s.x,s.y,s.r,0,Math.PI*2); clCtx.fill(); }); clCtx.globalAlpha=1; }
+function clDrawWorld(a=1){
+    clCtx.globalAlpha=a;
+
+    // ── Night sky gradient ──────────────────────────────
+    const sg=clCtx.createLinearGradient(0,0,0,500);
+    sg.addColorStop(0,'#05081a');
+    sg.addColorStop(0.45,'#0d1a3a');
+    sg.addColorStop(0.75,'#1a2a4a');
+    sg.addColorStop(1,'#0d1a10');
+    clCtx.fillStyle=sg; clCtx.fillRect(0,0,800,500);
+
+    // ── Stars ───────────────────────────────────────────
+    clDrawStars(a);
+
+    // ── Moon (top right) ────────────────────────────────
+    clCtx.save();
+    clCtx.globalAlpha=a*0.9;
+    // Moon glow
+    const mg=clCtx.createRadialGradient(680,60,8,680,60,55);
+    mg.addColorStop(0,'rgba(255,248,200,0.25)');
+    mg.addColorStop(1,'rgba(255,248,200,0)');
+    clCtx.fillStyle=mg; clCtx.fillRect(625,5,110,110);
+    // Moon disc
+    clCtx.fillStyle='#fff9e0';
+    clCtx.beginPath(); clCtx.arc(680,60,22,0,Math.PI*2); clCtx.fill();
+    // Moon crater shading
+    clCtx.fillStyle='rgba(200,190,150,0.3)';
+    clCtx.beginPath(); clCtx.arc(672,55,7,0,Math.PI*2); clCtx.fill();
+    clCtx.beginPath(); clCtx.arc(685,68,4,0,Math.PI*2); clCtx.fill();
+    clCtx.restore();
+
+    // ── Distant mountains / hills silhouette ────────────
+    clCtx.globalAlpha=a;
+    clCtx.fillStyle='#0a1228';
+    clCtx.beginPath();
+    clCtx.moveTo(0,320);
+    clCtx.lineTo(0,260); clCtx.lineTo(60,200); clCtx.lineTo(130,240);
+    clCtx.lineTo(200,165); clCtx.lineTo(270,230); clCtx.lineTo(320,195);
+    clCtx.lineTo(380,260); clCtx.lineTo(430,185); clCtx.lineTo(500,245);
+    clCtx.lineTo(560,170); clCtx.lineTo(630,220); clCtx.lineTo(700,190);
+    clCtx.lineTo(760,230); clCtx.lineTo(800,200);
+    clCtx.lineTo(800,320); clCtx.closePath(); clCtx.fill();
+
+    // ── Mid hills (slightly lighter) ────────────────────
+    clCtx.fillStyle='#0d1e1a';
+    clCtx.beginPath();
+    clCtx.moveTo(0,340);
+    clCtx.lineTo(0,300); clCtx.lineTo(80,270); clCtx.lineTo(160,305);
+    clCtx.lineTo(240,268); clCtx.lineTo(310,292); clCtx.lineTo(380,275);
+    clCtx.lineTo(460,295); clCtx.lineTo(530,272); clCtx.lineTo(610,300);
+    clCtx.lineTo(680,278); clCtx.lineTo(750,305); clCtx.lineTo(800,290);
+    clCtx.lineTo(800,340); clCtx.closePath(); clCtx.fill();
+
+    // ── TataKembara trees (pixel style) ─────────────────
+    // Left cluster
+    [[40,340],[90,330],[140,345],[30,355]].forEach(([x,y])=>{
+        // Trunk
+        clCtx.fillStyle='#3d2710';
+        clCtx.fillRect(x-4,y,8,30);
+        // Canopy layers
+        clCtx.fillStyle='#0d3a1a';
+        clCtx.beginPath(); clCtx.arc(x,y-5,18,0,Math.PI*2); clCtx.fill();
+        clCtx.fillStyle='#124a22';
+        clCtx.beginPath(); clCtx.arc(x,y-16,14,0,Math.PI*2); clCtx.fill();
+        clCtx.fillStyle='#1a6b2e';
+        clCtx.beginPath(); clCtx.arc(x,y-24,9,0,Math.PI*2); clCtx.fill();
+    });
+    // Right cluster
+    [[660,338],[710,328],[760,342],[780,352]].forEach(([x,y])=>{
+        clCtx.fillStyle='#3d2710';
+        clCtx.fillRect(x-4,y,8,30);
+        clCtx.fillStyle='#0d3a1a';
+        clCtx.beginPath(); clCtx.arc(x,y-5,18,0,Math.PI*2); clCtx.fill();
+        clCtx.fillStyle='#124a22';
+        clCtx.beginPath(); clCtx.arc(x,y-16,14,0,Math.PI*2); clCtx.fill();
+        clCtx.fillStyle='#1a6b2e';
+        clCtx.beginPath(); clCtx.arc(x,y-24,9,0,Math.PI*2); clCtx.fill();
+    });
+
+    // ── Ground ───────────────────────────────────────────
+    clCtx.fillStyle='#0a1e0d';
+    clCtx.fillRect(0,345,800,155);
+    // Ground highlight strip
+    clCtx.fillStyle='#112a14';
+    clCtx.fillRect(0,345,800,6);
+
+    // ── Pixel-art crowd silhouettes (bottom) ─────────────
+    clCtx.fillStyle='#060e08';
+    // People shapes — simple rectangles in a row
+    const crowd=[
+        [30,410,12,35],[55,415,10,30],[80,408,12,37],[108,412,10,33],
+        [135,407,14,38],[165,413,10,32],[190,409,12,36],[220,414,10,31],
+        [248,408,13,37],[278,411,11,34],[308,407,13,38],[340,413,10,32],
+        [370,409,12,36],[400,406,14,39],[435,412,10,33],[462,408,12,37],
+        [490,414,10,31],[518,409,13,36],[548,407,12,38],[578,412,10,33],
+        [606,408,13,37],[635,413,10,32],[660,409,12,35],[685,407,14,38],
+        [715,412,10,33],[740,409,12,36],[768,414,10,31],
+    ];
+    crowd.forEach(([x,y,w,h])=>{
+        // Body
+        clCtx.fillRect(x,y,w,h);
+        // Head (circle top)
+        clCtx.beginPath(); clCtx.arc(x+w/2,y-5,w/2+1,0,Math.PI*2); clCtx.fill();
+        // Random raised arm
+        if(Math.sin(x*0.7+clGlobalT*2)>0.3){
+            clCtx.fillRect(x+w-2,y-8,3,16);
+        }
+    });
+
+    // ── Lanterns / lights in the distance ───────────────
+    [[150,295],[280,282],[420,290],[550,285],[680,292]].forEach(([x,y],i)=>{
+        const flicker=0.6+0.4*Math.sin(clGlobalT*2.5+i*1.3);
+        clCtx.globalAlpha=a*flicker*0.7;
+        const lg=clCtx.createRadialGradient(x,y,1,x,y,12);
+        lg.addColorStop(0,'rgba(255,200,80,0.8)');
+        lg.addColorStop(1,'rgba(255,200,80,0)');
+        clCtx.fillStyle=lg; clCtx.fillRect(x-12,y-12,24,24);
+        clCtx.globalAlpha=a*flicker;
+        clCtx.fillStyle='#ffc850';
+        clCtx.beginPath(); clCtx.arc(x,y,3,0,Math.PI*2); clCtx.fill();
+    });
+
+    clCtx.globalAlpha=1;
+}
+function clDrawNPC(cx,cy,a=1){ const bob=Math.sin(clGlobalT*3)*4; clCtx.globalAlpha=a; const ng=clCtx.createRadialGradient(cx,cy+bob,5,cx,cy+bob,60); ng.addColorStop(0,'rgba(46,204,113,0.3)'); ng.addColorStop(1,'transparent'); clCtx.fillStyle=ng; clCtx.fillRect(cx-60,cy-60+bob,120,120); clCtx.globalAlpha=a*(0.45+0.3*Math.sin(clGlobalT*8)); clPx(cx-30,cy-10+bob,22,15,'#a8ffcc'); clPx(cx+8,cy-10+bob,22,15,'#a8ffcc'); clCtx.globalAlpha=a; clPx(cx-12,cy-22+bob,24,32,CL_C.green); clPx(cx-10,cy-20+bob,20,28,'#27ae60'); clPx(cx-10,cy-38+bob,20,22,CL_C.green); clPx(cx-8,cy-36+bob,16,18,'#27ae60'); clPx(cx-6,cy-32+bob,4,5,'#fff'); clPx(cx+2,cy-32+bob,4,5,'#fff'); clPx(cx-5,cy-31+bob,2,3,'#0a2010'); clPx(cx+3,cy-31+bob,2,3,'#0a2010'); clCtx.strokeStyle='#0a2010'; clCtx.lineWidth=1.5; clCtx.beginPath(); clCtx.arc(cx,cy-24+bob,4,0.1,Math.PI-0.1); clCtx.stroke(); const armA=Math.sin(clGlobalT*4)*0.5; clCtx.save(); clCtx.translate(cx-12,cy-12+bob); clCtx.rotate(-0.5+armA); clPx(-12,0,12,5,CL_C.green); clCtx.restore(); clCtx.save(); clCtx.translate(cx+12,cy-12+bob); clCtx.rotate(0.5-armA); clPx(0,0,12,5,CL_C.green); clCtx.restore(); [[-36,-36],[36,-30],[-40,8],[40,4],[-24,32],[24,30]].forEach(([dx,dy],i)=>{ clCtx.globalAlpha=a*(0.4+0.6*Math.sin(clGlobalT*2+i)); clCtx.fillStyle=CL_C.star; clCtx.font=`${8+i%3*4}px sans-serif`; clCtx.textAlign='center'; clCtx.fillText('✦',cx+dx,cy+dy+bob); }); clCtx.globalAlpha=1; }
+function clDrawRoom(a=1){ clCtx.globalAlpha=a; clPx(0,0,800,500,CL_C.wall); clPx(0,340,800,160,CL_C.floor); clPx(0,340,800,3,'#3d2b4d'); clCtx.globalAlpha=1; }
+function clDrawDesk(a=1){ clCtx.globalAlpha=a; clPx(158,318,20,124,CL_C.desk); clPx(578,318,20,124,CL_C.desk); clPx(138,292,484,30,CL_C.deskTop); clPx(138,290,484,5,'#8B7340'); clPx(558,258,18,36,'#c0392b'); clPx(546,263,14,31,'#2980b9'); clPx(532,268,14,26,'#27ae60'); clCtx.globalAlpha=1; }
+function clDrawChair(){ clPx(280,338,160,22,CL_C.chair); clPx(290,278,140,66,CL_C.chair); clPx(292,280,136,62,'#4a3526'); clPx(283,360,14,52,'#2d1f1a'); clPx(423,360,14,52,'#2d1f1a'); }
+function clDrawMonitor(fn,sa=1,glow=0){ clPx(353,288,44,12,'#1a1a2e'); clPx(328,296,94,6,'#1a1a2e'); clPx(208,128,334,168,'#0d0d1a'); clPx(213,133,324,158,CL_C.monitor); clPx(223,141,304,138,'#050508'); if(glow>0){ clCtx.save(); clCtx.globalAlpha=glow*0.35; const g=clCtx.createRadialGradient(375,210,10,375,210,165); g.addColorStop(0,'#7ec850'); g.addColorStop(1,'transparent'); clCtx.fillStyle=g; clCtx.fillRect(145,75,460,260); clCtx.restore(); } clCtx.globalAlpha=sa; fn(); clCtx.globalAlpha=1; clCtx.strokeStyle='#2a2a4a'; clCtx.lineWidth=2; clCtx.strokeRect(213,133,324,158); }
+function clScreenWira(a){ const g=clCtx.createLinearGradient(223,141,223,279); g.addColorStop(0,'#0a2010'); g.addColorStop(1,'#051008'); clCtx.fillStyle=g; clCtx.fillRect(223,141,304,138); clCtx.globalAlpha=0.1; for(let y=141;y<279;y+=3) clPx(223,y,304,1,'#00ff88'); clCtx.globalAlpha=1; clDrawNPC(375,222,a); }
+function clDrawPlayer(a=1){ clCtx.globalAlpha=a; const bx=362,by=332; clPx(bx-14,by-74,28,28,CL_C.hair); clPx(bx-12,by-72,24,24,'#3d2510'); clPx(bx-5,by-46,10,8,CL_C.skin); clPx(bx-26,by-40,52,36,CL_C.shirt); clPx(bx-24,by-38,48,32,'#2a4a6a'); clPx(bx-40,by-14,20,10,CL_C.shirt); clPx(bx+20,by-14,20,10,CL_C.shirt); clPx(bx-44,by-12,10,8,CL_C.skin); clPx(bx+34,by-12,10,8,CL_C.skin); clPx(bx-20,by-5,40,18,'#1a2a3a'); clPx(bx-28,by+11,20,12,'#1a2a3a'); clPx(bx+8,by+11,20,12,'#1a2a3a'); clCtx.globalAlpha=1; }
+function clDrawBook(x,y,openT){ const w=clLerp(0,60,clEaseOut(openT)),h=40; clCtx.save(); clCtx.translate(x,y); clCtx.fillStyle='#fcf8e8'; clCtx.strokeStyle='#8B7340'; clCtx.lineWidth=1.5; clCtx.beginPath(); clCtx.rect(-w,0,w,h); clCtx.fill(); clCtx.stroke(); clCtx.beginPath(); clCtx.rect(0,0,w,h); clCtx.fill(); clCtx.stroke(); clCtx.fillStyle='#8B6914'; clCtx.fillRect(-3,0,6,h); if(openT>0.6){ clCtx.strokeStyle='#ccc'; clCtx.lineWidth=0.8; for(let i=1;i<4;i++){ clCtx.beginPath(); clCtx.moveTo(-w+8,i*(h/4)); clCtx.lineTo(-8,i*(h/4)); clCtx.stroke(); clCtx.beginPath(); clCtx.moveTo(8,i*(h/4)); clCtx.lineTo(w-8,i*(h/4)); clCtx.stroke(); } } clCtx.restore(); }
+
+// ── Scenes ─────────────────────────────────────────────────
+function clDrawS0(t){
+    clDrawWorld();
+    clDrawNPC(400,220,1);
+    clDrawFX();
+    // Spawn visual fx in sync with audio — denser early, sparse later
+    if(Math.random()<(t<0.6?0.12:0.06)) clSpawnFX();
+}
+
+function clDrawS1(t){
+    clDrawWorld(1-t*0.4);
+    clDrawNPC(400,clLerp(220,210,t),1);
+    clCtx.save(); clCtx.globalAlpha=t*0.7;
+    const vg=clCtx.createRadialGradient(400,250,2,400,250,clLerp(20,200,clEaseIn(t)));
+    vg.addColorStop(0,'rgba(126,200,80,0.9)'); vg.addColorStop(0.5,'rgba(126,200,80,0.2)'); vg.addColorStop(1,'rgba(0,0,0,0)');
+    clCtx.fillStyle=vg; clCtx.fillRect(0,0,800,500); clCtx.restore();
+    for(let i=0;i<12;i++){
+        const ang=clGlobalT*5+i*(Math.PI*2/12), r=clLerp(160,10,clEaseIn(t));
+        clCtx.globalAlpha=t*(0.3+0.5*(i%2));
+        clCtx.fillStyle='#a8e878'; clCtx.beginPath(); clCtx.arc(400+Math.cos(ang)*r,250+Math.sin(ang)*r*0.5,clLerp(4,1,t),0,Math.PI*2); clCtx.fill();
+    }
+    clCtx.globalAlpha=1;
+    if(t>0.82){ clCtx.globalAlpha=clEaseIn((t-0.82)/0.18); clCtx.fillStyle='#fff'; clCtx.fillRect(0,0,800,500); clCtx.globalAlpha=1; }
+}
+
+function clDrawS2(t){ clDrawRoom(); clDrawDesk(); clDrawChair(); clDrawMonitor(()=>clScreenWira(1),1,0.9); clDrawPlayer(1); }
+
+function clDrawS3(t){
+    clDrawRoom(); clDrawDesk(); clDrawChair();
+    const wiraAlpha=Math.max(0,1-t*1.4);
+    clDrawMonitor(()=>clScreenWira(wiraAlpha),1,0.9*(1-t));
+    clDrawPlayer(1);
+    if(t>0.45){
+        const bT=clEaseOut((t-0.45)/0.55);
+        clDrawBook(362+5,332-10,bT);
+    }
+    // Waving hand text at fade out
+    if(t>0.6&&wiraAlpha<0.4){
+        clCtx.globalAlpha=clEaseOut((t-0.6)/0.4)*0.9;
+        clCtx.fillStyle=CL_C.star; clCtx.font='bold 14px Segoe UI'; clCtx.textAlign='center';
+        clCtx.fillText('Jumpa lagi! 👋',375,215);
+        clCtx.globalAlpha=1;
+    }
+}
+
+function clDrawS4(t){
+    clDrawRoom(1-t); clDrawDesk(1-t);
+    clCtx.globalAlpha=1-t; clDrawMonitor(()=>{const g=clCtx.createLinearGradient(223,141,223,279); g.addColorStop(0,'#0a2010'); g.addColorStop(1,'#051008'); clCtx.fillStyle=g; clCtx.fillRect(223,141,304,138);},1-t,0); clCtx.globalAlpha=1;
+    clDrawPlayer(1-t);
+    clDrawBook(362+5,332-10,1);
+    clCtx.globalAlpha=clEaseIn(t); clCtx.fillStyle='#000'; clCtx.fillRect(0,0,800,500); clCtx.globalAlpha=1;
+}
+
+function clDrawS5(t){
+    clPx(0,0,800,500,'#000');
+}
+
+// ── Dialog system ───────────────────────────────────────────
+let clDlgEl  = null;
+let clDlgTxt = null;
+function clShowDialog(idx){ clDialogIdx=idx; clDialogCharIdx=0; clWaitingClick=false; clDlgTxt.textContent=''; clDlgEl.style.display='block'; }
+function clHideDialog(){ clDlgEl.style.display='none'; }
+
+function clTickDialog(dt){
+    if(clDialogCharIdx>=CL_DIALOGS[clDialogIdx].text.length){ clWaitingClick=true; return; }
+    clDialogTimer+=dt;
+    while(clDialogTimer>=0.032&&clDialogCharIdx<CL_DIALOGS[clDialogIdx].text.length){
+        const ch=CL_DIALOGS[clDialogIdx].text[clDialogCharIdx];
+        clDialogCharIdx++; clDialogTimer-=0.032;
+        clDlgTxt.textContent=CL_DIALOGS[clDialogIdx].text.substring(0,clDialogCharIdx);
+        clPlayNPCChar(ch); // 🔊 sync voice with text
+    }
+    if(clDialogCharIdx>=CL_DIALOGS[clDialogIdx].text.length) clWaitingClick=true;
+}
+
+function clAdvanceS2(){
+    if(!clWaitingClick){ clDialogCharIdx=CL_DIALOGS[clDialogIdx].text.length; clDlgTxt.textContent=CL_DIALOGS[clDialogIdx].text; clWaitingClick=true; return; }
+    clDialogPhase++;
+    if(clDialogPhase<=4) clShowDialog(clDialogPhase);
+    else { clHideDialog(); clGoScene(3); }
+}
+function clAdvanceS3(){
+    if(!clWaitingClick){ clDialogCharIdx=CL_DIALOGS[clDialogIdx].text.length; clDlgTxt.textContent=CL_DIALOGS[clDialogIdx].text; clWaitingClick=true; return; }
+    clDialogPhase++;
+    if(clDialogPhase<=7) clShowDialog(clDialogPhase);
+    else { clHideDialog(); clGoScene(4); }
+}
+
+// ── Scene management ────────────────────────────────────────
+let clPendingScene = -1;
+
+function clGoScene(n){
+    clStopAllAudio();
+    clScene=n; clSceneT=0; clLastTime=null;
+    clPendingScene=-1;
+    if(n===0){ clStartFireworks(); }
+    if(n===1){ clStartReverseSwoosh(); }
+    if(n===2){ clShowDialog(0); clDialogPhase=0; }
+    if(n===3){ clShowDialog(5); clDialogPhase=5; clStartWiraFade(); }
+    if(n===4){ clStartTVOff(); }
+    if(n===5){
+        document.getElementById('cl-end-card').classList.add('show');
+        document.getElementById('cl-replay-btn').style.display='block';
+    }
+}
+
+// ── Main loop ───────────────────────────────────────────────
+function clLoop(ts){
+    if(clDone) return;
+    if(!clCtx) return;
+
+    // Handle pending scene transition (deferred from previous frame)
+    if(clPendingScene >= 0){
+        clGoScene(clPendingScene);
+        clAnimId=requestAnimationFrame(clLoop);
+        return;
+    }
+
+    if(!clLastTime) clLastTime=ts;
+    const dt=Math.min((ts-clLastTime)/1000,0.05);
+    clLastTime=ts; clGlobalT+=dt; clSceneT+=dt;
+
+    clCtx.clearRect(0,0,800,500);
+    const t=Math.min(clSceneT/CL_SCENE_DUR[clScene],1);
+
+    switch(clScene){
+        case 0: clDrawS0(t); clUpdateFX(dt); break;
+        case 1: clDrawS1(t); break;
+        case 2: clDrawS2(t); clTickDialog(dt); break;
+        case 3: clDrawS3(t); clTickDialog(dt); break;
+        case 4: clDrawS4(t); break;
+        case 5: clDrawS5(t); break;
+    }
+
+    // Auto-advance: set pending scene, do NOT transition mid-frame
+    if(clPendingScene < 0){
+        if(clScene===0 && clSceneT>=CL_SCENE_DUR[0]) clPendingScene=1;
+        if(clScene===1 && clSceneT>=CL_SCENE_DUR[1]) clPendingScene=2;
+        if(clScene===4 && clSceneT>=CL_SCENE_DUR[4]) clPendingScene=5;
+    }
+
+    clAnimId=requestAnimationFrame(clLoop);
+}
+
+    // Input handler wired inside triggerClosing()
+
+    // replay btn wired inside triggerClosing()
+
+    // ── Called when player reaches SELESAI ─────────────────
+    function triggerClosing() {
+        // Stop lobi BGM — both Web Audio and mp3 bgm object
+        if (typeof stopBGM === 'function') stopBGM();
+        if (typeof bgm !== 'undefined' && bgm && !bgm.paused) { bgm.pause(); bgm.currentTime = 0; }
+        document.getElementById('win-screen').classList.remove('show');
+        document.getElementById('closing-stage').classList.add('show');
+        // Assign canvas now that DOM is ready
+        clCanvas = document.getElementById('cl-c');
+        clCanvas.width = 800; clCanvas.height = 500;
+        clCtx    = clCanvas.getContext('2d');
+        clDlgEl  = document.getElementById('cl-dialog');
+        clDlgTxt = document.getElementById('cl-dialog-text');
+        // Reset state
+        clPendingScene=-1;
+        clScene=0; clSceneT=0; clGlobalT=0; clLastTime=null; clDone=false; clDialogPhase=0;
+        clFxParticles.length=0;
+        document.getElementById('cl-dialog').style.display='none';
+        document.getElementById('cl-end-card').classList.remove('show');
+        clStopAllAudio();
+        if (clAnimId) { cancelAnimationFrame(clAnimId); clAnimId = null; }
+        clGoScene(0);
+        clAnimId=requestAnimationFrame(clLoop);
+        // Wire click handler (once)
+        const cs=document.getElementById('closing-canvas');
+        cs.addEventListener('click', function clClick(e){
+            if(clDone||e.target.id==='cl-replay-btn') return;
+            if(clScene===2) clAdvanceS2();
+            else if(clScene===3) clAdvanceS3();
+        });
+        // Replay btn
+        document.getElementById('cl-replay-btn').addEventListener('click', ()=>{
+            // Restart whole game from intro (Mula screen)
+            clStopAllAudio();
+            if (clAnimId) { cancelAnimationFrame(clAnimId); clAnimId = null; }
+            sessionStorage.removeItem('tk_state');
+            window.location.reload();
+        },{once:true});
+    }
+    window.triggerClosing = triggerClosing;
+    // ===== END CLOSING JS =====
+
 </script>
 
+<!-- ===== CLOSING ANIMATION ===== -->
+<div id="closing-stage">
+  <div id="closing-canvas" style="position:relative;width:800px;height:500px;">
+    <canvas id="cl-c" width="800" height="500" style="position:absolute;top:0;left:0;"></canvas>
+    <div id="closing-ui" style="position:absolute;inset:0;pointer-events:none;">
+      <div id="cl-dialog">
+        <div id="cl-dialog-name">Wira — Penjaga TataKembara</div>
+        <div id="cl-dialog-text"></div>
+        <div id="cl-dialog-next">▼ klik untuk teruskan</div>
+      </div>
+      <div id="cl-end-card">
+        <div id="cl-end-title">TataKembara — Tamat</div>
+        <div id="cl-end-sub">Teruskan belajar, pengembara.</div>
+        <button id="cl-replay-btn">🎮 Main semula</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== END CLOSING ===== -->
 </body>
 </html>
